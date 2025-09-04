@@ -1,0 +1,322 @@
+## 2.4.2 Executing tasks in parallel
+
+**Q351. Concurrency vs parallelism in JS—what’s the difference?**
+👉 Answer: JS is **single-threaded** on the main thread; it achieves **concurrency** by interleaving async work via the **event loop**. True **parallelism** needs separate threads/processes (e.g., **Web Workers**/Node workers). 📌 For I/O (fetch, timers), start tasks together and let the runtime overlap them.
+
+**Q352. How do I start multiple async tasks truly “in parallel” (I/O)?**
+👉 Answer: Kick them off **before** awaiting, then join with `Promise.all`.
+
+```js
+const aP = fetch(aURL).then(r=>r.json());
+const bP = fetch(bURL).then(r=>r.json());
+const [a, b] = await Promise.all([aP, bP]);
+```
+
+📌 Starting then awaiting together avoids accidental **serialization**.
+
+**Q353. How do I keep results in input order when completion order differs?**
+👉 Answer: `Promise.all` **preserves order by index**, regardless of finish times.
+📌 Don’t sort by completion—use array positions to correlate inputs/outputs.
+
+**Q354. How do I handle “some succeed, some fail” without aborting all?**
+👉 Answer: Use **`Promise.allSettled`** or map each task to **catch** its own error.
+
+```js
+const out = await Promise.allSettled(tasks.map(t => t()));
+// or
+const out = await Promise.all(tasks.map(t => t().catch(e => ({ error: e }))));
+```
+
+📌 `allSettled` never rejects; inspect each entry.
+
+**Q355. How do I cap concurrency (e.g., only 5 requests at a time)?**
+👉 Answer: Use a **pool/limiter**.
+
+```js
+async function mapLimit(items, limit, worker){
+  const out = new Array(items.length); let i=0; const running = new Set();
+  async function run(){
+    if (i>=items.length) return;
+    const idx = i++, p = worker(items[idx]).then(v => (out[idx]=v));
+    running.add(p); p.finally(()=>running.delete(p)).finally(run);
+  }
+  for (let k=0;k<Math.min(limit, items.length);k++) run();
+  await Promise.all([...running]);
+  return out;
+}
+```
+
+📌 Prevents **rate-limit** hits and memory spikes.
+
+**Q356. I only need the *first* successful result—what pattern fits?**
+👉 Answer: Use **`Promise.any`** and **abort** the others if possible.
+
+```js
+const ctl = new AbortController();
+const tryMirror = u => fetch(u, { signal: ctl.signal });
+const winner = await Promise.any(urls.map(tryMirror));
+ctl.abort(); // cancel losers if supported
+```
+
+📌 Pair with **AbortController** to free resources.
+
+---
+
+## 2.4.3 Fetch APIs 📌
+
+**Q357. What does `fetch` return, and when does it reject?**
+👉 Answer: `fetch(url, init?)` returns a **Promise\<Response>**. It **rejects only** on **network errors/abort**—**not** for HTTP 4xx/5xx. Check `res.ok`/`res.status`.
+
+```js
+const res = await fetch(url);
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+```
+
+📌 Many bugs come from assuming 404/500 **reject**—they don’t.
+
+**Q358. How do I read a response body? Can I read it twice?**
+👉 Answer: Use **one** of `.json()`, `.text()`, `.blob()`, `.arrayBuffer()` (or stream). A body is **consumable once**; subsequent reads fail.
+📌 Clone first if you must read twice: `const copy = res.clone()`.
+
+**Q359. How do I POST JSON correctly?**
+👉 Answer: Set `Content-Type` and `JSON.stringify` the body; handle non-OK.
+
+```js
+const res = await fetch(api, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+});
+if (!res.ok) throw new Error(await res.text());
+const data = await res.json();
+```
+
+📌 Server must actually expect JSON.
+
+**Q360. How do I upload files or form data?**
+👉 Answer: Use **`FormData`**; **don’t** set `Content-Type` manually.
+
+```js
+const fd = new FormData();
+fd.append('avatar', file);
+fd.append('name', 'Dilip');
+await fetch('/upload', { method: 'POST', body: fd });
+```
+
+📌 The browser sets the correct **multipart boundary**.
+
+**Q361. What’s a clean way to build query strings?**
+👉 Answer: Use **`URL`** and **`URLSearchParams`**.
+
+```js
+const u = new URL('/search', origin);
+u.search = new URLSearchParams({ q: 'js', page: 2 });
+const res = await fetch(u);
+```
+
+📌 Handles encoding safely.
+
+**Q362. How do I add a timeout/abort?**
+👉 Answer: Use **`AbortController`** (or `AbortSignal.timeout` where available).
+
+```js
+const ctl = new AbortController();
+const t = setTimeout(()=>ctl.abort(), 8000);
+try { await fetch(url, { signal: ctl.signal }); }
+finally { clearTimeout(t); }
+```
+
+📌 Always clear timers; handle `AbortError`.
+
+**Q363. CORS in a nutshell—what should I know?**
+👉 Answer: The **same-origin policy** blocks reading cross-origin responses unless the server sends `Access-Control-Allow-Origin` (and more for **credentials**). Some requests trigger **preflight** (OPTIONS).
+📌 `mode:"no-cors"` returns **opaque** responses—basically unreadable.
+
+**Q364. How do cookies/credentials work with `fetch`?**
+👉 Answer: Set `credentials` appropriately:
+
+* `'same-origin'` (default for same origin)
+* `'include'` (send cookies cross-site if server allows)
+  Server must send: `Access-Control-Allow-Credentials: true` and a **non-`*`** `Allow-Origin`.
+  📌 Mind **`SameSite`** cookie attributes and **CSRF** tokens.
+
+**Q365. What about redirects?**
+👉 Answer: `fetch` follows by default (`redirect:'follow'`). You can set `redirect:'error'` or `'manual'` (limited info exposed).
+📌 Be careful with credentialed cross-origin redirects.
+
+**Q366. Can I stream large responses progressively?**
+👉 Answer: Yes—use **ReadableStream**.
+
+```js
+const res = await fetch(url);
+const reader = res.body.getReader();
+let received = 0;
+for(;;){
+  const {value, done} = await reader.read();
+  if (done) break;
+  received += value.byteLength; // process chunk
+}
+```
+
+📌 Good for **large files** or **NDJSON**.
+
+**Q367. Can I track upload progress with `fetch`?**
+👉 Answer: Browser `fetch` still lacks **upload progress events** in most cases. Use **XHR** for granular progress, or **streams** where supported.
+📌 For downloads, stream reading allows manual progress.
+
+**Q368. How does HTTP caching interact with `fetch`?**
+👉 Answer: Respect server headers: `Cache-Control`, `ETag`, `Last-Modified`. Or use the **Cache Storage API** (often via a **Service Worker**) for app-controlled caching.
+📌 Prefer **revalidation** over blanket `no-store` for performance.
+
+**Q369. What is `keepalive` (and `sendBeacon`) for unload-safe calls?**
+👉 Answer: `fetch(..., { keepalive:true })` or `navigator.sendBeacon` lets small requests outlive page unload (analytics/logs).
+📌 There are **size limits**; keep payloads small and fire-and-forget.
+
+**Q370. Security tips for `fetch` in SPAs?**
+👉 Answer: 📌 Validate & sanitize inputs, use **CSRF tokens** for cookie-auth, prefer **token + `Authorization`** headers, lock down CORS, and never echo untrusted HTML. Use **`Content-Security-Policy`** to limit script sources.
+
+---
+
+## 2.4.4 `setTimeout` & `setInterval` 📌
+
+**Q371. When should I prefer `setTimeout` over `setInterval`?**
+👉 Answer: `setInterval` can **pile up** if the handler is slower than the interval, causing drift and reentrancy. Prefer a **self-scheduling `setTimeout`** that schedules the **next** run after the current finishes.
+
+```js
+function tick(){
+  doWork().finally(()=> setTimeout(tick, 1000));
+}
+setTimeout(tick, 1000);
+```
+
+📌 Gives you **backpressure** and less drift.
+
+**Q372. Why isn’t `setTimeout(fn, 0)` immediate?**
+👉 Answer: Timers are **macrotasks**; they run **after** the current stack and **after microtasks**. Browsers also apply **minimum clamping** (and heavier throttling in background tabs).
+📌 For ASAP post-tick work, use **`queueMicrotask`**.
+
+**Q373. How do microtasks relate to timers?**
+👉 Answer: Microtasks (e.g., **Promise callbacks**) run **before** timers.
+
+```js
+setTimeout(()=>console.log('timeout'));
+Promise.resolve().then(()=>console.log('then'));
+// logs: then → timeout
+```
+
+📌 Use `queueMicrotask(fn)` for deterministic “after current call” behavior.
+
+**Q374. How do I cancel timers reliably?**
+👉 Answer: Store the ID and call the clear function.
+
+```js
+const id = setInterval(tick, 500);
+clearInterval(id);
+```
+
+📌 In modern runtimes, **`AbortSignal.timeout(ms)`** or `AbortController` can coordinate cancellation across APIs that support `signal`.
+
+**Q375. When is `requestAnimationFrame` better than timers?**
+👉 Answer: For **visual updates**, `requestAnimationFrame` syncs with the display’s **refresh cycle** → smoother animations and less jank.
+
+```js
+let running = true;
+function step(t){ if (!running) return; update(); requestAnimationFrame(step); }
+requestAnimationFrame(step);
+```
+
+📌 Cancel with `cancelAnimationFrame`.
+
+**Q376. Show robust debounce and throttle with timers.**
+👉 Answer:
+
+```js
+// Debounce: run after inactivity window
+function debounce(fn, wait=300){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), wait); };
+}
+// Throttle: run at most once per window
+function throttle(fn, wait=300){
+  let last=0, t;
+  return (...args)=>{
+    const now = Date.now(), remaining = wait - (now - last);
+    if (remaining <= 0){ last = now; fn(...args); }
+    else if (!t){ t=setTimeout(()=>{ t=null; last=Date.now(); fn(...args); }, remaining); }
+  };
+}
+```
+
+📌 Debounce = **group bursts**; Throttle = **limit frequency**.
+
+---
+
+## 2.4.5 Generators and Iterators
+
+**Q377. What is a generator function and what does it return?**
+👉 Answer: A generator (`function*`) can **pause** with `yield` and **resume** via `.next()`. It returns an **iterator** (with `next/throw/return`) and is also **iterable** (has `[Symbol.iterator]`).
+
+```js
+function* ids(){ let i=0; while(true) yield i++; }
+const g = ids(); g.next(); // {value:0, done:false}
+```
+
+📌 Great for **lazy sequences** and **custom control flow**.
+
+**Q378. How does `yield*` work?**
+👉 Answer: It **delegates** to another iterable/generator, yielding its values seamlessly.
+
+```js
+function* g1(){ yield 1; yield 2; }
+function* g2(){ yield* g1(); yield 3; }
+[...g2()]; // [1,2,3]
+```
+
+📌 Useful for composing iterables.
+
+**Q379. Practical uses for generators?**
+👉 Answer: 📌 **Lazy data pipelines**, **in-order tree/graph traversal**, **flattening**, **back-pressure friendly** processing, and implementing **finite state machines**.
+
+```js
+function* inorder(node){ if (!node) return; yield* inorder(node.left); yield node.val; yield* inorder(node.right); }
+```
+
+**Q380. How do I make any object iterable?**
+👉 Answer: Define `[Symbol.iterator]()` to return an iterator.
+
+```js
+const range = {
+  from:1, to:3,
+  [Symbol.iterator](){ let i=this.from; return { next:()=>({ value:i, done: i++>this.to }) }; }
+};
+[...range]; // [1,2,3]
+```
+
+📌 Enables `for...of`, spread, destructuring.
+
+**Q381. What’s the difference between generators and async generators?**
+👉 Answer: **Async generators** (`async function*`) yield **Promises** and are consumed with **`for await...of`**.
+
+```js
+async function* stream(urls){ for (const u of urls) yield fetch(u).then(r=>r.text()); }
+for await (const text of stream(urls)) { /* ... */ }
+```
+
+📌 Fit for **incremental async** data.
+
+**Q382. Can I send values *into* a generator?**
+👉 Answer: Yes—`gen.next(value)` passes `value` back into the paused `yield` expression.
+
+```js
+function* echo(){ const x = yield "send me"; return x; }
+const g = echo(); g.next();        // {value:"send me"}
+g.next(42);                        // returns {value:42, done:true}
+```
+
+📌 Enables **two-way** communication.
+
+**Q383. Do generators replace async/await?**
+👉 Answer: Not anymore. Generators once powered async via “co” libraries, but **`async/await`** is now standard. Generators shine for **lazy synchronous** flows and **custom iteration**.
+📌 Use **async generators** for streaming async sequences.
+
+**Q384. Any pitfalls with generators?**
+👉 Answer: They hold **internal state** (not reentrant), can be **partially consumed**, and errors thrown in them must be handled. 📌 Document consumption contract (single pass, restart by creating a new iterator).
