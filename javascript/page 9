@@ -1,0 +1,241 @@
+## 1.8.5 Prototypes 📌
+
+**Q234. What is a prototype in JavaScript?**
+👉 Answer: A **prototype** is an object that another object **delegates to** for property/method lookups via its internal **`[[Prototype]]`** link. If a property isn’t found on the object, JS looks **up the chain** to its prototype, then that prototype’s prototype, and so on, until `null`.
+📌 Prototype = **fallback storage** for shared behavior.
+
+**Q235. How is an object’s `[[Prototype]]` set?**
+👉 Answer:
+
+* **Object literal**: `[[Prototype]]` → `Object.prototype`.
+* **Array literal**: → `Array.prototype`.
+* **Function (callable)**: → `Function.prototype`.
+* **`new Ctor()`**: → `Ctor.prototype`.
+* **`Object.create(proto)`**: explicitly sets it.
+  📌 Prefer **`Object.create`** or **`class`/`extends`**; avoid mutating later.
+
+**Q236. `prototype` vs `__proto__` vs `[[Prototype]]`—what’s the difference?**
+👉 Answer:
+
+* **`[[Prototype]]`**: the hidden internal link.
+* **`obj.__proto__`**: historic accessor to `[[Prototype]]` (use **`Object.getPrototypeOf`** / **`Object.setPrototypeOf`** instead).
+* **`Func.prototype`**: the object used as **`[[Prototype]]`** for **instances created with `new Func()`**.
+  📌 Don’t confuse **function’s `.prototype`** with **instance’s `__proto__`**.
+
+**Q237. How does property lookup work with the prototype chain?**
+👉 Answer: Read: **search own props → walk prototypes**. Write: if you assign to a **new** property name, it **creates an own property** (shadowing). If a **setter** exists on the chain, it may intercept.
+
+```js
+const base = { a:1 };
+const obj = Object.create(base);
+obj.a;        // 1 (from base)
+obj.a = 2;    // shadows base.a
+```
+
+📌 Use `hasOwnProperty`/`Object.hasOwn` to distinguish own vs inherited.
+
+**Q238. How do you create a “dictionary” without prototype pollution?**
+👉 Answer:
+
+```js
+const dict = Object.create(null);  // no Object.prototype
+dict.toString; // undefined (safe)
+```
+
+📌 Great for **plain key-value** maps without inherited keys.
+
+**Q239. What is property shadowing?**
+👉 Answer: Defining an **own property** with the same name as one on the prototype **hides** (shadows) the inherited one during lookup.
+📌 Deleting the own property reveals the inherited again.
+
+**Q240. Should I change prototypes at runtime? (`Object.setPrototypeOf`)**
+👉 Answer: Avoid—it’s **slow** and can deoptimize engines. Prefer constructing objects with the **correct prototype** (`Object.create`, `class`) from the start.
+📌 Prototype is best treated as **immutable** post-creation.
+
+**Q241. How do I test for presence correctly—own vs anywhere?**
+👉 Answer:
+
+* Own only: `Object.hasOwn(obj, "k")` or `obj.hasOwnProperty("k")`.
+* Anywhere on the chain: `"k" in obj`.
+  📌 Use the right check to avoid **false assumptions**.
+
+---
+
+## 1.8.6 `Object.freeze()` vs `Object.seal()`
+
+**Q242. What’s the difference between `freeze`, `seal`, and `preventExtensions`?**
+👉 Answer:
+
+* **`Object.preventExtensions(o)`**: can’t **add** new props.
+* **`Object.seal(o)`**: preventExtensions **+** can’t **delete** props; existing props stay writable.
+* **`Object.freeze(o)`**: seal **+** make **all data props non-writable** (deep values still mutable).
+  📌 All are **shallow**.
+
+**Q243. How do I check these states?**
+👉 Answer:
+
+```js
+Object.isExtensible(o); // false → prevented
+Object.isSealed(o);     // true  → sealed
+Object.isFrozen(o);     // true  → frozen
+```
+
+**Q244. Do `freeze`/`seal` affect arrays?**
+👉 Answer: Yes—arrays are objects.
+
+* **Seal**: can’t change length by deleting indices, but can **overwrite existing indices**.
+* **Freeze**: cannot change elements, length, or descriptors.
+  📌 Methods that mutate (e.g., `push`) will **fail** (or throw in strict mode) on frozen arrays.
+
+**Q245. How to “deep-freeze” an object?**
+👉 Answer: Recursively freeze nested objects you care about:
+
+```js
+function deepFreeze(o){
+  Object.freeze(o);
+  for (const v of Object.values(o))
+    if (v && typeof v === "object" && !Object.isFrozen(v)) deepFreeze(v);
+  return o;
+}
+```
+
+📌 Beware of **cycles** (track visited).
+
+**Q246. When should I use `freeze` or `seal`?**
+👉 Answer:
+
+* Use **`freeze`** for **immutable config/state** at runtime.
+* Use **`seal`** for **stable shape** while allowing value updates.
+  📌 In apps, consider **persistent/immutable** libs or **`structuredClone`** + copy-on-write patterns.
+
+---
+
+## 1.9.1 Prototype Inheritance and Chain
+
+**Q247. How do I set up inheritance with constructor functions (ES5 style)?**
+👉 Answer:
+
+```js
+function Animal(n){ this.n = n; }
+Animal.prototype.speak = function(){ return this.n + "..." };
+
+function Dog(n){ Animal.call(this, n); }             // 1) call parent ctor
+Dog.prototype = Object.create(Animal.prototype);     // 2) link prototypes
+Dog.prototype.constructor = Dog;                     // 3) fix constructor
+Dog.prototype.speak = function(){ return Animal.prototype.speak.call(this) + " woof"; }
+```
+
+📌 Three steps: **call**, **link**, **restore constructor**.
+
+**Q248. How does `class`/`extends` express the same thing?**
+👉 Answer:
+
+```js
+class Animal { constructor(n){ this.n = n; } speak(){ return `${this.n}...`; } }
+class Dog extends Animal { speak(){ return super.speak() + " woof"; } }
+```
+
+📌 `extends` builds the **same prototype chain**; `super` for parent access.
+
+**Q249. How do I inspect the chain?**
+👉 Answer:
+
+```js
+Object.getPrototypeOf(dog) === Dog.prototype;                    // instance → class prototype
+Object.getPrototypeOf(Dog.prototype) === Animal.prototype;       // subclass → parent
+Animal.prototype.isPrototypeOf(dog);                             // true
+```
+
+📌 `isPrototypeOf` checks membership **anywhere** in the chain.
+
+**Q250. What pitfalls exist with shared mutable state on prototypes?**
+👉 Answer: Don’t put **mutable objects** (e.g., arrays) on prototypes, or all instances will **share** them.
+
+```js
+function C(){ }
+C.prototype.items = [];    // BAD: shared
+```
+
+📌 Put per-instance state on `this` inside the **constructor**.
+
+**Q251. How do I call a “super method” without classes?**
+👉 Answer: Use parent prototype method with **`call`**:
+
+```js
+Child.prototype.method = function(){
+  Parent.prototype.method.call(this);    // super
+  // child work...
+};
+```
+
+📌 Mirrors `super.method()` semantics.
+
+**Q252. Can I mix prototypes with composition?**
+👉 Answer: Yes—inherit for the **is-a** core, and **mix in** capabilities with `Object.assign` or factories.
+📌 Don’t overuse inheritance; **favor composition** for optional features.
+
+---
+
+## 1.9.2 Array Methods: `map`, `reduce`, `filter`, `forEach` 📌
+
+**Q253. What are the core differences between `forEach`, `map`, `filter`, and `reduce`?**
+👉 Answer:
+
+* **`forEach`**: iterate with **side effects**; returns **`undefined`**.
+* **`map`**: **transform** each element; returns **same-length** array.
+* **`filter`**: **select** elements by predicate; returns **subset**.
+* **`reduce`**: **accumulate** to a single value (or any shape).
+  📌 Prefer **pure callbacks** (no mutations) for predictability.
+
+**Q254. Can I `break` out of `forEach`?**
+👉 Answer: No. Use a plain `for`/`for...of`, or methods that short-circuit: **`some`** (stops on `true`) or **`every`** (stops on `false`).
+
+```js
+if (arr.some(x => x > 10)) { /* found */ }
+```
+
+**Q255. How do these methods handle sparse arrays (holes)?**
+👉 Answer: `map`, `filter`, `forEach`, `reduce` **skip holes** (don’t call the callback for missing indices).
+
+```js
+const a = [ , 1, , 2 ];
+a.map(x => x ?? 0); // [ , 1, , 2 ] → callbacks only for present indices
+```
+
+📌 If you need to treat holes as values, **normalize** first.
+
+**Q256. What are common `reduce` patterns (and initial value pitfalls)?**
+👉 Answer: Always provide an **initial value** to avoid edge cases on empty arrays. Patterns:
+
+```js
+// sum
+arr.reduce((acc, x) => acc + x, 0);
+
+// groupBy
+arr.reduce((acc, x) => ((acc[x.type] ??= []).push(x), acc), {});
+
+// indexBy id
+arr.reduce((acc, x) => (acc[x.id] = x, acc), {});
+```
+
+📌 Without an initial value, reduce uses the **first present element** as `acc`.
+
+**Q257. Map vs chain (map→filter) vs single `reduce`—performance?**
+👉 Answer: One `reduce` can fuse work, but modern engines optimize well; prefer **clarity**. If arrays are **huge/hot paths**, consider **fusion** or **transducers**.
+📌 Micro-opt only after measuring.
+
+**Q258. Do these callbacks run async? Can I `await` inside?**
+👉 Answer: They are **synchronous**. Using `async` makes the callback return a **promise**, which `map/filter/reduce` **won’t await**.
+
+```js
+// WRONG for sequencing
+arr.map(async x => await fetch(x));
+// RIGHT: Promise.all
+await Promise.all(arr.map(x => fetch(x)));
+```
+
+📌 For sequential async, use a **for...of with await** or **reduce with awaits** carefully.
+
+**Q259. How to avoid unintended mutations with array transforms?**
+👉 Answer: Treat inputs as **immutable**: use `map/filter/reduce` to build **new arrays**; for sorted views: `arr.slice().sort(...)`.
+📌 Mutators: `push/pop/shift/unshift/splice/sort/reverse/fill/copyWithin`—use on **copies** unless mutation is intended.
