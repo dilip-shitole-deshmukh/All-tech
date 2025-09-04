@@ -1,0 +1,175 @@
+## 2.4.6 Web Workers
+
+**Q385. What are Web Workers and why are they needed?**
+👉 Answer: Web Workers are background threads in the browser that let you run **JavaScript off the main UI thread**. They are used for **CPU-intensive tasks** (e.g., image processing, large computations) so the main thread stays responsive.
+📌 Workers **don’t share state** with the main thread; instead, they communicate by **message passing** (`postMessage` + `onmessage`).
+
+---
+
+**Q386. How do you create and communicate with a worker?**
+👉 Answer:
+
+Main thread:
+
+```js
+const worker = new Worker('worker.js');
+worker.postMessage({ input: 42 });
+worker.onmessage = (e) => console.log("Result:", e.data);
+```
+
+`worker.js`:
+
+```js
+onmessage = (e) => {
+  const { input } = e.data;
+  postMessage(input * 2);
+};
+```
+
+📌 Data passed must be **structured clonable** (objects, arrays, primitives). Functions, DOM nodes, etc., cannot be transferred.
+
+---
+
+**Q387. What is transferable vs clonable data in Workers?**
+👉 Answer: Normally, data is **copied** (structured cloning). But for **large binary data** (`ArrayBuffer`, `MessagePort`), you can transfer ownership instead of copying:
+
+```js
+const ab = new ArrayBuffer(8);
+worker.postMessage(ab, [ab]);  // ab transferred, now unusable here
+```
+
+📌 Transfers improve performance for **large data**.
+
+---
+
+**Q388. What are Dedicated, Shared, and Service Workers?**
+👉 Answer:
+
+* **Dedicated Worker**: linked to a single page/thread.
+* **Shared Worker**: multiple pages/tabs from the same origin can connect to it.
+* **Service Worker**: a background proxy between page and network, for **offline caching**, **push notifications**, **background sync**.
+  📌 Each solves different app problems: performance, multi-tab state, offline-first.
+
+---
+
+**Q389. Can Workers access the DOM?**
+👉 Answer: ❌ No. Workers don’t have access to the DOM, `document`, or `window`. They run in an isolated thread with only `self` as the global.
+📌 They can **compute**, then send results back for the main thread to apply to the DOM.
+
+---
+
+**Q390. How do you terminate a worker?**
+👉 Answer:
+
+* From main: `worker.terminate()` (immediately stops).
+* From inside worker: `self.close()`.
+  📌 Always clean up idle workers to save memory and CPU.
+
+---
+
+**Q391. What are common pitfalls with Workers?**
+👉 Answer:
+
+* Heavy **startup cost** (loading script + spin-up).
+* **Context isolation**: can’t directly share DOM or closures.
+* **Debugging** is harder (must inspect separate thread).
+* Not available in all environments (e.g., older browsers).
+  📌 Use when **long-running computation** would otherwise block UI.
+
+---
+
+## 2.4.7 Caching 📌
+
+**Q392. What are the main browser caching layers?**
+👉 Answer:
+
+1. **HTTP cache** (driven by server headers like `Cache-Control`, `ETag`).
+2. **Service Worker cache** (via Cache Storage API, controlled by app).
+3. **IndexedDB/localStorage/sessionStorage** (manual app-managed caches).
+   📌 Understanding layers helps avoid **stale or double caching**.
+
+---
+
+**Q393. How does HTTP caching work with `Cache-Control`?**
+👉 Answer:
+
+* `Cache-Control: max-age=600` → cache for 10 minutes.
+* `Cache-Control: no-cache` → must revalidate with server (ETag/Last-Modified).
+* `Cache-Control: no-store` → never cache.
+  📌 Combined with `ETag` headers, the browser/server negotiate whether to reuse content.
+
+---
+
+**Q394. What is the Service Worker Cache API?**
+👉 Answer: A programmable cache that lets apps control caching explicitly.
+
+```js
+const cache = await caches.open('v1');
+await cache.put('/data.json', new Response(JSON.stringify({x:1})));
+const res = await cache.match('/data.json');
+```
+
+📌 Enables **offline-first** strategies in PWAs.
+
+---
+
+**Q395. Difference between `localStorage` caching and SW Cache API?**
+👉 Answer:
+
+* `localStorage` stores **strings only**, synchronous (can block main thread).
+* Cache API stores **full responses** (headers + body), async, and efficient for large data.
+  📌 Prefer Cache API for **network responses**; localStorage only for small config.
+
+---
+
+**Q396. What are stale-while-revalidate patterns?**
+👉 Answer: Serve **cached content immediately**, then **fetch in background** to update cache for next time.
+
+```js
+async function staleWhileRevalidate(url){
+  const cache = await caches.open('v1');
+  const cached = await cache.match(url);
+  const fetchPromise = fetch(url).then(res => { cache.put(url, res.clone()); return res; });
+  return cached || fetchPromise; // return fast, update in background
+}
+```
+
+📌 Balances **speed** + **freshness**.
+
+---
+
+**Q397. How do ETag and Last-Modified work in caching?**
+👉 Answer:
+
+* **ETag**: server sends a hash; browser revalidates with `If-None-Match`.
+* **Last-Modified**: server sends a timestamp; browser revalidates with `If-Modified-Since`.
+  If unchanged, server replies **304 Not Modified**, saving bandwidth.
+  📌 Use ETag for finer granularity; timestamps can miss millisecond changes.
+
+---
+
+**Q398. How can caching cause bugs?**
+👉 Answer:
+
+* Serving **stale data** (e.g., user logs out but cached page shows old info).
+* **Hard-to-debug** cache busting issues.
+* Misusing **localStorage** for large objects can block UI.
+  📌 Always plan **cache invalidation** carefully.
+
+---
+
+**Q399. Best practices for app-level caching?**
+👉 Answer:
+
+* Use **unique versioned URLs** for static assets (`/app.v123.js`).
+* Implement **SW caching** for offline pages.
+* Respect **server headers** but override if UX requires.
+* Clear caches when **auth state changes**.
+  📌 Treat caching as part of your **app architecture**, not an afterthought.
+
+---
+
+✅ Stopped at **2.4.7 Caching**.
+Next in sequence: **2.5.1 JavaScript Engines and V8 Engine 📌**.
+
+Would you like me to go **deep into how engines (like V8) parse, optimize, and run JS under the hood**, or keep answers **more practical for interview prep**?
