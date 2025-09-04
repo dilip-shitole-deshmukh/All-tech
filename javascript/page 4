@@ -1,0 +1,317 @@
+## 1.3.3 Closure 📌
+
+**Q72. What are practical uses of closures in real apps?**
+👉 Answer: Closures power **data privacy**, **function factories**, and **stateful utilities**.
+
+```js
+// 1) Data privacy (counter)
+function createCounter() {
+  let count = 0;                  // private
+  return { inc: () => ++count, get: () => count };
+}
+const c = createCounter(); c.inc(); c.get(); // 1
+
+// 2) Function factory
+const add = x => y => x + y;
+add(10)(5); // 15
+
+// 3) Once utility
+function once(fn) {
+  let ran = false, val;
+  return (...args) => ran ? val : (ran = true, val = fn(...args));
+}
+```
+
+📌 Closures **retain access** to outer variables after the outer function has returned.
+
+**Q73. Why do loops with `var` often break closures, and how to fix?**
+👉 Answer: `var` is **function-scoped**, so all callbacks share the **same** `i` value after the loop ends. Use `let` (block scope) or an IIFE.
+
+```js
+for (var i=0;i<3;i++) { setTimeout(()=>console.log(i), 0); } // 3,3,3
+for (let i=0;i<3;i++) { setTimeout(()=>console.log(i), 0); } // 0,1,2
+// or
+for (var i=0;i<3;i++) { (j=>setTimeout(()=>console.log(j),0))(i); }
+```
+
+📌 Prefer `let` for loop indices.
+
+**Q74. Do closures cause memory leaks?**
+👉 Answer: Closures **keep referenced variables alive**. That’s **not a leak** by itself. A leak happens when you **unintentionally** keep references (e.g., long-lived event listeners capturing large objects).
+📌 Fix: **Remove listeners**, **null out** long-lived references, or **scope** them narrowly.
+
+**Q75. How do you build a module (private + public API) with closures?**
+👉 Answer: Return only the functions you want public; keep internals in the outer scope.
+
+```js
+const wallet = (function(){
+  let balance = 0;                         // private
+  function deposit(x){ balance += x; }
+  function get(){ return balance; }
+  return { deposit, get };                 // public API
+})();
+wallet.deposit(100); wallet.get(); // 100
+```
+
+📌 Classic “Module Pattern” for **encapsulation** before ES modules.
+
+**Q76. How do closures help implement debounce (concept preview)?**
+👉 Answer: The returned function **remembers** the timer ID across calls.
+
+```js
+function debounce(fn, wait=300){
+  let t;
+  return (...args)=>{
+    clearTimeout(t);
+    t = setTimeout(()=>fn(...args), wait);
+  };
+}
+```
+
+📌 The inner function closes over `t` to manage the timer state.
+
+---
+
+## 1.3.4 `new`, Constructor, `instanceof`, Instances
+
+**Q77. What exactly happens when you use `new` with a function?**
+👉 Answer: `new Foo(args)` performs:
+
+1. **Create** a new empty object.
+2. **Link** it to `Foo.prototype`.
+3. **Bind** `this` inside `Foo` to that object.
+4. **Run** `Foo(...)`.
+5. **Return** the new object (unless Foo returns an object explicitly).
+   📌 This is the **constructor call** path.
+
+**Q78. How do you write a constructor function? Any conventions?**
+👉 Answer: A constructor is a **normal function** intended for `new`. Convention: **Capitalize** the name; put shared methods on **`FunctionName.prototype`**.
+
+```js
+function Person(name){ this.name = name; }
+Person.prototype.sayHi = function(){ return `Hi ${this.name}`; };
+const p = new Person("Dilip");
+```
+
+📌 Methods on the prototype are **shared** across instances.
+
+**Q79. How does this differ from ES6 `class`?**
+👉 Answer: `class` is **syntactic sugar** over prototypal inheritance, adding cleaner syntax, `constructor`, `extends`, `super`, and fields. Under the hood it still uses **prototypes**.
+📌 `class` is **not hoisted** like function declarations and runs in **strict mode**.
+
+**Q80. How does `instanceof` work?**
+👉 Answer: `a instanceof Ctor` checks whether **`Ctor.prototype`** is found anywhere in `a`’s **prototype chain**.
+
+```js
+p instanceof Person; // true
+```
+
+📌 It doesn’t check constructors by name—only the **prototype chain**.
+
+**Q81. What if a constructor returns something?**
+👉 Answer: If it **returns an object**, that object **replaces** the new instance. If it returns a **primitive**, the primitive is **ignored** and the new instance is returned.
+
+```js
+function F(){ this.x=1; return {y:2}; }
+new F(); // {y:2}
+```
+
+📌 Returning objects from constructors is **uncommon** and confusing.
+
+**Q82. Can arrow functions be constructors?**
+👉 Answer: **No.** Arrow functions lack `[[Construct]]` and a `prototype` property.
+
+```js
+const A = () => {};
+new A(); // TypeError
+```
+
+📌 Use **function** or **class** for constructors.
+
+**Q83. What’s the difference between `.prototype` and `__proto__`?**
+👉 Answer:
+
+* **`Function.prototype`**: the object used for instances created with `new Function()`.
+* **`obj.__proto__`**: the **actual internal link** to the object’s prototype (now standardized as `Object.getPrototypeOf(obj)`).
+  📌 Don’t assign to `__proto__` in production; use `Object.create()` or class/extends.
+
+**Q84. How to implement a simple `myNew` polyfill?**
+👉 Answer:
+
+```js
+function myNew(Ctor, ...args){
+  const obj = Object.create(Ctor.prototype); // link
+  const ret = Ctor.apply(obj, args);         // bind this
+  return (ret && (typeof ret === 'object' || typeof ret === 'function')) ? ret : obj;
+}
+```
+
+📌 Mirrors the **`new`** algorithm.
+
+---
+
+## 1.3.5 `undefined` vs `not defined`
+
+**Q85. Difference between `undefined` and `ReferenceError: x is not defined`?**
+👉 Answer:
+
+* **`undefined`**: a **value** meaning “declared but not assigned”.
+* **`not defined`**: the identifier **doesn’t exist** in any scope → **ReferenceError**.
+
+```js
+let a;        // declared, no value
+console.log(a);     // undefined
+console.log(b);     // ReferenceError: b is not defined
+```
+
+📌 Don’t confuse the **value** `undefined` with a **missing binding**.
+
+**Q86. Why does `typeof missingVar` not throw?**
+👉 Answer: `typeof` is **safe**: for undeclared identifiers it returns the string `"undefined"` instead of throwing.
+
+```js
+typeof foo; // "undefined"
+```
+
+📌 Useful for **feature detection** without crashing.
+
+**Q87. Should I assign `undefined` manually?**
+👉 Answer: Prefer **`null`** to signal “intentional emptiness” and let `undefined` mean “uninitialized”.
+
+```js
+let user = null; // explicit "no user"
+```
+
+📌 Avoid writing `x = undefined`; use `delete obj.prop` for properties you want to remove.
+
+**Q88. How to safely check if a global exists?**
+👉 Answer:
+
+```js
+if (typeof window !== 'undefined') { /* browser */ }
+if (typeof process !== 'undefined') { /* Node */ }
+```
+
+📌 Avoid direct reference to unknown names without `typeof`.
+
+---
+
+## 1.4.1 `this`, `call`, `apply`, `bind` 📌
+
+**Q89. When should I use `call`, `apply`, or `bind`?**
+👉 Answer:
+
+* **`call`**: invoke now, pass args individually.
+* **`apply`**: invoke now, pass args as **array**.
+* **`bind`**: **return** a new function with fixed `this` (and optional partial args).
+
+```js
+function greet(g, n){ return `${g} ${n}`; }
+greet.call(null, "Hello", "Dilip");
+greet.apply(null, ["Hello", "Dilip"]);
+const hiDilip = greet.bind(null, "Hello", "Dilip");
+hiDilip(); // "Hello Dilip"
+```
+
+📌 `bind` is for **callbacks**; `call/apply` are for **immediate** invocation.
+
+**Q90. How does partial application with `bind` work?**
+👉 Answer: Pre-fill some arguments and get a new function.
+
+```js
+const add = (a,b,c) => a+b+c;
+const add5 = add.bind(null, 5);
+add5(10, 2); // 17
+```
+
+📌 Handy for **customized callbacks**.
+
+**Q91. What is method borrowing with `call/apply`?**
+👉 Answer: Use another object’s method as if it were your own.
+
+```js
+function list(){ return Array.prototype.join.call(arguments, "-"); }
+list(1,2,3); // "1-2-3"
+```
+
+📌 Before rest/spread, borrowing was common for `arguments` → array tricks.
+
+**Q92. What if I `bind` a function and then use `new` on it? Who wins?**
+👉 Answer: **Constructor (`new`) binding wins** over `bind` for `this`, but **bound arguments remain**.
+
+```js
+function P(name){ this.name = name; }
+const B = P.bind({ fake: true }, "BoundName");
+const p = new B(); 
+p.name; // "BoundName", `this` is the new instance, not {fake:true}
+```
+
+📌 `new` ignores the bound `this` but keeps **pre-applied args**.
+
+**Q93. How to write a minimal `bind` polyfill?**
+👉 Answer:
+
+```js
+Function.prototype.myBind = function(ctx, ...preset){
+  const fn = this;
+  function bound(...rest){
+    const isNew = this instanceof bound;
+    return fn.apply(isNew ? this : ctx, [...preset, ...rest]);
+  }
+  bound.prototype = Object.create(fn.prototype);
+  return bound;
+};
+```
+
+📌 Supports `new` behavior and preserves the prototype chain.
+
+---
+
+## 1.4.2 `class` Keyword
+
+**Q94. What does `class` add to JavaScript?**
+👉 Answer: A **clean syntax** for prototype-based OO: `constructor`, instance methods, **static** methods, **extends**, **super**, public/ private fields.
+
+```js
+class Person {
+  static create(name){ return new Person(name); } // static
+  #ssn;                                          // private field
+  constructor(name){ this.name = name; this.#ssn = 123; }
+  say(){ return `Hi ${this.name}`; }
+}
+```
+
+📌 Class bodies are **strict mode**; methods are **non-enumerable** by default.
+
+**Q95. How do inheritance and `super` work with classes?**
+👉 Answer: `extends` sets the prototype chain; `super()` calls the **parent constructor**; `super.method()` calls parent methods.
+
+```js
+class Animal { constructor(n){ this.n = n; } speak(){ return `${this.n}...`; } }
+class Dog extends Animal {
+  speak(){ return super.speak() + " woof"; }
+}
+new Dog("Bruno").speak(); // "Bruno... woof"
+```
+
+📌 In a subclass, you **must call `super()` before using `this`** in the constructor.
+
+**Q96. Are class methods hoisted? Any pitfalls?**
+👉 Answer: **Classes are not hoisted** like functions; you must **define before use**. Using **arrow class fields** captures lexical `this`, useful for callbacks.
+
+```js
+class C {
+  count = 0;
+  onClick = () => { this.count++; }; // arrow keeps `this`
+}
+```
+
+📌 Don’t overuse arrow methods if you need **dynamic receivers** (e.g., method reuse via `call`).
+
+**Q97. How do classes differ from constructor functions at runtime?**
+👉 Answer:
+
+* Class **constructor must be called with `new`**; calling without `new` throws.
+* Methods defined in `class {}` are **non-enumerable**.
+* Class body code runs in **strict mode**.
+  📌 Semantics are tighter; behavior is less “forgiving” than plain functions.
