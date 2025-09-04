@@ -1,0 +1,242 @@
+## 1.2.5 Scopes (Function, Block, Lexical) 📌
+
+**Q46. What is “scope” in JavaScript and what kinds exist?**
+👉 Answer: Scope is the **current region of code where variables are accessible**. JS has three primary scopes: **global scope**, **function scope** (created by `function`), and **block scope** (created by `{}` with `let`/`const`). There’s also **lexical scope**, meaning inner scopes can access outer-scope variables. 📌 Proper scoping avoids name clashes and unintended access.
+
+**Q47. How do function scope and block scope differ?**
+👉 Answer: Variables declared with `var` are **function-scoped** (visible anywhere inside the function), while `let`/`const` are **block-scoped** (visible only inside the nearest `{}` block).
+
+```js
+function demo() {
+  if (true) {
+    var x = 1;      // function-scoped
+    let y = 2;      // block-scoped
+  }
+  console.log(x);   // 1
+  console.log(y);   // ReferenceError
+}
+```
+
+📌 Prefer `let`/`const` to avoid accidental leakage across blocks.
+
+**Q48. What is lexical scope?**
+👉 Answer: **Lexical scope** means a function’s accessible variables are determined by **where it is defined**, not where it is called.
+
+```js
+const a = 10;
+function outer() {
+  const b = 20;
+  function inner() { console.log(a, b); }
+  return inner;
+}
+outer()(); // 10 20
+```
+
+📌 The inner function “remembers” `a` and `b` because of its lexical environment.
+
+**Q49. What is variable shadowing and the Temporal Dead Zone (TDZ)?**
+👉 Answer: **Shadowing** occurs when an inner scope declares a variable with the same name as an outer one, hiding it. **TDZ** is the period between block entry and declaration where `let`/`const` exist but are **not initialized**, causing a ReferenceError if accessed.
+
+```js
+let x = 1;
+{
+  // TDZ for y starts here
+  // console.log(y); // ReferenceError
+  let y = 2;        // TDZ ends
+  let x = 3;        // shadows outer x
+}
+```
+
+📌 TDZ prevents using variables before their declaration, reducing bugs.
+
+**Q50. How does the scope chain resolve identifiers?**
+👉 Answer: JS looks for a variable **in the current scope first**, then **walks outward** through enclosing lexical scopes until the global scope. If not found, a **ReferenceError** occurs. 📌 This orderly lookup is the **scope chain**.
+
+**Q51. How does hoisting interact with scope?**
+👉 Answer: `var` declarations are **hoisted** (their names are declared at the top of the function scope with value `undefined`), while `let`/`const` are hoisted but remain in **TDZ** until the declaration line. Functions declared with `function` are hoisted **with their definitions**. 📌 Hoisting order + scope rules explain many “weird” behaviors.
+
+---
+
+## 1.2.6 Execution Context
+
+**Q52. What is an Execution Context (EC)?**
+👉 Answer: An EC is the **runtime container** for executing code. It holds:
+
+* **Variable Environment** (var bindings),
+* **Lexical Environment** (let/const, scope chain),
+* **`this` binding**,
+* **Outer environment reference**.
+  📌 Different code runs in different ECs (Global EC, Function EC, eval EC).
+
+**Q53. What happens in the creation vs execution phases of an EC?**
+👉 Answer:
+
+* **Creation phase**: sets up environments, hoists declarations, determines `this`.
+* **Execution phase**: runs code line by line, assigning values and invoking functions.
+
+```js
+console.log(x);  // undefined (var hoisted)
+var x = 5;
+```
+
+📌 Understanding phases clarifies hoisting and TDZ.
+
+**Q54. What are the Variable Environment and Lexical Environment?**
+👉 Answer: Both are **environment records** storing bindings. Historically, **var** went to the **Variable Environment**, while **let/const** go to the **Lexical Environment**. The Lexical Environment also **links to the outer scope** (forming the scope chain). 📌 Practically: think “`var` (function-scope), `let/const` (block-scope).”
+
+**Q55. How is `this` set in an execution context?**
+👉 Answer: `this` is determined **at call time** based on how a function is invoked: default/global, implicit (object method), explicit (call/apply/bind), constructor (`new`), or **lexically** for arrow functions. 📌 In **strict mode**, default `this` is `undefined`; otherwise it’s the global object.
+
+**Q56. How does the call stack relate to execution contexts?**
+👉 Answer: Each function call **creates a new EC** and **pushes it** on the **call stack**. When the function returns, its EC is **popped**.
+
+```js
+function a(){ b(); }
+function b(){ /* ... */ }
+a(); // stack: [global]->a->b
+```
+
+📌 Recursion grows the stack with one EC per call.
+
+---
+
+## 1.2.7 Global vs Function Execution Context
+
+**Q57. What is the Global Execution Context (GEC)?**
+👉 Answer: The GEC is created **once** when the script starts. It creates the **global object** (e.g., `window` in browsers) and sets up **global bindings**. 📌 In modules (`type="module"`), top-level `this` is `undefined`; in scripts, it’s the global object.
+
+**Q58. Do `var`, `let`, and `const` become properties on the global object?**
+👉 Answer: In the browser’s global scope:
+
+* `var x = 1;` → `window.x === 1` (creates a property)
+* `let y = 2; const z = 3;` → **do not** become `window` props
+  📌 Prefer `let/const` to avoid **polluting globals**.
+
+**Q59. What is a Function Execution Context (FEC)?**
+👉 Answer: Created on **each function call**; it holds **its own bindings**, the **`arguments` object**, parameter values, its **lexical environment**, and **`this`** resolution. 📌 Each call has an **independent** FEC, even for the same function.
+
+---
+
+## 1.2.8 Window Object
+
+**Q60. What is the `window` object, and how does it relate to `globalThis`/`self`?**
+👉 Answer: In browsers, **`window`** is the **global object** providing Web APIs (DOM, timers, etc.). **`globalThis`** is a **unified global reference** (works in browsers and Node). **`self`** is `window` in window contexts and the global scope in Web Workers. 📌 Use `globalThis` for cross-environment code.
+
+**Q61. Are `setTimeout`/`setInterval` part of JS or the window?**
+👉 Answer: They’re **Web APIs provided by the environment** (`window` in browsers), not core JS. JS schedules callbacks via the **event loop** after timers expire.
+
+```js
+const id = setTimeout(() => {}, 0);
+clearTimeout(id);
+```
+
+📌 Timers return **IDs** used for clearing.
+
+**Q62. Why avoid adding many globals to `window`?**
+👉 Answer: It causes **name collisions**, hinders maintainability, and complicates testing. Prefer **modules, closures, or namespaces** to encapsulate state. 📌 Global pollution is a common anti-pattern.
+
+---
+
+## 1.3.1 Nested Function Scope
+
+**Q63. How do nested functions access variables?**
+👉 Answer: Inner functions can **read (and modify)** variables from all **outer lexical scopes**.
+
+```js
+function outer(){
+  let count = 0;
+  function inc(){ count++; return count; }
+  return inc;
+}
+const next = outer();
+next(); // 1
+```
+
+📌 This is the foundation of **closures**.
+
+**Q64. Are there risks when inner functions modify outer variables?**
+👉 Answer: Yes—can lead to **unexpected mutations** and tight coupling. Mitigate by using **immutable data** (`const`), returning **new values** instead of mutating, or confining writes to a **single place**.
+
+---
+
+## 1.3.2 `this` Keyword 📌
+
+**Q65. What is `this` in JavaScript?**
+👉 Answer: `this` is a **dynamic reference** to the “owner” of the current execution—**set by how a function is called**, not where it’s defined (except arrow functions). 📌 Understanding call-site rules is critical for debugging.
+
+**Q66. What is the default binding of `this`?**
+👉 Answer:
+
+* **Non-strict**: default `this` → **global object** (`window`).
+* **Strict mode**: default `this` → **`undefined`**.
+
+```js
+function f(){ "use strict"; console.log(this); }
+f(); // undefined
+```
+
+📌 Strict mode avoids accidental global usage.
+
+**Q67. How does implicit binding work (object method calls)?**
+👉 Answer: When a function is called as a **property** of an object, `this` is **that object**.
+
+```js
+const user = { name: "A", hi(){ console.log(this.name); } };
+const h = user.hi;
+h();           // default binding (A? no) => undefined/global
+user.hi();     // "A" (implicit)
+```
+
+📌 **Losing the method** (`const h = user.hi`) loses the binding. Use **`bind`** to fix.
+
+**Q68. What are `call`, `apply`, and `bind` for setting `this`?**
+👉 Answer:
+
+* `fn.call(ctx, ...args)` → calls immediately with `this = ctx`.
+* `fn.apply(ctx, argsArray)` → like call but **array** of args.
+* `fn.bind(ctx, ...args)` → returns a **new function** with fixed `this` (and optional partial args).
+  📌 Use for **method borrowing** or fixing lost context.
+
+**Q69. How do arrow functions handle `this`?**
+👉 Answer: Arrow functions **don’t have their own `this`**; they **lexically inherit** `this` from their defining scope.
+
+```js
+const obj = {
+  id: 1,
+  normal(){ setTimeout(function(){ console.log(this.id); }, 0); },
+  arrow(){ setTimeout(() => { console.log(this.id); }, 0); }
+};
+obj.normal(); // undefined/global
+obj.arrow();  // 1
+```
+
+📌 Great for callbacks; **not** for methods that need dynamic receivers or constructors.
+
+**Q70. How is `this` used in classes and event handlers?**
+👉 Answer: Class methods use **implicit binding** when called via the instance. But passing them as callbacks **loses `this`**; fix by **binding in constructor**, using **class fields with arrow functions**, or by **`fn.bind(this)`**.
+
+```js
+class Btn {
+  constructor(){ this.count = 0; this.onClick = this.onClick.bind(this); }
+  onClick(){ this.count++; }
+}
+```
+
+---
+
+## 1.3.3 Closure 📌
+
+**Q71. What is a closure and why is it useful?**
+👉 Answer: A **closure** is formed when a function **remembers** and can **access** variables from its **lexical scope** even after that outer function has returned.
+
+```js
+function makeCounter(){
+  let c = 0;                 // captured variable
+  return () => ++c;          // inner function closes over `c`
+}
+const next = makeCounter();
+next(); // 1
+next(); // 2
+```
+
+📌 Uses: **data privacy**, **encapsulation**, **function factories**, **memoization**, and **once** utilities.
