@@ -1,0 +1,430 @@
+## 1.4.3 Object-Oriented Programming (OOP) Basics
+
+**Q98. What does OOP mean in JavaScript (prototype-based OOP)?**
+👉 Answer: JavaScript uses **prototype-based OOP**, where objects **inherit directly** from other objects via the **prototype chain**. Core ideas:
+
+* 📌 **Encapsulation**: bundle data + behavior.
+* 📌 **Inheritance**: share behavior via prototypes (`obj → obj.__proto__`).
+* 📌 **Polymorphism**: same interface, different implementations.
+
+```js
+const animal = { speak(){ return "..." } };
+const dog = Object.create(animal);
+dog.speak = function(){ return "woof"; };
+dog.speak();           // "woof"
+Object.getPrototypeOf(dog) === animal; // true
+```
+
+📌 Unlike class-based languages, JS prototypes are **flexible** and **dynamic**.
+
+**Q99. Instance methods vs prototype methods—what’s the difference and why it matters?**
+👉 Answer:
+
+* **Instance methods/properties** are stored **per object** (higher memory if repeated).
+* **Prototype methods** live on `Ctor.prototype` and are **shared** by instances. 📌 Prefer prototype methods for shared behavior.
+
+```js
+function Person(name){ this.name = name; }       // instance property
+Person.prototype.say = function(){ return "Hi "+this.name; }; // shared
+const a = new Person("A"), b = new Person("B");
+a.say === b.say; // true (memory efficient)
+```
+
+**Q100. What is prototypal inheritance? How is it different from classical inheritance?**
+👉 Answer: Prototypal inheritance links objects via **`[[Prototype]]`** (e.g., `Object.create(base)`), while classical uses **classes** to create instances.
+
+```js
+const base = { greet(){ return "hello"; } };
+const obj  = Object.create(base);
+obj.greet(); // "hello"
+```
+
+📌 Prototypal is **object-to-object**; classical is **class-to-instance**. JS `class` is **syntactic sugar** over prototypes.
+
+**Q101. How do you achieve encapsulation/private members?**
+👉 Answer:
+
+* **Closures** (module pattern)
+* **Private class fields** `#field` (ES2022)
+* **Symbols** (semi-private)
+
+```js
+class Bank {
+  #balance = 0;                        // private
+  deposit(x){ if(x>0) this.#balance+=x; }
+  get balance(){ return this.#balance; }
+}
+```
+
+📌 Private fields are **truly private**—inaccessible outside the class.
+
+**Q102. Show polymorphism with method overriding.**
+👉 Answer: Subtypes override a common method. Callers use the **same API**.
+
+```js
+class Shape { area(){ return 0; } }
+class Rect extends Shape { constructor(w,h){ super(); this.w=w; this.h=h; } area(){ return this.w*this.h; } }
+class Circle extends Shape { constructor(r){ super(); this.r=r; } area(){ return Math.PI*this.r*this.r; } }
+[ new Rect(2,3), new Circle(2) ].map(s => s.area());
+```
+
+📌 Polymorphism enables **extensibility** without changing callers.
+
+**Q103. Composition vs inheritance—when to use which?**
+👉 Answer:
+
+* **Composition**: build objects by **combining small behaviors** (preferred for flexibility).
+* **Inheritance**: use when there’s a clear **is-a** hierarchy and you benefit from shared protocol.
+
+```js
+const canFly = s => ({ fly(){ return `${s.name} flying`; } });
+const canQuack = s => ({ quack(){ return "quack"; } });
+const duck = name => Object.assign({ name }, canFly({name}), canQuack());
+duck("Daffy").fly();
+```
+
+📌 “**Favor composition over inheritance**” to reduce tight coupling.
+
+---
+
+## 1.4.4 Custom Array Polyfills
+
+**Q104. What is a polyfill, and when should you write one?**
+👉 Answer: A **polyfill** implements a missing feature in older environments. Write them to **match spec behavior** when targeting older browsers. 📌 Always **feature-detect** before patching and avoid overriding if native exists.
+
+**Q105. Polyfill `forEach` (spec-inspired).**
+👉 Answer:
+
+```js
+if (!Array.prototype.forEach) {
+  Array.prototype.forEach = function(cb, thisArg){
+    if (this == null) throw new TypeError("this is null/undefined");
+    const O = Object(this), len = O.length >>> 0;
+    for (let i=0; i<len; i++) if (i in O) cb.call(thisArg, O[i], i, O);
+  };
+}
+```
+
+📌 Handles **array-like**, respects **holes**, binds **`thisArg`**.
+
+**Q106. Polyfill `map`.**
+👉 Answer:
+
+```js
+if (!Array.prototype.map) {
+  Array.prototype.map = function(cb, thisArg){
+    const O = Object(this), len = O.length >>> 0, A = new Array(len);
+    for (let i=0; i<len; i++) if (i in O) A[i] = cb.call(thisArg, O[i], i, O);
+    return A;
+  };
+}
+```
+
+📌 Returns a **new array**; keeps **sparse** positions sparse.
+
+**Q107. Polyfill `filter`.**
+👉 Answer:
+
+```js
+if (!Array.prototype.filter) {
+  Array.prototype.filter = function(cb, thisArg){
+    const O = Object(this), len = O.length >>> 0, A = [];
+    for (let i=0; i<len; i++) if (i in O && cb.call(thisArg, O[i], i, O)) A.push(O[i]);
+    return A;
+  };
+}
+```
+
+📌 Preserves **order** and **skips holes**.
+
+**Q108. Polyfill `reduce` (initial value nuances).**
+👉 Answer:
+
+```js
+if (!Array.prototype.reduce) {
+  Array.prototype.reduce = function(cb, init){
+    const O = Object(this), len = O.length >>> 0;
+    let i = 0, acc;
+    if (arguments.length > 1) acc = init;
+    else {
+      // find first present index
+      while (i < len && !(i in O)) i++;
+      if (i >= len) throw new TypeError("Reduce of empty array with no initial value");
+      acc = O[i++];
+    }
+    for (; i<len; i++) if (i in O) acc = cb(acc, O[i], i, O);
+    return acc;
+  };
+}
+```
+
+📌 If **no initial value**, uses the **first present element**; else throws on empty arrays.
+
+**Q109. What polyfill pitfalls should you watch out for?**
+👉 Answer:
+
+* 📌 **Don’t overwrite** native impls.
+* **Spec edge cases**: holes, `thisArg`, array-like objects.
+* **Non-enumerable** definition (via `Object.defineProperty`) to mimic native behavior.
+* **Performance**: polyfills may be slower; prefer Babel/TS + core-js for production.
+
+---
+
+## 1.4.5 Flatten Nested Arrays
+
+**Q110. What does “flatten an array” mean?**
+👉 Answer: Convert nested arrays into a **single-level** array.
+
+```js
+const arr = [1,[2,[3,4]],5]; // -> [1,2,3,4,5]
+arr.flat(2); // built-in (depth=2)
+```
+
+📌 `Array.prototype.flat(depth = 1)` handles many cases; use custom logic for **unknown depth** or **type filtering**.
+
+**Q111. Write a recursive `flatten` for unknown depth.**
+👉 Answer:
+
+```js
+const flatten = (xs) =>
+  xs.reduce((acc, x) => acc.concat(Array.isArray(x) ? flatten(x) : x), []);
+flatten([1,[2,[3]],4]); // [1,2,3,4]
+```
+
+📌 Simple but can hit **call stack limits** for **very deep** arrays.
+
+**Q112. Write an iterative (stack-based) `flatten`.**
+👉 Answer:
+
+```js
+function flattenIter(xs){
+  const out = [], stack = [...xs];        // LIFO
+  while (stack.length){
+    const v = stack.pop();
+    if (Array.isArray(v)) stack.push(...v); else out.push(v);
+  }
+  return out.reverse();                    // restore original order
+}
+```
+
+📌 Avoids recursion limits; watch out for **order** (reverse at end).
+
+**Q113. Can you flatten lazily (generator)?**
+👉 Answer: Yes—yield values as they’re discovered.
+
+```js
+function* flatGen(xs){
+  for (const x of xs)
+    if (Array.isArray(x)) yield* flatGen(x); else yield x;
+}
+[...flatGen([1,[2,[3]],4])]; // [1,2,3,4]
+```
+
+📌 Useful for **streams** and **huge** structures.
+
+**Q114. What are practical concerns when flattening?**
+👉 Answer:
+
+* 📌 **Depth control** (avoid collapsing intended groups).
+* **Type guards**: don’t split strings inadvertently.
+* **Performance**: prefer **push** over `concat` in tight loops.
+* **Immutability**: return a **new** array; don’t mutate inputs unless required.
+
+---
+
+## 1.4.6 Flatten Complex Objects
+
+**Q115. What does it mean to “flatten an object”?**
+👉 Answer: Convert nested objects into a **single-level** map of **path → value**.
+
+```js
+// Input
+{ a:{ b:2 }, c:[3, { d:4 }] }
+// Flat (dot/bracket paths)
+{ "a.b":2, "c[0]":3, "c[1].d":4 }
+```
+
+📌 Useful for **logging, search, diff, form serialization**.
+
+**Q116. Implement `flattenObject` with dot paths (arrays as `[i]`).**
+👉 Answer:
+
+```js
+function flattenObject(obj, prefix = "", out = {}){
+  if (obj !== Object(obj) || obj === null) { out[prefix] = obj; return out; }
+  for (const k of Object.keys(obj)){
+    const path = prefix ? `${prefix}.${k}` : k;
+    flattenObject(obj[k], path, out);
+  }
+  return out;
+}
+// tweak to handle arrays:
+function flattenAny(x, p="", out={}){
+  if (Array.isArray(x)) x.forEach((v,i)=>flattenAny(v, `${p}[${i}]`, out));
+  else if (x && typeof x === "object") for (const k in x) flattenAny(x[k], p?`${p}.${k}`:k, out);
+  else out[p]=x;
+  return out;
+}
+```
+
+📌 Treat arrays **separately** to avoid ambiguous keys.
+
+**Q117. How to support custom separators and skip certain types (e.g., Date/Map/Set)?**
+👉 Answer:
+
+```js
+function isPlainObject(o){ return Object.prototype.toString.call(o)==='[object Object]'; }
+function flattenCustom(x, p="", out={}, sep="."){
+  if (x instanceof Date || x instanceof Map || x instanceof Set || typeof x === "function") {
+    out[p] = x; return out; // 📌 stop descent
+  }
+  if (Array.isArray(x)) x.forEach((v,i)=>flattenCustom(v, `${p}[${i}]`, out, sep));
+  else if (isPlainObject(x)) for (const k of Object.keys(x)) flattenCustom(x[k], p?`${p}${sep}${k}`:k, out, sep);
+  else out[p]=x;
+  return out;
+}
+```
+
+📌 Decide **what to descend into** to avoid losing semantics.
+
+**Q118. How to unflatten back to nested form? Any pitfalls?**
+👉 Answer:
+
+```js
+function unflatten(obj){
+  const out = {};
+  for (const [path, val] of Object.entries(obj)){
+    const parts = path.split('.'); // simplistic: doesn't handle [i]
+    let cur = out;
+    parts.forEach((k, i)=>{
+      cur[k] = (i === parts.length-1) ? val : (cur[k] ?? {});
+      cur = cur[k];
+    });
+  }
+  return out;
+}
+```
+
+📌 Paths with **array indices** (e.g., `a[0].b`) need a **parser**; key collisions (e.g., `a.b` vs `['a.b']`) require escaping rules.
+
+**Q119. Real-world uses and cautions?**
+👉 Answer:
+
+* 📌 **Logging/analytics** (flat keys), **CSV export**, **diffing configs**, **search indexing**.
+* **Caution**: Don’t flatten **cyclic** objects (detect cycles), preserve **Dates/Regex/Maps/Sets**, and be mindful of **key injection** if serializing user input.
+
+---
+
+## 1.5.1 Conditionals (`if`, `else if`, `else`, `switch`)
+
+**Q120. When to use `if/else`, ternary, or logical operators?**
+👉 Answer:
+
+* **`if/else`**: multi-branch or side effects.
+* **Ternary**: simple expression-based choice.
+* **`&&` / `||`**: short-circuit to **conditionally evaluate** expressions.
+
+```js
+user && sendEmail(user);                 // run only if user
+const label = score > 90 ? "A" : "B";    // ternary
+```
+
+📌 Prefer **readability**; avoid nested ternaries beyond one level.
+
+**Q121. How to use `switch` effectively?**
+👉 Answer:
+
+```js
+switch (status) {
+  case 200:
+  case 204: handleSuccess(); break;      // fall-through group
+  case 400: handleBad(); break;
+  default:  handleUnknown();
+}
+```
+
+📌 Always use **`break`** (unless intentional fall-through). Consider **object dispatch** for data-driven branching.
+
+**Q122. What is dictionary dispatch and why is it cleaner?**
+👉 Answer: Replace long `switch`/`if` with a **map of handlers**.
+
+```js
+const handlers = {
+  admin: () => "...",
+  user:  () => "...",
+  guest: () => "..."
+};
+(handlers[role] || (() => "default"))();
+```
+
+📌 Easier to **extend** and **test**.
+
+**Q123. What are truthy/falsy pitfalls in conditionals?**
+👉 Answer: Falsy: `0,"",null,undefined,false,NaN`.
+
+```js
+const qty = 0;
+if (qty) { /* won't run */ }     // 0 is falsy
+if (qty ?? 0) { /* runs */ }     // nullish coalescing
+```
+
+📌 Use **`??`** for defaults when **0/""** are valid, and **`?.`** for safe property access.
+
+---
+
+## 1.5.2 Exception Handling: (`try`, `catch`, `finally`) 📌
+
+**Q124. How do `try`, `catch`, and `finally` work?**
+👉 Answer:
+
+* **`try`**: code that may throw.
+* **`catch (e)`**: handles the thrown error.
+* **`finally`**: runs **always** (after try/catch) for cleanup.
+
+```js
+try { mayFail(); }
+catch (e) { log(e); if (isFatal(e)) throw e; }  // rethrow if needed
+finally { close(); }                             // 📌 always executes
+```
+
+📌 `catch` handles **synchronous** throws only.
+
+**Q125. How do you handle async errors with Promises and `async/await`?**
+👉 Answer:
+
+* Promises: `.catch()`
+* `async/await`: wrap with `try/catch`
+
+```js
+fetch(url)
+  .then(r => r.json())
+  .catch(err => log(err));                 // promise style
+
+async function load(){
+  try { const r = await fetch(url); return await r.json(); }
+  catch (e) { log(e); throw e; }           // rethrow preserves rejection
+}
+```
+
+📌 Listen for global **`unhandledrejection`** for uncaught promise errors.
+
+**Q126. How to define custom errors properly?**
+👉 Answer: Extend `Error`, set `name`, call `super(message)`.
+
+```js
+class ValidationError extends Error {
+  constructor(msg, code){ super(msg); this.name="ValidationError"; this.code=code; }
+}
+throw new ValidationError("Email invalid", "E_EMAIL");
+```
+
+📌 Custom errors add **context** and enable **granular handling**.
+
+**Q127. Best practices for error handling in apps?**
+👉 Answer:
+
+* 📌 **Don’t swallow errors**; rethrow or handle meaningfully.
+* **Add context** (inputs, ids) and **log** centrally.
+* Differentiate **expected** (validation, 404) vs **unexpected** (bugs).
+* Map technical errors to **user-friendly** messages; keep stack traces for devs.
+* Ensure **cleanup** in `finally` and avoid leaking resources.
