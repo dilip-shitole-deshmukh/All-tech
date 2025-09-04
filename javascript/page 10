@@ -1,0 +1,321 @@
+## 1.9.3 `let`, `const`
+
+**Q260. How do `let` and `const` differ from `var` in scope and initialization?**
+👉 Answer: `let`/`const` are **block-scoped** and hoisted into the **TDZ** (uninitialized until the declaration line). `var` is **function-scoped**, hoisted and **initialized to `undefined`**. 📌 `const` requires an initializer and the **binding** can’t be reassigned (the **object** it refers to may still mutate).
+
+**Q261. When should I choose `let` vs `const`?**
+👉 Answer: Prefer **`const` by default** (signals intent, helps readers/tools). Use **`let`** only when you **must reassign**. 📌 This reduces accidental reassignment and improves maintainability.
+
+**Q262. Does `const` make objects immutable?**
+👉 Answer: No. `const` prevents **rebinding**, not **mutation**.
+
+```js
+const user = {name: "A"};
+user.name = "B"; // ✅ allowed
+// user = {}     // ❌ TypeError (rebinding)
+```
+
+📌 Use `Object.freeze`/deep-freeze or immutability patterns to prevent mutation.
+
+**Q263. Why do loops often prefer `let`?**
+👉 Answer: `let` in `for` creates a **new binding per iteration**, so closures capture the correct value.
+
+```js
+for (let i=0;i<3;i++) setTimeout(()=>console.log(i)); // 0,1,2
+```
+
+📌 With `var`, all callbacks see the **final** value.
+
+**Q264. Do `let`/`const` create globals on `window` at top level?**
+👉 Answer: In classic scripts, `var` becomes a **property of `window`**; `let`/`const` do **not**. In ES modules, **none** become `window` props and top-level `this` is `undefined`. 📌 Reduces **global pollution**.
+
+**Q265. What happens if I access a `let`/`const` binding before its line?**
+👉 Answer: You hit the **Temporal Dead Zone** and get a **ReferenceError**.
+📌 TDZ catches **use-before-declare** bugs early.
+
+---
+
+## 1.9.4 Template Literals
+
+**Q266. What problems do template literals solve?**
+👉 Answer: They provide **string interpolation** and **multiline** strings without awkward concatenation/escaping.
+
+```js
+const who="Dilip", n=3;
+`Hello ${who}, you have ${n} messages.`
+```
+
+📌 Improves readability for HTML snippets, logs, i18n.
+
+**Q267. How do tagged template literals work?**
+👉 Answer: A **tag function** processes the template pieces + substitutions for custom output (e.g., safe HTML).
+
+```js
+function tag(strings, ...vals){ /* return transformed */ }
+tag`User: ${name}`;
+```
+
+📌 Useful for **sanitization**, **i18n**, **CSS-in-JS**.
+
+**Q268. Any security pitfalls with template literals?**
+👉 Answer: Interpolating **untrusted HTML** into a template string and then assigning to `innerHTML` is **XSS-prone**. 📌 Use **tagged sanitizers** or build DOM nodes programmatically.
+
+**Q269. Can I nest expressions inside `${...}`?**
+👉 Answer: Yes—any valid JS expression: ternaries, function calls, expressions (`${items.map(x=>x.name).join(", ")}`). 📌 Keep expressions **short** for readability.
+
+---
+
+## 1.9.5 Destructuring
+
+**Q270. What is array and object destructuring?**
+👉 Answer: A concise way to **extract values** from arrays/objects into variables.
+
+```js
+const [a,b=0] = arr;
+const {id: userId, name, cfg: {dark} = {dark:false}} = user;
+```
+
+📌 Supports **defaults**, **renaming**, and **nested** patterns.
+
+**Q271. How do defaults interact with `undefined` vs other values?**
+👉 Answer: Defaults only apply when the extracted value is **`undefined`**.
+
+```js
+const [x=1] = [0];   // x=0
+const [y=1] = [undefined]; // y=1
+```
+
+📌 `null` doesn’t trigger defaults.
+
+**Q272. Can I destructure directly in function parameters?**
+👉 Answer: Yes—great for options objects.
+
+```js
+function create({name, active=true, role="user"} = {}) { /*...*/ }
+```
+
+📌 Add a **default `{}`** to handle missing args.
+
+**Q273. How do rest properties work in destructuring?**
+👉 Answer: Collect remaining fields/elements.
+
+```js
+const {a, ...rest} = obj; // rest has other props
+const [head, ...tail] = list;
+```
+
+📌 Rest is **last** and **shallow**.
+
+**Q274. Pitfalls with destructuring?**
+👉 Answer:
+
+* Destructuring `null`/`undefined` throws.
+* Deep patterns can hurt readability.
+* Object property **names must exist** (or provide defaults).
+  📌 Guard with `= {}` or optional chaining before destructuring nested objects.
+
+---
+
+## 2.1.1 Default Parameters
+
+**Q275. When are default parameters evaluated?**
+👉 Answer: **At call time**, left-to-right. Later defaults can depend on earlier ones.
+
+```js
+function f(a=1, b=a+1){ return [a,b]; }
+f(); // [1,2]
+```
+
+📌 Heavy defaults run **each call**.
+
+**Q276. How do defaults interact with `undefined` vs `null`?**
+👉 Answer: Defaults apply only for **`undefined`**. Passing `null` **uses null**.
+
+```js
+f(undefined); // uses default
+f(null);      // null as value
+```
+
+**Q277. Default parameters vs inside-body fallback (`x = x || 1`)?**
+👉 Answer: `||` treats `0`, `""`, `false` as falsy (overwrites them). Defaults only replace **`undefined`**. 📌 Prefer **default parameters** for precise semantics.
+
+**Q278. Can I combine default params with destructuring?**
+👉 Answer: Yes, common for options.
+
+```js
+function init({ host="localhost", port=3000 } = {}){}
+```
+
+📌 Add the outer `= {}` to handle missing arg gracefully.
+
+---
+
+## 2.1.2 Rest and Spread Operators
+
+**Q279. Difference between rest `...` and spread `...`?**
+👉 Answer: **Rest** collects multiple values into an array/object **on the left** (parameter/assignment). **Spread** expands an iterable/object **on the right** (calls/arrays/objects).
+
+```js
+function sum(...nums){ return nums.reduce((a,b)=>a+b,0); } // rest
+const all = [...arr1, ...arr2];                            // spread
+```
+
+**Q280. What does object spread copy—and what doesn’t it?**
+👉 Answer: Copies **own enumerable** properties **shallowly**. It **doesn’t** copy prototype props, non-enumerables, or preserve accessors as accessors (values only). 📌 Nested objects remain **shared references**.
+
+**Q281. How do I convert array-like/iterables to arrays?**
+👉 Answer: Use spread or `Array.from`.
+
+```js
+[...document.querySelectorAll('li')];
+Array.from(new Set([1,1,2])); // [1,2]
+```
+
+📌 `Array.from` supports a **map** function.
+
+**Q282. Common pitfalls with rest/spread?**
+👉 Answer:
+
+* Order matters in object merge (right-most **wins**).
+* Spreading large arrays/objects can be **costly** (copies).
+* Rest must be **last** in the pattern.
+  📌 Measure before micro-optimizing hot paths.
+
+---
+
+## 2.1.3 Optional Chaining `?.` & Nullish Coalescing `??`
+
+**Q283. How does optional chaining help?**
+👉 Answer: Safely access **nested** properties/calls when a step may be nullish (`null`/`undefined`).
+
+```js
+user?.address?.city
+user?.getName?.()
+arr?.[0]
+```
+
+📌 Short-circuits to **`undefined`** if any link is nullish.
+
+**Q284. `??` vs `||`—what’s the difference?**
+👉 Answer: `??` uses the **right-hand default** only if the left is **nullish** (`null`/`undefined`). `||` uses it for **any falsy** (`0`, `""`, `false`, `NaN`, `null`, `undefined`).
+
+```js
+count ?? 0   // keeps 0
+count || 0   // replaces 0 with 0 (ok) but also "" → 0 (maybe not intended)
+```
+
+📌 Prefer `??` when `0`/`""`/`false` are **valid**.
+
+**Q285. Can I assign through optional chaining?**
+👉 Answer: No. `a?.b = 1` is a **syntax error**. You can read via `?.`, but not **write**. 📌 Use guards: `if (a) a.b = 1;`.
+
+**Q286. How to combine `?.` and `??` idiomatically?**
+👉 Answer:
+
+```js
+const city = user?.address?.city ?? "Unknown";
+```
+
+📌 Read safely, then default **only** when nullish.
+
+**Q287. Any performance concerns with `?.` deep chains?**
+👉 Answer: There’s overhead per step; in hot paths, cache intermediates:
+
+```js
+const addr = user?.address;
+const city = addr?.city ?? "Unknown";
+```
+
+📌 Readability first; optimize only when measured.
+
+---
+
+## 2.1.4 Symbols & Iterators
+
+**Q288. What are Symbols and when do I use them?**
+👉 Answer: `Symbol()` creates a **unique, non-string** property key—never clashes. Use for **“hidden”** keys and protocols.
+
+```js
+const ID = Symbol('id');
+obj[ID] = 123;
+```
+
+📌 Not enumerated by `for...in`/`Object.keys`.
+
+**Q289. What are well-known symbols?**
+👉 Answer: Built-in hooks like **`Symbol.iterator`**, `Symbol.toStringTag`, `Symbol.asyncIterator`, `Symbol.hasInstance`, `Symbol.toPrimitive`, etc. 📌 They let objects **customize** language behaviors.
+
+**Q290. How do I make an object iterable?**
+👉 Answer: Implement `[Symbol.iterator]()` returning an **iterator** with `next()`.
+
+```js
+const range = {
+  from: 1, to: 3,
+  [Symbol.iterator]() {
+    let i = this.from;
+    return { next: () => ({ value: i, done: i++ > this.to }) };
+  }
+};
+[...range]; // [1,2,3]
+```
+
+📌 Enables `for...of`, spread, destructuring.
+
+**Q291. Difference between `for...in` and `for...of`?**
+👉 Answer: `for...in` iterates **enumerable keys** (including inherited). `for...of` iterates **values** from an **iterator** (`Array`, `Map`, `Set`, custom iterables). 📌 Prefer **`for...of`** for arrays/iterables.
+
+**Q292. How to define a custom primitive conversion with `Symbol.toPrimitive`?**
+👉 Answer:
+
+```js
+const price = {
+  amount: 99,
+  [Symbol.toPrimitive](hint){ return hint === 'string' ? `$${this.amount}` : this.amount; }
+};
+`${price}`;  // "$99"
++price;      // 99
+```
+
+📌 Controls behavior in **numeric** vs **string** contexts.
+
+---
+
+## 2.1.5 ES6+ Features 📌
+
+**Q293. What are the most impactful ES6+ additions for frontend devs?**
+👉 Answer:
+
+* ES6 (2015): **`let/const`**, **arrow functions**, **classes**, **modules**, **destructuring**, **template literals**, **promises**, **Map/Set**, **rest/spread**.
+* ES2016+: `Array.prototype.includes`, exponentiation `**`.
+* ES2017: **`async/await`**.
+* ES2018: **object rest/spread**, async iteration.
+* ES2020: **`optional chaining`**, **`nullish coalescing`**, **`BigInt`**, **`Promise.allSettled`**, **`globalThis`**.
+* ES2021+: `String.prototype.replaceAll`, **logical assignment** (`||=`, `&&=`, `??=`), `Promise.any`.
+  📌 Modern bundlers transpile/polyfill for compatibility.
+
+**Q294. Why modules (`import`/`export`) changed architecture?**
+👉 Answer: Native modules enable **tree-shaking**, **lazy loading**, and **scoped dependencies** without globals. 📌 Improves **performance** and **maintainability**.
+
+---
+
+## 2.1.6 ES5 vs ES6
+
+**Q295. Key differences between ES5 and ES6 in everyday code?**
+👉 Answer:
+
+* **Variables**: `var` → `let/const` (block scope, TDZ).
+* **Functions**: arrow functions (lexical `this`).
+* **OOP**: prototype manipulation → `class/extends/super`.
+* **Modules**: IIFEs/namespace objects → native `import/export`.
+* **Collections**: plain objects → `Map/Set`.
+* **Async**: callbacks → promises → `async/await` (ES2017).
+  📌 ES6+ yields **clearer, safer, more modular** code.
+
+**Q296. How do we run ES6+ on older browsers?**
+👉 Answer: Use **Babel**/**SWC** (transpile syntax) + **polyfills** (`core-js`, `regenerator-runtime`) for missing APIs. 📌 Configure **browserslist** targets to ship minimal polyfills.
+
+**Q297. Any pitfalls when mixing ES modules and older tooling?**
+👉 Answer: Module format mismatches (ESM vs CJS) cause import/export errors. 📌 Use proper bundler config or dual builds; in Node, respect `"type": "module"` and file extensions.
+
+**Q298. Does ES6 make code faster automatically?**
+👉 Answer: Mostly **ergonomic** and **safety** improvements. Performance depends on your patterns and engine optimizations. 📌 Measure; don’t assume.
