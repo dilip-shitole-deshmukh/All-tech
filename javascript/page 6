@@ -1,0 +1,362 @@
+## 1.5.3 Global Error Handlers
+
+**Q128. What are “global error handlers” in browsers?**
+👉 Answer: They’re catch-alls that notify you when **uncaught** errors happen anywhere in your app. Main ones:
+
+* 📌 `window.onerror(message, source, lineno, colno, error)`
+* 📌 `window.addEventListener('error', handler, true)` (capture resource + runtime errors)
+* 📌 `window.addEventListener('unhandledrejection', handler)` for **unhandled Promise** rejections
+  These help collect telemetry, show user-friendly fallbacks, and keep the app stable.
+
+**Q129. How do I capture both runtime and resource loading errors?**
+👉 Answer: Use two listeners:
+
+```js
+// runtime errors (bubbling)
+window.onerror = (msg, src, line, col, err) => report({msg, src, line, col, err});
+
+// resource errors (images/scripts/css) use capture phase
+window.addEventListener('error', e => {
+  if (e.target && e.target !== window) {
+    report({ type: 'resource', tag: e.target.tagName, src: e.target.src || e.target.href });
+  }
+}, true);
+```
+
+📌 Resource error events **don’t bubble**; set `{ capture: true }`.
+
+**Q130. How do I handle unhandled Promise rejections?**
+👉 Answer: Listen for `unhandledrejection`.
+
+```js
+window.addEventListener('unhandledrejection', e => {
+  report({ type: 'promise', reason: e.reason });
+});
+```
+
+📌 Always **return** or **await** promises to avoid accidental unhandled rejections.
+
+**Q131. Why do I sometimes only see “Script error.” with no stack?**
+👉 Answer: That’s a **cross-origin** script error. Fix by serving the script with **CORS headers** and using the `crossorigin` attribute:
+
+```html
+<script src="https://cdn/app.js" crossorigin="anonymous"></script>
+```
+
+📌 Also ensure **source maps** are accessible for readable stacks.
+
+**Q132. What’s the Node.js equivalent of global handlers?**
+👉 Answer:
+
+```js
+process.on('uncaughtException', err => { log(err); gracefulShutdown(); });
+process.on('unhandledRejection', reason => { log(reason); gracefulShutdown(); });
+```
+
+📌 After `uncaughtException`, prefer **exiting** (gracefully) because state may be **corrupted**.
+
+**Q133. How do source maps help error diagnosis?**
+👉 Answer: Source maps map minified code back to original files, giving **real file/line** in stacks.
+📌 Ship maps **securely** (e.g., upload to your error tracker) rather than publicly exposing them.
+
+**Q134. What should I include when reporting errors?**
+👉 Answer: 📌 **Message**, **stack**, **URL**, **user action/route**, **app/version**, **browser/OS**, **breadcrumbs**, **custom context** (user id hashed). This enables actionable triage.
+
+---
+
+## 1.5.4 Custom Errors
+
+**Q135. Why create custom error classes?**
+👉 Answer: To **categorize** and **handle** errors precisely (e.g., `ValidationError`, `AuthError`, `NetworkTimeoutError`) and attach **metadata** (status codes, error codes). 📌 This improves routing, retries, and UX messages.
+
+**Q136. How do I define a proper custom error?**
+👉 Answer:
+
+```js
+class ValidationError extends Error {
+  constructor(message, code, cause) {
+    super(message, { cause });        // Node 16+/modern browsers
+    this.name = 'ValidationError';
+    this.code = code;                  // domain-specific
+  }
+}
+throw new ValidationError('Email invalid', 'E_EMAIL');
+```
+
+📌 Use `{ cause }` to **chain** underlying errors.
+
+**Q137. How to wrap lower-level errors while keeping the stack?**
+👉 Answer:
+
+```js
+try { await db.save(user); }
+catch (e) { throw new ValidationError('Failed to save user', 'E_SAVE', e); }
+```
+
+📌 `error.cause` preserves the **original** error for debugging.
+
+**Q138. What about `Error.captureStackTrace`?**
+👉 Answer: In V8 (Chrome/Node), you can control stack creation:
+
+```js
+if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+```
+
+📌 Avoids constructor frames in the stack (nice-to-have, not required).
+
+**Q139. Should I attach HTTP status to errors in frontend apps?**
+👉 Answer: Yes—store **`status`** and **`endpoint`** on network errors to decide UX (retry vs show message).
+
+```js
+class HttpError extends Error { constructor(msg, status, url){ super(msg); this.status=status; this.url=url; } }
+```
+
+📌 4xx → show guidance; 5xx → suggest retry; 401 → re-auth flow.
+
+**Q140. How do I serialize errors safely?**
+👉 Answer: Errors aren’t JSON by default. Extract fields:
+
+```js
+function toJSON(err){
+  return { name: err.name, message: err.message, stack: err.stack, code: err.code, cause: err.cause?.message };
+}
+```
+
+📌 Don’t leak sensitive data; scrub tokens/PII.
+
+---
+
+## 1.5.5 Errors Management
+
+**Q141. What’s a good strategy for retries?**
+👉 Answer: Use **exponential backoff with jitter** for transient failures; avoid retrying **non-idempotent** operations.
+
+```js
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function retry(fn, times=3){
+  for (let i=0;i<times;i++){
+    try { return await fn(); }
+    catch (e) { await sleep((2**i + Math.random()) * 300); }
+  }
+  throw new Error('Retry limit reached');
+}
+```
+
+📌 Check error **type/status** before retrying.
+
+**Q142. How do I prevent cascades of failures?**
+👉 Answer: Use a **circuit breaker**: open the circuit after N failures, short-circuit calls for a cooldown, then half-open to test recovery. 📌 Libraries exist, or implement a small state machine.
+
+**Q143. What should users see vs what should we log?**
+👉 Answer: Users: **clear, non-technical** message + next action (“Try again”, “Contact support”). Logs: **full stack**, **context**, **ids**. 📌 Separate user messaging from developer telemetry.
+
+**Q144. Centralized logging or scattered `console.error`?**
+👉 Answer: Centralize with a **logger** that adds context, throttles duplicates, and sends to a backend.
+
+```js
+const log = createLogger({ app: 'web', version: APP_VER });
+log.error(err, { route, userId: mask(userId) });
+```
+
+📌 Reduces noise and improves triage.
+
+**Q145. How do I avoid swallowing errors in async code?**
+👉 Answer: Always **return/await** promises and **rethrow** after adding context when appropriate.
+
+```js
+try { await doTask(); } 
+catch (e) { log(e); throw e; }
+```
+
+📌 Missing `return` in `.then()` chains is a common pitfall.
+
+**Q146. Any pattern for safe cleanup?**
+👉 Answer: Use `finally` (or `try { … } finally { … }`) to close resources, clear timers, unlock UI. 📌 `finally` runs **regardless** of success or failure.
+
+---
+
+## 1.6.1 Selecting Elements: `querySelector`, `getElementById`, etc.
+
+**Q147. What’s the recommended way to select elements today?**
+👉 Answer: Prefer **`querySelector`** / **`querySelectorAll`** for **CSS-selector** power and readability.
+
+```js
+const btn = document.querySelector('#save');
+const rows = document.querySelectorAll('table tbody tr.selected');
+```
+
+📌 They return **the first match** and a **static NodeList** respectively.
+
+**Q148. When is `getElementById` still useful?**
+👉 Answer: It’s the **fastest** and most direct for a single known id.
+
+```js
+const modal = document.getElementById('login-modal');
+```
+
+📌 Use it when you have a **unique id** for performance/clarity.
+
+**Q149. `getElementsByClassName` vs `querySelectorAll('.x')`?**
+👉 Answer:
+
+* `getElementsByClassName` → **live HTMLCollection** (updates as DOM changes).
+* `querySelectorAll` → **static NodeList** (snapshot).
+  📌 Live lists can be surprising; static lists are usually easier to reason about.
+
+**Q150. How to scope queries to a container (avoid global lookups)?**
+👉 Answer: Call selectors on an **element**:
+
+```js
+const form = document.getElementById('signup');
+const inputs = form.querySelectorAll('input[required]');
+```
+
+📌 Scoping improves **performance** and **correctness** in complex pages.
+
+**Q151. How to check if an element matches a selector or find the nearest ancestor?**
+👉 Answer:
+
+```js
+el.matches('.btn.primary');     // boolean
+el.closest('[data-panel]');     // nearest ancestor (or self)
+```
+
+📌 `closest` walks **upwards** following the DOM tree.
+
+**Q152. What is `:scope` and why is it handy?**
+👉 Answer: `:scope` refers to the **current element** when querying within a container (disambiguates selectors).
+
+```js
+container.querySelectorAll(':scope > .row'); // only direct children
+```
+
+📌 Avoids accidental matches outside the intended subtree.
+
+**Q153. How do I read `data-*` attributes idiomatically?**
+👉 Answer: Use the **`dataset`** API:
+
+```js
+<button data-user-id="42"></button>
+btn.dataset.userId; // "42"
+```
+
+📌 `data-user-id` → `dataset.userId` (kebab → camelCase).
+
+**Q154. Any pitfalls when iterating NodeLists/HTMLCollections?**
+👉 Answer: `querySelectorAll` returns **NodeList** (iterable in modern browsers). `getElementsBy*` returns **live HTMLCollection** (not an array).
+
+```js
+[...document.getElementsByTagName('li')].forEach(/* ... */); // spread to array
+```
+
+📌 Converting to arrays gives you **array methods** and a **stable snapshot**.
+
+---
+
+## 1.6.2 Manipulating DOM: `innerHTML`, `textContent`, `style`
+
+**Q155. `innerHTML` vs `textContent`—what’s the difference?**
+👉 Answer:
+
+* **`innerHTML`** parses a string as **HTML** (can insert elements).
+* **`textContent`** inserts **plain text** (no HTML parsing).
+  📌 Use `textContent` by default for **safety/performance**; `innerHTML` only when you **must** inject markup.
+
+**Q156. How to avoid XSS when inserting HTML?**
+👉 Answer: **Never** concatenate untrusted strings into `innerHTML`. Sanitize with a **trusted library**, or build DOM nodes programmatically:
+
+```js
+const li = document.createElement('li');
+li.textContent = userInput;     // safe
+list.append(li);
+```
+
+📌 Treat all external input as **untrusted**.
+
+**Q157. What are the safe, fast ways to build fragments?**
+👉 Answer: Use **`DocumentFragment`** or template cloning.
+
+```js
+const frag = new DocumentFragment();
+items.forEach(t => { const li = document.createElement('li'); li.textContent = t; frag.append(li); });
+ul.append(frag);
+```
+
+📌 Reduces **reflows** by batching insertions.
+
+**Q158. When to use `classList` and inline `style`?**
+👉 Answer: Prefer **`classList`** to toggle state; inline `style` only for dynamic one-offs.
+
+```js
+el.classList.toggle('hidden', isHidden);
+```
+
+📌 Keeps styling **declarative** and maintainable.
+
+**Q159. Replace vs append—how to clear content efficiently?**
+👉 Answer:
+
+```js
+container.replaceChildren();          // fastest clear
+container.replaceChildren(newEl);     // clear and insert
+```
+
+📌 More efficient than `innerHTML = ""` in many cases.
+
+**Q160. How to measure or force layout safely?**
+👉 Answer: Read **layout properties** (e.g., `offsetWidth`) only when needed; batch reads before writes to avoid **layout thrash**.
+📌 Libraries like **FastDOM** or patterns that separate **read/write** phases help performance.
+
+---
+
+## 1.6.3 Basic Event Handling: `addEventListener`
+
+**Q161. How to attach and remove event listeners correctly?**
+👉 Answer:
+
+```js
+function onClick(e){ /* ... */ }
+btn.addEventListener('click', onClick);
+btn.removeEventListener('click', onClick); // must pass the same reference
+```
+
+📌 Anonymous functions **can’t be removed** later—keep a reference.
+
+**Q162. What options exist for `addEventListener`?**
+👉 Answer: `{ capture, once, passive, signal }`
+
+* **capture**: run during capture phase
+* **once**: auto-remove after first call
+* **passive**: promise not to call `preventDefault()` (improves scroll perf)
+* **signal**: AbortController to remove multiple listeners at once
+
+**Q163. `event.target` vs `event.currentTarget`?**
+👉 Answer:
+
+* **`target`**: actual element that **triggered** the event
+* **`currentTarget`**: the **element the listener is attached to**
+  📌 In delegation, use `currentTarget` for container, `target` for clicked child.
+
+**Q164. Preventing default vs stopping propagation?**
+👉 Answer:
+
+```js
+e.preventDefault();   // stop default browser action (e.g., link navigation)
+e.stopPropagation();  // stop bubbling to ancestors
+e.stopImmediatePropagation(); // also block other listeners on same node
+```
+
+📌 Use sparingly; overuse makes behavior hard to reason about.
+
+**Q165. How to add a listener that runs only once?**
+👉 Answer:
+
+```js
+btn.addEventListener('click', handle, { once: true });
+```
+
+📌 Cleaner than manual `removeEventListener` after first run.
+
+**Q166. What is the “passive” option and when should I use it?**
+👉 Answer: For **scroll/touch** listeners, `{ passive: true }` tells the browser you **won’t** call `preventDefault()`, enabling smoother scrolling.
+📌 Use on `touchstart`, `touchmove`, `wheel` where appropriate.
