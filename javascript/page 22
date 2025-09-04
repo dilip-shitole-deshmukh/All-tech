@@ -1,0 +1,367 @@
+Awesome—here’s the **next code pack** with **high-impact interview snippets** across multiple topics. Tight explanations + production-leaning code.
+
+---
+
+## 15) Advanced Data Structures (Map/Set/WeakMap/WeakRef)
+
+### 15.1 Map vs Object (safe keys, predictable)
+
+```js
+const hits = new Map();
+function inc(key){ hits.set(key, (hits.get(key) ?? 0) + 1); }
+```
+
+### 15.2 MultiMap (one-to-many) with Map → Array
+
+```js
+class MultiMap {
+  m = new Map();
+  add(k, v){ (this.m.get(k) ?? this.m.set(k, []).get(k)).push(v); }
+  get(k){ return this.m.get(k) ?? []; }
+  delete(k, v){ const a=this.m.get(k); if(!a) return false; a.splice(a.indexOf(v),1); if(!a.length) this.m.delete(k); return true; }
+}
+```
+
+### 15.3 LRU Cache (O(1) via Map insertion order)
+
+```js
+class LRU {
+  constructor(limit=100){ this.limit=limit; this.map=new Map(); }
+  get(k){ if(!this.map.has(k)) return; const v=this.map.get(k); this.map.delete(k); this.map.set(k,v); return v; }
+  set(k,v){ if(this.map.has(k)) this.map.delete(k); this.map.set(k,v); if(this.map.size>this.limit) this.map.delete(this.map.keys().next().value); }
+}
+```
+
+### 15.4 WeakMap for private per-instance data (auto-GC)
+
+```js
+const priv = new WeakMap();
+class Counter {
+  constructor(){ priv.set(this, { c:0 }); }
+  inc(){ return ++priv.get(this).c; }
+}
+```
+
+### 15.5 WeakRef + FinalizationRegistry (rare but senior-level)
+
+```js
+const registry = new FinalizationRegistry(token => console.log('GCd', token));
+function track(obj, token){ registry.register(obj, token); return new WeakRef(obj); }
+```
+
+### 15.6 Set utilities (dedupe, union/intersection/diff)
+
+```js
+const dedupe = arr => [...new Set(arr)];
+const union = (a,b) => new Set([...a,...b]);
+const inter = (a,b) => new Set([...a].filter(x=>b.has(x)));
+const diff  = (a,b) => new Set([...a].filter(x=>!b.has(x)));
+```
+
+---
+
+## 16) DOM Performance & Observers
+
+### 16.1 Batch reads/writes (avoid layout thrash)
+
+```js
+// read
+const w = el.offsetWidth;
+// write later
+requestAnimationFrame(() => { el.style.width = (w + 20) + 'px'; });
+```
+
+### 16.2 Passive event listeners (scroll/touch perf)
+
+```js
+window.addEventListener('touchmove', onTouch, { passive: true });
+```
+
+### 16.3 IntersectionObserver: lazy images
+
+```js
+const io = new IntersectionObserver(entries=>{
+  for(const e of entries){
+    if(e.isIntersecting){
+      const img = e.target; img.src = img.dataset.src; io.unobserve(img);
+    }
+  }
+},{ rootMargin: '200px' });
+document.querySelectorAll('img[data-src]').forEach(img => io.observe(img));
+```
+
+### 16.4 MutationObserver: react to dynamic DOM
+
+```js
+const mo = new MutationObserver(muts => { /* reconcile list, rebind, etc */ });
+mo.observe(container, { childList:true, subtree:true });
+```
+
+### 16.5 ResizeObserver: responsive logic without polling
+
+```js
+const ro = new ResizeObserver(entries=>{
+  for (const { target, contentRect:{width} } of entries) target.dataset.size = width>600?'lg':'sm';
+});
+ro.observe(panel);
+```
+
+### 16.6 DocumentFragment: batch insert
+
+```js
+const frag = new DocumentFragment();
+items.forEach(t => { const li = document.createElement('li'); li.textContent = t; frag.append(li); });
+ul.replaceChildren(frag);
+```
+
+---
+
+## 17) Fetch Patterns: ETag, Token Refresh, Rate Limits, Streams
+
+### 17.1 Conditional request with ETag (If-None-Match)
+
+```js
+async function getJSONWithETag(url, etag){
+  const res = await fetch(url, { headers: etag ? { 'If-None-Match': etag } : {} });
+  if (res.status === 304) return { status: 'not-modified' };
+  const newEtag = res.headers.get('ETag');
+  return { status:'ok', etag:newEtag, data: await res.json() };
+}
+```
+
+### 17.2 Token refresh with single-flight lock
+
+```js
+let refreshing;
+async function fetchAuth(url, init={}){
+  let token = localStorage.getItem('token');
+  const res = await fetch(url, { ...init, headers:{...init.headers, Authorization:`Bearer ${token}`} });
+  if (res.status !== 401) return res;
+
+  refreshing = refreshing || (async () => {
+    const r = await fetch('/auth/refresh', { method:'POST', credentials:'include' });
+    if (!r.ok) throw new Error('refresh-failed');
+    const { token: t } = await r.json(); localStorage.setItem('token', t); return t;
+  })();
+
+  try { token = await refreshing; }
+  finally { refreshing = undefined; }
+
+  return fetch(url, { ...init, headers:{...init.headers, Authorization:`Bearer ${token}`} });
+}
+```
+
+### 17.3 Respect 429 Retry-After (backoff)
+
+```js
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+async function fetchRespectingRate(url, init={}, attempts=3){
+  const res = await fetch(url, init);
+  if (res.status !== 429 || attempts<=0) return res;
+  const ra = res.headers.get('Retry-After'); // seconds or HTTP-date
+  const ms = ra && !isNaN(+ra) ? (+ra)*1000 : 1000; // basic
+  await sleep(ms);
+  return fetchRespectingRate(url, init, attempts-1);
+}
+```
+
+### 17.4 File upload (abort + progress via XHR fallback)
+
+```js
+function uploadWithProgress(url, file, onProgress){
+  return new Promise((res, rej) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(e.loaded/e.total); };
+    xhr.onload = () => xhr.status>=200 && xhr.status<300 ? res(xhr.response) : rej(new Error(xhr.statusText));
+    xhr.onerror = rej;
+    const fd = new FormData(); fd.append('file', file); xhr.send(fd);
+  });
+}
+```
+
+### 17.5 Stream NDJSON (newline-delimited JSON)
+
+```js
+async function* ndjson(stream){
+  const reader = stream.getReader(); let buf = '';
+  for(;;){
+    const { done, value } = await reader.read(); if (done) break;
+    buf += new TextDecoder().decode(value, { stream:true });
+    let idx; while ((idx = buf.indexOf('\n')) >= 0){ yield JSON.parse(buf.slice(0, idx)); buf = buf.slice(idx+1); }
+  }
+  if (buf.trim()) yield JSON.parse(buf);
+}
+```
+
+### 17.6 Idempotency keys for safe retries (POST)
+
+```js
+async function safeCreate(url, payload){
+  const key = crypto.randomUUID();
+  return fetch(url, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Idempotency-Key': key },
+    body: JSON.stringify(payload)
+  });
+}
+```
+
+---
+
+## 18) SSR/Hydration Utilities (isomorphic-safe)
+
+### 18.1 isBrowser guard
+
+```js
+export const isBrowser = typeof window !== 'undefined';
+```
+
+### 18.2 Use effects only on client
+
+```js
+if (isBrowser) {
+  // add listeners, read window size, etc.
+}
+```
+
+### 18.3 Serialize state safely (guard `</script>`)
+
+```js
+const serialize = (obj) =>
+  `<script>window.__STATE__ = ${JSON.stringify(obj).replaceAll('</', '<\\/')}</script>`;
+```
+
+### 18.4 Hydration mismatch guard (client-only key)
+
+```js
+// React: avoid random values server-side
+const useClientId = () => {
+  const [id, setId] = React.useState(''); React.useEffect(()=>setId(crypto.randomUUID()),[]);
+  return id;
+};
+```
+
+### 18.5 Client-only dynamic import in SSR frameworks
+
+```js
+// Next.js
+const Chart = dynamic(() => import('../components/Chart'), { ssr: false });
+```
+
+---
+
+## 19) Mini Coding Challenges (with answers)
+
+### 19.1 Closure loop bug: fix `var` with IIFE or `let`
+
+```js
+for (var i=0;i<3;i++){
+  ((i)=>setTimeout(()=>console.log(i),0))(i); // or: for (let i=0; i<3; i++) ...
+}
+```
+
+### 19.2 Chainable sum `sum(1)(2)(3) == 6`
+
+```js
+function sum(a){
+  const f = (b) => sum(a + b);
+  f.valueOf = () => a; f.toString = () => String(a);
+  return f;
+}
+// Number(sum(1)(2)(3)) === 6
+```
+
+### 19.3 Deep equal (objects/arrays, no cycles)
+
+```js
+function deepEqual(a,b){
+  if (Object.is(a,b)) return true;
+  if (typeof a !== 'object' || !a || typeof b !== 'object' || !b) return false;
+  const ka = Object.keys(a), kb = Object.keys(b);
+  if (ka.length !== kb.length) return false;
+  for (const k of ka) if (!kb.includes(k) || !deepEqual(a[k], b[k])) return false;
+  return true;
+}
+```
+
+### 19.4 Flatten array to depth `d`
+
+```js
+const flatDepth = (arr, d=1) =>
+  d>0 ? arr.reduce((acc, v) => acc.concat(Array.isArray(v) ? flatDepth(v, d-1) : v), [])
+      : arr.slice();
+```
+
+### 19.5 Promise sequence transformer
+
+```js
+const sequence = (tasks) => tasks.reduce((p, t) => p.then(t), Promise.resolve());
+```
+
+### 19.6 Async compose (left→right)
+
+```js
+const composeAsync = (...fns) => x => fns.reduce((p,f)=>p.then(f), Promise.resolve(x));
+// usage: await composeAsync(f1,f2,f3)(input)
+```
+
+### 19.7 Curry with placeholder `_`
+
+```js
+const _ = Symbol('placeholder');
+const curryP = (fn, ...args) => (...rest) => {
+  const filled = args.map(a => a===_ && rest.length ? rest.shift() : a).concat(rest);
+  return filled.length >= fn.length && !filled.slice(0,fn.length).includes(_) 
+    ? fn(...filled.slice(0,fn.length))
+    : curryP(fn, ...filled);
+};
+// usage: const add3=(a,b,c)=>a+b+c; curryP(add3, _, 2)(1)(3) // 6
+```
+
+### 19.8 Throttle with leading+trailing and cancel
+
+```js
+function throttleLT(fn, wait=300, {leading=true, trailing=true}={}){
+  let last=0, t, lastArgs;
+  const invoke = (now, args) => { last=now; fn(...args); };
+  const throttled = (...args) => {
+    const now = Date.now();
+    if (!last && !leading) last = now;
+    const rem = wait - (now - last);
+    lastArgs = args;
+    if (rem <= 0){ if (t) { clearTimeout(t); t=null; } invoke(now,args); }
+    else if (!t && trailing) t = setTimeout(()=>{ t=null; if (trailing && (Date.now()-last)>=wait) invoke(Date.now(), lastArgs); }, rem);
+  };
+  throttled.cancel = () => { clearTimeout(t); t=null; last=0; lastArgs=undefined; };
+  return throttled;
+}
+```
+
+### 19.9 groupBy utility
+
+```js
+const groupBy = (arr, key) =>
+  arr.reduce((acc, x) => ((acc[typeof key==='function' ? key(x) : x[key]] ??= []).push(x), acc), {});
+```
+
+### 19.10 Event loop ordering puzzle (answer in comments)
+
+```js
+console.log('A');
+setTimeout(()=>console.log('B'), 0);
+Promise.resolve().then(()=>console.log('C'));
+queueMicrotask(()=>console.log('D'));
+console.log('E');
+// Output order: A, E, C, D, B  (microtasks before macrotasks)
+```
+
+---
+
+If you want, I can ship **one more compact pack** with:
+
+* **More fetch/auth recipes** (refresh race prevention with mutex, exponential backoff + jitter already done, E2E error mapping)
+* **Image/perf tricks** (responsive `<img srcset>`, `decode()` pipeline, `createImageBitmap`)
+* **Accessibility helpers** (focus trapping, roving tabindex)
+* **React performance** (memo, useMemo/useCallback patterns, list virtualization code)
+* **5 more challenge problems** (prototype chain, `this.call/apply/bind`, generators, async iterators, custom iterator for tree)
