@@ -1,0 +1,255 @@
+## 2.3.1 Promise.any
+
+**Q324. What does `Promise.any` do, conceptually?**
+👉 Answer: `Promise.any(iterable)` returns a Promise that **fulfills with the first fulfilled value** among the inputs; it **rejects only if all inputs reject**, with an **`AggregateError`** containing all reasons. 📌 Use when you want the **first success** (e.g., fastest mirror).
+
+```js
+const fastest = await Promise.any([
+  fetch('/mirror1/data'),
+  fetch('/mirror2/data'),
+  fetch('/mirror3/data')
+]);
+```
+
+**Q325. How is `any` different from `race`?**
+👉 Answer: `race` settles with the **first settler** (fulfill or reject). `any` ignores **rejections** until all reject. 📌 `any` is for **“succeed-fast”**, `race` is for **“settle-fast”** (including failure).
+
+**Q326. How do you handle the `AggregateError` from `any`?**
+👉 Answer: Catch and inspect `.errors`.
+
+```js
+try { await Promise.any(tasks); }
+catch (e) {
+  if (e instanceof AggregateError) {
+    e.errors.forEach(err => console.warn(err));
+  }
+}
+```
+
+📌 This fires only when **every** input rejected.
+
+**Q327. When is `Promise.any` the right choice in apps?**
+👉 Answer: 📌 **Multi-endpoint redundancy** (first healthy region), **progressive media** (pick the first CDN), **feature detection** (try multiple strategies; accept first success).
+
+---
+
+## 2.3.2 Promise.allSettled
+
+**Q328. What does `Promise.allSettled` return and why use it?**
+👉 Answer: It returns a Promise that **always fulfills** with an **array of `{ status, value|reason }`** for each input. 📌 Use when you need **complete results** regardless of failures (e.g., dashboards).
+
+```js
+const results = await Promise.allSettled([getUser(), getPosts(), getPrefs()]);
+// results: [{status:'fulfilled', value:...}, {status:'rejected', reason:...}, ...]
+```
+
+**Q329. How do you extract only successful values from `allSettled`?**
+👉 Answer:
+
+```js
+const okValues = results
+  .filter(r => r.status === 'fulfilled')
+  .map(r => r.value);
+```
+
+📌 Keep rejected reasons for logging/telemetry.
+
+**Q330. `all` vs `allSettled` vs `any`—quick rule of thumb?**
+👉 Answer:
+
+* **all**: succeed only if **all** succeed (fail-fast).
+* **allSettled**: **always** give per-task outcome.
+* **any**: succeed if **any** succeed (fail-only-if-all-fail).
+  📌 Choose based on **tolerance** to partial failure.
+
+**Q331. Do `allSettled` entries preserve input order?**
+👉 Answer: Yes—**array positions match input order**, independent of completion time. 📌 Rely on indexes for correlating tasks.
+
+---
+
+## 2.3.3 Async Programming
+
+**Q332. What is “async programming” in JS and why is it vital?**
+👉 Answer: It’s organizing work so the **single-threaded** JS engine can **start tasks now** and **handle results later** (I/O, timers, UI) without blocking. 📌 Achieved via **callbacks → Promises → `async/await`**, scheduled through the **event loop** (microtasks/macrotasks).
+
+**Q333. What patterns improve async code readability and safety?**
+👉 Answer: 📌 Prefer `async/await` with **`try/catch/finally`**, **small composable functions**, **guard clauses**, and **explicit concurrency** (`Promise.all`, pools). Avoid **hidden globals** and **shared mutable state**.
+
+**Q334. How do you model backpressure and concurrency limits?**
+👉 Answer: Use **pools/queues** to cap concurrent tasks.
+
+```js
+async function mapLimit(items, limit, worker){
+  const out = new Array(items.length);
+  let i = 0; const running = new Set();
+  async function run() {
+    if (i >= items.length) return;
+    const idx = i++, p = worker(items[idx]).then(v => (out[idx]=v));
+    running.add(p); p.finally(()=>running.delete(p)).finally(run);
+  }
+  for (let k=0; k<Math.min(limit, items.length); k++) run();
+  await Promise.all(running); return out;
+}
+```
+
+📌 Prevents **throttling** and **browser/OS limits** issues.
+
+**Q335. What’s the right way to compose async steps with cleanup?**
+👉 Answer: Use **`try { await step1; await step2; } finally { cleanup(); }`** so cleanup runs on both success and failure. 📌 Keep **side effects** localized.
+
+**Q336. What async bugs are most common?**
+👉 Answer: 📌 **Forgotten `await`**, **unhandled rejections**, **sequential-by-accident** (await inside loop), **race conditions** on shared state, **leaked timers/listeners**.
+
+**Q337. How do you handle CPU-bound work without freezing the UI?**
+👉 Answer: Offload to **Web Workers** (browser) or **worker threads** (Node). 📌 JS main thread stays responsive; communicate via **postMessage** or **structured clone**.
+
+---
+
+## 2.3.4 Execute Promises in sequence
+
+**Q338. How to run tasks strictly one after another with `for...of`?**
+👉 Answer:
+
+```js
+for (const job of jobs) {
+  const res = await job();  // sequential
+  handle(res);
+}
+```
+
+📌 Most readable; keeps order and backpressure.
+
+**Q339. How to build a reusable sequential runner?**
+👉 Answer:
+
+```js
+async function inSequence(tasks, worker){
+  const out = [];
+  for (const t of tasks) out.push(await worker(t));
+  return out;
+}
+```
+
+📌 Ensures **one-at-a-time** processing.
+
+**Q340. How to chain with `reduce` (functional style)?**
+👉 Answer:
+
+```js
+await tasks.reduce((p, t) => p.then(()=> doTask(t)), Promise.resolve());
+```
+
+📌 Compact but less readable than `for...of`.
+
+**Q341. When is sequential execution preferable?**
+👉 Answer: 📌 When tasks **depend** on each other, or when APIs enforce **rate limits** / **ordering** (e.g., transactional steps).
+
+---
+
+## 2.3.5 Create a cancelable Promises
+
+**Q342. Are Promises cancelable by spec?**
+👉 Answer: No—Promises are **not cancelable** once started. You implement **cancelation** by **cooperating** with the underlying operation (e.g., `AbortController` for `fetch`) or by **ignoring** results after a cancel signal. 📌 Cancelation is a **protocol**, not a Promise feature.
+
+**Q343. How to cancel a `fetch` properly?**
+👉 Answer: Use **`AbortController`**.
+
+```js
+const ctl = new AbortController();
+const p = fetch(url, { signal: ctl.signal });
+ctl.abort(); // cancels
+```
+
+📌 Handle `DOMException: "The operation was aborted"`.
+
+**Q344. How to create a “cancelable wrapper” that ignores late results?**
+👉 Answer:
+
+```js
+function makeCancelable(promise){
+  let canceled = false;
+  const wrapped = new Promise((res, rej) =>
+    promise.then(v => canceled ? undefined : res(v),
+                 e => canceled ? undefined : rej(e))
+  );
+  return { promise: wrapped, cancel(){ canceled = true; } };
+}
+```
+
+📌 This **doesn’t stop** the underlying work—just **drops** results.
+
+**Q345. How to pair cancelation with cleanup reliably?**
+👉 Answer: Use **`finally`** to release resources no matter what.
+
+```js
+const { promise, cancel } = makeCancelable(doWork());
+try { await promise; }
+finally { cleanup(); }
+```
+
+📌 Always free timers, sockets, locks.
+
+**Q346. Can we combine `race` with a cancel signal?**
+👉 Answer: Yes—race the work against a **signal Promise**.
+
+```js
+function withSignal(p, signal){
+  return Promise.race([
+    p,
+    new Promise((_, rej)=> signal.addEventListener('abort', ()=>rej(signal.reason), {once:true}))
+  ]);
+}
+```
+
+📌 Still requires the **producer** to honor abort.
+
+---
+
+## 2.4.1 Retry a promise N times on failure
+
+**Q347. What’s a robust retry strategy for network calls?**
+👉 Answer: Use **exponential backoff + jitter**, and **only retry transient errors** (e.g., 429/503, network). Avoid retrying **non-idempotent** actions unless the API supports it. 📌 Cap max attempts and **timeout** each try.
+
+**Q348. Show a reusable `retry` helper with backoff + jitter.**
+👉 Answer:
+
+```js
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function retry(fn, {
+  retries = 3, // attempts after the first
+  base = 300,  // ms
+  factor = 2,  // backoff
+  jitter = true,
+  retryIf = (e) => e?.status === 429 || e?.status >= 500
+} = {}) {
+  let attempt = 0;
+  for (;;) {
+    try { return await fn(); }
+    catch (e) {
+      if (attempt++ >= retries || !retryIf(e)) throw e;
+      const delay = (base * (factor ** (attempt - 1))) * (jitter ? (0.5 + Math.random()) : 1);
+      await sleep(delay);
+    }
+  }
+}
+```
+
+📌 Customize `retryIf` to your domain.
+
+**Q349. How do you add **per-attempt timeouts** to avoid hanging?**
+👉 Answer: Wrap each call with **`AbortController`** (for `fetch`) or a **`race`** timeout.
+
+```js
+async function fetchWithTimeout(url, ms=5000){
+  const ctl = new AbortController();
+  const t = setTimeout(()=>ctl.abort(), ms);
+  try { return await fetch(url, { signal: ctl.signal }); }
+  finally { clearTimeout(t); }
+}
+```
+
+📌 Combine with `retry` to bound total waiting time.
+
+**Q350. What telemetry should retries record?**
+👉 Answer: 📌 **Attempt count**, **error codes**, **delays**, **final outcome**, **endpoint**, **correlation id**. This enables **alerting**, capacity planning, and spotting **bad retry storms**.
