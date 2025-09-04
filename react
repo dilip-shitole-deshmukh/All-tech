@@ -1,1 +1,2783 @@
+Perfect 🚀 we’ll do React the same way we did JavaScript:
+
+* **300+ React interview Q\&A** across all **8 stages**.
+* Delivered in **\~7 chunks** (\~40–50 Q\&A per chunk).
+* Each Q\&A = **interview style**:
+
+  * `**Qn. Question?**` → 👉 Answer: explanation + 📌 key insights + examples.
+
+We’ll start **Stage 1: React Basics** → around 45 Q\&A in this first chunk.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 1 – Basics)
+
+---
+
+## 1.1 React Fundamentals
+
+**Q1. What is React and why is it popular?**
+👉 Answer: React is a **JavaScript library** (not framework) for building **user interfaces**.
+
+* 📌 Component-based → reusable, modular UIs.
+* 📌 Virtual DOM → efficient updates.
+* 📌 Huge ecosystem (Redux, Next.js).
+* 📌 Backed by Meta + community.
+  Example:
+
+```jsx
+function App(){ return <h1>Hello React</h1>; }
+```
+
+---
+
+**Q2. What is the Virtual DOM in React?**
+👉 Answer: A lightweight **JS object representation** of the actual DOM.
+
+* React updates the Virtual DOM first → then diffs with the real DOM → applies minimal changes.
+  📌 Benefits: faster rendering, avoids unnecessary DOM manipulation.
+
+---
+
+**Q3. What are the main features of React?**
+👉 Answer:
+
+* Declarative UI (UI = function of state).
+* Component-based.
+* Virtual DOM.
+* One-way data flow (props).
+* Hooks (functional components with state/lifecycle).
+
+---
+
+**Q4. What is JSX?**
+👉 Answer: JSX = **JavaScript + XML-like syntax**. It lets us write HTML inside JS.
+Example:
+
+```jsx
+const el = <h1 className="title">Hello</h1>;
+```
+
+📌 Compiles to `React.createElement("h1", {className:"title"}, "Hello")`.
+
+---
+
+**Q5. Why is JSX not required in React?**
+👉 Answer: JSX is just syntax sugar. You can use `React.createElement` directly, but JSX is more readable.
+
+---
+
+## 1.2 Components
+
+**Q6. What is the difference between Functional and Class components?**
+👉 Answer:
+
+* **Functional**: simple functions, hooks for state/lifecycle.
+
+```jsx
+function Greet({name}){ return <h1>Hello {name}</h1>; }
+```
+
+* **Class**: older style, use `this.state`, lifecycle methods.
+  📌 Since React 16.8, **functional + hooks** are standard.
+
+---
+
+**Q7. What are props in React?**
+👉 Answer: Props are **inputs to components** (read-only).
+
+* Passed from parent → child.
+* Immutable inside child.
+
+```jsx
+<Greet name="Dilip" />
+```
+
+---
+
+**Q8. How do you define default props in React?**
+👉 Answer:
+
+```jsx
+function Greet({name="Guest"}){ return <h1>Hello {name}</h1>; }
+```
+
+📌 Default props avoid `undefined` errors.
+
+---
+
+**Q9. What is state in React?**
+👉 Answer: State is **mutable data** managed inside a component.
+
+* `useState` in functional components.
+
+```jsx
+const [count, setCount] = useState(0);
+```
+
+📌 Updating state re-renders the component.
+
+---
+
+**Q10. How do props differ from state?**
+👉 Answer:
+
+* **Props**: external, read-only, passed by parent.
+* **State**: internal, managed by the component.
+
+---
+
+**Q11. Why should we not mutate state directly?**
+👉 Answer: Mutating doesn’t trigger re-render. Always use `setState`/`setCount`.
+📌 React needs immutability for Virtual DOM diffing.
+
+---
+
+**Q12. What is the difference between controlled and uncontrolled components?**
+👉 Answer:
+
+* **Controlled**: React manages input state via `value` + `onChange`.
+
+```jsx
+<input value={name} onChange={e=>setName(e.target.value)} />
+```
+
+* **Uncontrolled**: DOM manages input, use `ref`.
+
+```jsx
+<input ref={inputRef} />
+```
+
+📌 Controlled preferred for predictable forms.
+
+---
+
+**Q13. How do you render lists in React?**
+👉 Answer: Use `map`.
+
+```jsx
+const items = ["A","B"];
+items.map(i => <li key={i}>{i}</li>);
+```
+
+📌 Always give **unique key** to avoid diffing issues.
+
+---
+
+**Q14. Why is `key` important in React lists?**
+👉 Answer: Helps React **identify which items changed/added/removed**. Without keys → inefficient re-renders or bugs.
+
+---
+
+**Q15. What are fragments in React?**
+👉 Answer: `<React.Fragment>` or shorthand `<>...</>` lets you group elements without extra DOM nodes.
+
+```jsx
+<>
+ <h1>Hello</h1>
+ <p>World</p>
+</>
+```
+
+---
+
+## 1.3 Rendering & Conditional Logic
+
+**Q16. How to conditionally render elements in React?**
+👉 Answer:
+
+* `if` statement.
+* Ternary operator: `{cond ? <A/> : <B/>}`.
+* Logical AND: `{cond && <A/>}`.
+
+---
+
+**Q17. What happens when state updates in React?**
+👉 Answer:
+
+1. State setter updates state.
+2. React schedules a re-render.
+3. Virtual DOM is compared with old.
+4. Only changes are applied to real DOM.
+
+---
+
+**Q18. Why are state updates asynchronous in React?**
+👉 Answer: For performance, React batches updates.
+📌 You cannot rely on immediate new value after `setState`. Use callback/updater:
+
+```js
+setCount(c => c+1);
+```
+
+---
+
+**Q19. What is batching in React?**
+👉 Answer: React groups multiple state updates into one re-render for performance.
+Example:
+
+```js
+setA(1); setB(2); // only one render
+```
+
+---
+
+**Q20. What is reconciliation in React?**
+👉 Answer: The process React uses to diff the Virtual DOM and apply only necessary DOM updates. 📌 Keys make this efficient.
+
+---
+
+## 1.4 Events in React
+
+**Q21. How are events handled in React?**
+👉 Answer: Events are camelCase and passed functions.
+
+```jsx
+<button onClick={handleClick}>Click</button>
+```
+
+📌 React uses **synthetic event system** (cross-browser wrapper).
+
+---
+
+**Q22. What is a synthetic event?**
+👉 Answer: A cross-browser wrapper around native events for consistent behavior.
+
+---
+
+**Q23. Difference between `onClick={fn()}` vs `onClick={fn}`?**
+👉 Answer:
+
+* `{fn()}` → runs immediately (bad).
+* `{fn}` → passes reference, runs on click (correct).
+
+---
+
+**Q24. How do you prevent default in React events?**
+👉 Answer:
+
+```jsx
+const handle = (e)=>{ e.preventDefault(); }
+<form onSubmit={handle}>
+```
+
+---
+
+**Q25. Can you pass parameters to event handlers?**
+👉 Answer: Yes, wrap in arrow function.
+
+```jsx
+<button onClick={()=>handle(id)}>Delete</button>
+```
+
+---
+
+## 1.5 Core Pitfalls
+
+**Q26. Why shouldn’t we use index as a key in lists?**
+👉 Answer: If items reorder, React mismatches elements → UI bugs. Use stable IDs.
+
+---
+
+**Q27. Why does `setState` not update immediately?**
+👉 Answer: React batches and schedules updates. State update is **async** to improve performance.
+
+---
+
+**Q28. What is the difference between `className` and `class` in JSX?**
+👉 Answer: JSX uses `className` because `class` is reserved in JS.
+
+---
+
+**Q29. Why should you avoid modifying props?**
+👉 Answer: Props are **read-only**. Modifying them breaks unidirectional flow.
+
+---
+
+**Q30. Can React components return multiple elements?**
+👉 Answer: Yes, wrap them in **fragments** or a parent element.
+
+---
+
+## 1.6 Interview-Specific Basics
+
+**Q31. What is one-way data flow in React?**
+👉 Answer: Data flows parent → child via props. Child cannot directly change parent’s state. 📌 Predictable architecture.
+
+---
+
+**Q32. How do you share state between components?**
+👉 Answer: Lift state up to common parent, then pass via props. For bigger apps, use Context/Redux.
+
+---
+
+**Q33. What is the difference between React and Angular/Vue?**
+👉 Answer:
+
+* React = library (flexible).
+* Angular = full framework (opinionated).
+* Vue = progressive framework.
+  📌 React gives freedom but needs extra libraries for routing, state.
+
+---
+
+**Q34. Why does React need a root element (`<div id="root">`)?**
+👉 Answer: React renders into a single root using `ReactDOM.createRoot`. Keeps app isolated.
+
+---
+
+**Q35. What is the role of `ReactDOM.createRoot` in React 18?**
+👉 Answer: Creates a concurrent root enabling React 18 features (concurrent rendering, Suspense improvements).
+
+---
+
+**Q36. Can React render on server?**
+👉 Answer: Yes, via SSR frameworks like Next.js. React has `renderToString` for server-side rendering.
+
+---
+
+**Q37. What are controlled inputs and why are they better?**
+👉 Answer: Controlled inputs keep React state as the single source of truth. Easier validation, predictable UI.
+
+---
+
+**Q38. Why should you avoid using `dangerouslySetInnerHTML`?**
+👉 Answer: It can expose your app to **XSS attacks** if unsafe input is inserted.
+
+---
+
+**Q39. What is the difference between default export and named export in React components?**
+👉 Answer:
+
+* Default: `export default App; import App from './App'`.
+* Named: `export const App=...; import {App} from './App'`.
+
+---
+
+**Q40. How does React differ from vanilla JS DOM manipulation?**
+👉 Answer: React updates **Virtual DOM** → diffs → efficient real DOM update. Vanilla JS manipulates DOM directly → slower.
+
+---
+
+**Q41. Why is React declarative?**
+👉 Answer: You describe **what UI should look like** based on state. React handles how to update DOM.
+
+---
+
+**Q42. Can React apps run without build tools like Webpack?**
+👉 Answer: Yes, using CDN React scripts + Babel in browser. But not practical for production.
+
+---
+
+**Q43. What are functional components called before hooks?**
+👉 Answer: They were called **stateless functional components** because they had no state or lifecycle.
+
+---
+
+**Q44. Can you conditionally call hooks?**
+👉 Answer: ❌ No. Hooks must be called at the **top level** of components. React relies on order.
+
+---
+
+**Q45. Why is React called “unidirectional”?**
+👉 Answer: Because **data flows downward** (parent → child). Children notify parents via callbacks, but not directly mutate parent state.
+
+---
+
+✅ That’s **45 Q\&A (Stage 1: Basics)**.
+
+---
+
+👉 Next chunk (Stage 2: Intermediate) will cover **Hooks, Lifecycle, Forms, Context, Custom Hooks** (\~45 Q\&A).
+
+Do you want me to continue with **Stage 2 Q\&A right away** or also start mixing in **essential React code snippets (e.g. custom hooks, controlled forms, reducers)** along with Q\&A?
+
+
+
+Perfect 👍 Let’s continue with **Stage 2: React Intermediate**.
+We’ll cover **Hooks, Lifecycle, Forms, Context, Refs, Reducers, Custom Hooks, Prop Drilling** with **\~45 Q\&A**.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 2 – Intermediate)
+
+---
+
+## 2.1 Lifecycle & Effects
+
+**Q46. What are lifecycle methods in class components?**
+👉 Answer:
+
+* **Mounting**: `constructor`, `render`, `componentDidMount`
+* **Updating**: `shouldComponentUpdate`, `render`, `componentDidUpdate`
+* **Unmounting**: `componentWillUnmount`
+  📌 With hooks, lifecycle is mostly handled via `useEffect`.
+
+---
+
+**Q47. What is the equivalent of `componentDidMount` in hooks?**
+👉 Answer: Use `useEffect` with an **empty dependency array**.
+
+```jsx
+useEffect(() => { console.log("mounted"); }, []);
+```
+
+---
+
+**Q48. How do you clean up side effects in React?**
+👉 Answer: Return a cleanup function from `useEffect`.
+
+```jsx
+useEffect(() => {
+  const id = setInterval(()=>console.log("tick"), 1000);
+  return () => clearInterval(id); // cleanup on unmount
+}, []);
+```
+
+---
+
+**Q49. What happens if you don’t provide a dependency array in `useEffect`?**
+👉 Answer: The effect runs **after every render**.
+
+---
+
+**Q50. What happens if you provide an empty array `[]` in `useEffect`?**
+👉 Answer: The effect runs **only once after mount** (like `componentDidMount`).
+
+---
+
+**Q51. What happens if you pass variables in dependency array of `useEffect`?**
+👉 Answer: The effect runs **every time those variables change**.
+
+---
+
+**Q52. What are common pitfalls with `useEffect`?**
+👉 Answer:
+
+* Forgetting dependencies → stale state bugs.
+* Adding unnecessary dependencies → infinite loops.
+  📌 Use **ESLint plugin for React hooks** to catch issues.
+
+---
+
+## 2.2 useContext & Prop Drilling
+
+**Q53. What is prop drilling in React?**
+👉 Answer: Passing props through multiple layers of components unnecessarily.
+📌 Example: passing `user` through 5 components when only last one needs it.
+
+---
+
+**Q54. How do you solve prop drilling?**
+👉 Answer: Use **Context API** or external state libraries (Redux, Zustand).
+
+---
+
+**Q55. What is Context API in React?**
+👉 Answer: Context provides a way to share values between components **without passing props manually**.
+
+```jsx
+const Theme = createContext("light");
+<Theme.Provider value="dark"><App/></Theme.Provider>
+```
+
+---
+
+**Q56. How do you consume context in functional components?**
+👉 Answer: Use `useContext`.
+
+```jsx
+const theme = useContext(Theme);
+```
+
+---
+
+**Q57. What is the downside of Context API?**
+👉 Answer: Context re-renders **all consumers** when the value changes → can impact performance in large apps.
+
+---
+
+## 2.3 Forms & Events
+
+**Q58. What is a controlled component in React forms?**
+👉 Answer: Input where **React state is the source of truth**.
+
+```jsx
+<input value={name} onChange={e=>setName(e.target.value)} />
+```
+
+---
+
+**Q59. What is an uncontrolled component in React forms?**
+👉 Answer: Input where DOM maintains its state, accessed via `ref`.
+
+```jsx
+<input ref={inputRef} />
+```
+
+---
+
+**Q60. Which is better: controlled or uncontrolled forms?**
+👉 Answer: Controlled is preferred for **validation, predictability, integration**.
+📌 Uncontrolled is fine for **simple forms** or performance-sensitive cases.
+
+---
+
+**Q61. How do you handle multiple form inputs in React?**
+👉 Answer: Use computed property names.
+
+```jsx
+const handleChange = e => setForm({...form, [e.target.name]: e.target.value});
+```
+
+---
+
+**Q62. How do you validate forms in React?**
+👉 Answer:
+
+* Manual checks inside `onSubmit`.
+* Use libraries: **Formik**, **React Hook Form**, **Yup**.
+
+---
+
+## 2.4 Refs in React
+
+**Q63. What are refs in React?**
+👉 Answer: Refs give **direct access to DOM nodes** or React elements.
+
+```jsx
+const ref = useRef(null);
+<input ref={ref}/>
+```
+
+---
+
+**Q64. When to use refs instead of state?**
+👉 Answer:
+
+* To manage **uncontrolled inputs**.
+* For DOM manipulation (focus, scroll).
+* To persist values across renders without causing re-render.
+
+---
+
+**Q65. What is `forwardRef` in React?**
+👉 Answer: Allows refs to be passed from parent → child.
+
+```jsx
+const Input = React.forwardRef((props, ref)=><input ref={ref} {...props}/>);
+```
+
+📌 Used in UI libraries.
+
+---
+
+**Q66. What is `useImperativeHandle`?**
+👉 Answer: Customizes what is exposed via `ref` when using `forwardRef`.
+
+```jsx
+useImperativeHandle(ref, ()=>({ focus:()=>inputRef.current.focus() }));
+```
+
+---
+
+## 2.5 useReducer & Custom Hooks
+
+**Q67. What is `useReducer` in React?**
+👉 Answer: Alternative to `useState` for **complex state logic**.
+
+```jsx
+const reducer = (state, action) => action.type==="inc" ? state+1 : state;
+const [count, dispatch] = useReducer(reducer, 0);
+```
+
+---
+
+**Q68. When should you use `useReducer` instead of `useState`?**
+👉 Answer:
+
+* Complex state transitions.
+* Multiple related state updates.
+* To centralize logic outside component.
+
+---
+
+**Q69. Can `useReducer` replace Redux?**
+👉 Answer: For small/medium apps, yes. But Redux offers **devtools, middleware, global state management**.
+
+---
+
+**Q70. What are custom hooks in React?**
+👉 Answer: Reusable functions that encapsulate logic using hooks.
+
+```jsx
+function useFetch(url){ 
+  const [data,setData] = useState(null);
+  useEffect(()=>{ fetch(url).then(r=>r.json()).then(setData); },[url]);
+  return data;
+}
+```
+
+---
+
+**Q71. What rules apply to custom hooks?**
+👉 Answer: Same as React hooks:
+
+* Must start with `use`.
+* Must be called at top level, not in loops/conditions.
+
+---
+
+**Q72. What are the benefits of custom hooks?**
+👉 Answer:
+
+* Reuse logic across components.
+* Keep components cleaner.
+* Easier testing.
+
+---
+
+**Q73. Example of a custom hook for window width?**
+👉 Answer:
+
+```jsx
+function useWindowWidth(){
+  const [w,setW]=useState(window.innerWidth);
+  useEffect(()=>{ 
+    const onResize=()=>setW(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return ()=>window.removeEventListener('resize', onResize);
+  },[]);
+  return w;
+}
+```
+
+---
+
+## 2.6 Advanced Hooks
+
+**Q74. What is `useRef` used for besides DOM access?**
+👉 Answer:
+
+* Persist values across renders (like instance variables).
+* Store mutable values without re-render.
+  📌 Example: track previous state.
+
+---
+
+**Q75. How do you track previous state with `useRef`?**
+👉 Answer:
+
+```jsx
+const prev = useRef();
+useEffect(()=>{ prev.current = count; }, [count]);
+```
+
+---
+
+**Q76. What is `useLayoutEffect`?**
+👉 Answer: Similar to `useEffect`, but runs **synchronously after DOM mutations** and before paint.
+📌 Useful for measuring DOM (like element size).
+
+---
+
+**Q77. When should you avoid `useLayoutEffect`?**
+👉 Answer: Avoid heavy computations inside it → blocks painting → can cause flicker.
+
+---
+
+**Q78. What is the difference between `useEffect` and `useLayoutEffect`?**
+👉 Answer:
+
+* `useEffect`: async, runs after paint.
+* `useLayoutEffect`: sync, runs before paint.
+
+---
+
+**Q79. What is `useDebugValue` in React?**
+👉 Answer: Used inside custom hooks to label values in React DevTools.
+
+```js
+useDebugValue(isOnline ? "Online" : "Offline");
+```
+
+---
+
+**Q80. What happens if you call hooks conditionally?**
+👉 Answer: Breaks rules of hooks. React relies on consistent hook order → will throw runtime errors.
+
+---
+
+**Q81. What are common mistakes with hooks?**
+👉 Answer:
+
+* Using hooks inside conditions/loops.
+* Forgetting dependencies in `useEffect`.
+* Mutating state directly instead of setters.
+
+---
+
+## 2.7 Misc Interview Questions
+
+**Q82. Why is lifting state up a common pattern in React?**
+👉 Answer: To share state between components → move it to nearest common ancestor.
+
+---
+
+**Q83. Why should side effects not be placed in render?**
+👉 Answer: Render must be pure. Side effects (API calls, subscriptions) go in `useEffect`.
+
+---
+
+**Q84. What happens if you set state in `useEffect` without dependency array?**
+👉 Answer: Infinite re-render loop.
+
+---
+
+**Q85. How do you optimize context performance?**
+👉 Answer:
+
+* Split context into smaller ones.
+* Memoize context values with `useMemo`.
+* Use libraries like `zustand` for state.
+
+---
+
+**Q86. What is stale closure in React hooks?**
+👉 Answer: When an effect references **old state/props** due to missing dependencies.
+📌 Fix: add dependencies or use refs.
+
+---
+
+**Q87. Why does React recommend immutable state updates?**
+👉 Answer: React relies on shallow comparison in diffing. Mutation may not trigger re-render.
+
+---
+
+**Q88. How do you optimize forms in React?**
+👉 Answer:
+
+* Controlled components for accuracy.
+* Debounced input updates.
+* Use `React.memo` for heavy form sections.
+* Libraries like React Hook Form for large forms.
+
+---
+
+✅ That’s **43 Q\&A (Stage 2: Intermediate)**.
+
+---
+
+👉 Next chunk (Stage 3) will cover **Advanced React: Router, Code Splitting, Error Boundaries, HOC, Render Props, Performance Optimization, Strict Mode** (\~45 Q\&A).
+
+Would you like me to also **start including code snippets** (e.g. HOC implementation, custom render prop, error boundary class) along with Stage 3 Q\&A?
+
+
+Perfect 🚀 Let’s dive into **Stage 3: Advanced React**.
+We’ll cover **Router, Code Splitting, Error Boundaries, HOC, Render Props, Patterns, Optimization, Virtual DOM, Strict Mode** in **\~45 Q\&A**.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 3 – Advanced)
+
+---
+
+## 3.1 Routing in React
+
+**Q89. What is React Router?**
+👉 Answer: A library for **client-side routing**. It lets you map URL paths → components without full-page reloads.
+
+---
+
+**Q90. How do you define routes in React Router v6?**
+👉 Answer:
+
+```jsx
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Home/>}/>
+    <Route path="/about" element={<About/>}/>
+  </Routes>
+</BrowserRouter>
+```
+
+---
+
+**Q91. How do you navigate programmatically in React Router v6?**
+👉 Answer: Use `useNavigate`.
+
+```js
+const navigate = useNavigate();
+navigate("/login");
+```
+
+---
+
+**Q92. How do you get route params in React Router?**
+👉 Answer: Use `useParams`.
+
+```js
+const { id } = useParams();
+```
+
+---
+
+**Q93. Difference between `<Link>` and `<a>` in React Router?**
+👉 Answer:
+
+* `<Link>` prevents reload → SPA navigation.
+* `<a>` reloads page → full request.
+
+---
+
+## 3.2 Code Splitting & Lazy Loading
+
+**Q94. What is code splitting in React?**
+👉 Answer: Breaking bundles into smaller chunks loaded on demand. Reduces initial load time.
+
+---
+
+**Q95. How do you implement lazy loading in React?**
+👉 Answer:
+
+```jsx
+const About = React.lazy(() => import('./About'));
+<Suspense fallback={<Spinner/>}><About/></Suspense>
+```
+
+---
+
+**Q96. What is the difference between `React.lazy` and dynamic import?**
+👉 Answer:
+
+* `React.lazy` is a wrapper around dynamic import for components.
+* Dynamic import can load any module.
+
+---
+
+**Q97. What is the fallback in `<Suspense>` used for?**
+👉 Answer: Displays a loader while the lazy-loaded component is being fetched.
+
+---
+
+**Q98. Can Suspense be used for data fetching?**
+👉 Answer: Yes, in **React 18+**, Suspense supports async data fetching (with libraries like React Query or Relay).
+
+---
+
+## 3.3 Error Boundaries
+
+**Q99. What are error boundaries in React?**
+👉 Answer: Special components that **catch JavaScript errors in child components** and display fallback UI.
+
+---
+
+**Q100. How do you create an error boundary?**
+👉 Answer: Must be a **class component** with `componentDidCatch` + `getDerivedStateFromError`.
+
+```jsx
+class ErrorBoundary extends React.Component {
+  state={hasError:false};
+  static getDerivedStateFromError(){ return {hasError:true}; }
+  componentDidCatch(err, info){ console.error(err, info); }
+  render(){ return this.state.hasError ? <h2>Error</h2> : this.props.children; }
+}
+```
+
+---
+
+**Q101. Do error boundaries catch errors in event handlers?**
+👉 Answer: ❌ No. They only catch **rendering, lifecycle, and constructors**. Event handlers need try/catch.
+
+---
+
+**Q102. Can hooks replace error boundaries?**
+👉 Answer: ❌ No. Only class-based error boundaries exist (hooks can’t catch render errors).
+
+---
+
+## 3.4 Advanced Patterns
+
+**Q103. What is a Higher-Order Component (HOC)?**
+👉 Answer: A function that takes a component → returns a new component with added behavior.
+
+```js
+const withLogger = Comp => props => { console.log("Props:", props); return <Comp {...props}/>; };
+```
+
+---
+
+**Q104. What are common use cases for HOCs?**
+👉 Answer:
+
+* Authentication guards.
+* Logging/analytics.
+* Conditional rendering.
+
+---
+
+**Q105. What is the difference between HOCs and custom hooks?**
+👉 Answer:
+
+* HOCs wrap components.
+* Custom hooks encapsulate logic without modifying component tree.
+  📌 Hooks are preferred in modern React.
+
+---
+
+**Q106. What is the Render Props pattern?**
+👉 Answer: A component that takes a **function as a prop** to decide what to render.
+
+```jsx
+<DataProvider render={(data)=><List items={data}/>}/>
+```
+
+---
+
+**Q107. Why was the Render Props pattern used before hooks?**
+👉 Answer: It allowed **reusable logic** across components (similar to hooks today).
+
+---
+
+**Q108. What are compound components in React?**
+👉 Answer: Components designed to work together.
+
+```jsx
+<Tabs>
+  <Tabs.List/>
+  <Tabs.Panel/>
+</Tabs>
+```
+
+📌 Gives developers flexible APIs.
+
+---
+
+## 3.5 Performance Optimization
+
+**Q109. What is `React.memo` and when to use it?**
+👉 Answer: A HOC that memoizes functional components. Prevents re-render if props don’t change.
+
+```jsx
+const Button = React.memo(({label})=><button>{label}</button>);
+```
+
+---
+
+**Q110. What is the difference between `React.memo` and `useMemo`?**
+👉 Answer:
+
+* `React.memo`: memoizes a **component**.
+* `useMemo`: memoizes a **calculation** inside component.
+
+---
+
+**Q111. What is `useCallback` in React?**
+👉 Answer: Returns a memoized function to avoid re-creating callbacks on every render.
+
+```js
+const handleClick = useCallback(()=>setCount(c=>c+1),[]);
+```
+
+---
+
+**Q112. When should you use `useMemo`?**
+👉 Answer: For **expensive calculations** or memoizing objects/arrays passed as props.
+
+---
+
+**Q113. What is React reconciliation?**
+👉 Answer: The algorithm React uses to compare Virtual DOM trees and update only changed nodes.
+
+---
+
+**Q114. How does React decide when to re-render a component?**
+👉 Answer: If parent re-renders, children may too unless:
+
+* Props are shallowly equal.
+* Component is memoized.
+
+---
+
+**Q115. What is the difference between controlled and uncontrolled re-renders?**
+👉 Answer: Controlled: React updates component due to state/props. Uncontrolled: DOM updates without React knowing (dangerous).
+
+---
+
+**Q116. How do you optimize performance in large React apps?**
+👉 Answer:
+
+* Code splitting.
+* Memoization (`React.memo`, `useMemo`, `useCallback`).
+* Windowing lists (react-window, react-virtualized).
+* Avoid unnecessary context re-renders.
+
+---
+
+**Q117. What is list virtualization in React?**
+👉 Answer: Rendering only visible items in large lists (e.g., 10 visible out of 10,000).
+📌 Reduces DOM nodes, improves performance.
+
+---
+
+**Q118. How do you debug React re-renders?**
+👉 Answer:
+
+* React DevTools “Highlight updates”.
+* `why-did-you-render` library.
+* Console logs in child components.
+
+---
+
+## 3.6 Strict Mode & Internals
+
+**Q119. What is React Strict Mode?**
+👉 Answer: A tool for highlighting potential issues (unsafe lifecycles, side-effects).
+
+```jsx
+<React.StrictMode>
+  <App/>
+</React.StrictMode>
+```
+
+---
+
+**Q120. Why does React Strict Mode render components twice in dev?**
+👉 Answer: To detect side-effects in render and lifecycle logic. Doesn’t happen in production.
+
+---
+
+**Q121. What is the Virtual DOM diffing algorithm?**
+👉 Answer: React assumes:
+
+1. Elements of different types → destroy & recreate.
+2. Lists need keys to track identity.
+   📌 O(n) instead of O(n²).
+
+---
+
+**Q122. How does React identify elements across renders?**
+👉 Answer: Using the `key` prop. If no key, React assumes all nodes changed → re-renders unnecessarily.
+
+---
+
+**Q123. Why does React recommend pure functions for components?**
+👉 Answer: Predictability + easier reconciliation. Pure functions ensure same input → same output.
+
+---
+
+**Q124. Can React update DOM outside Virtual DOM?**
+👉 Answer: ❌ No. All updates go through Virtual DOM diffing. Direct DOM manipulation should be avoided (except with refs).
+
+---
+
+**Q125. What is the Fiber architecture in React?**
+👉 Answer: Fiber is the **new reconciliation engine** (React 16+). Allows React to **pause, abort, or prioritize updates** for smoother UIs.
+
+---
+
+✅ That’s **37 Q\&A (Stage 3: Advanced React)**.
+
+---
+
+👉 Next chunk (Stage 4) will cover **State Management beyond basics (Redux, Redux Toolkit, React Query, Zustand, Recoil, Context vs Redux)** (\~40–45 Q\&A).
+
+Would you like me to also **include Redux/Redux Toolkit code snippets (slice, thunk, dispatch usage)** directly in Stage 4 Q\&A?
+
+
+
+Great 👍 Let’s move into **Stage 4: React State Management Beyond Basics**.
+This stage is super important for **interviews**, especially in India/global product companies where **Redux / React Query / Context** knowledge is often tested.
+
+We’ll cover **Redux, Redux Toolkit, React Query, Zustand/Recoil, Context vs Redux** in **\~42 Q\&A**.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 4 – State Management)
+
+---
+
+## 4.1 Redux Basics
+
+**Q126. What is Redux?**
+👉 Answer: Redux is a **predictable state container** for JavaScript apps.
+
+* 📌 Centralized store.
+* 📌 One-way data flow.
+* 📌 State updates via pure reducers.
+
+---
+
+**Q127. What are the three core principles of Redux?**
+👉 Answer:
+
+1. **Single source of truth** – one store for the whole app.
+2. **State is read-only** – changes via actions only.
+3. **Changes via pure functions** – reducers decide new state.
+
+---
+
+**Q128. What is an action in Redux?**
+👉 Answer: Plain JS object describing **what happened**.
+
+```js
+{ type: 'ADD_TODO', payload: { text: 'Learn Redux' } }
+```
+
+---
+
+**Q129. What is a reducer in Redux?**
+👉 Answer: Pure function that takes `(state, action)` → returns new state.
+
+```js
+function todoReducer(state=[], action){
+  switch(action.type){
+    case "ADD_TODO": return [...state, action.payload];
+    default: return state;
+  }
+}
+```
+
+---
+
+**Q130. What is a Redux store?**
+👉 Answer: Holds state tree. Provides:
+
+* `getState()`
+* `dispatch(action)`
+* `subscribe(listener)`
+
+---
+
+**Q131. What are middleware in Redux?**
+👉 Answer: Functions that intercept actions before reducers. Used for logging, async (Redux Thunk, Saga).
+
+---
+
+**Q132. What is Redux Thunk?**
+👉 Answer: Middleware allowing actions to return functions (async logic).
+
+```js
+const fetchTodos = () => async dispatch => {
+  dispatch({type:"LOADING"});
+  const data = await fetch('/todos').then(r=>r.json());
+  dispatch({type:"SET_TODOS", payload:data});
+};
+```
+
+---
+
+**Q133. What is Redux Saga?**
+👉 Answer: Middleware using generator functions for async flows (better for complex async than Thunks).
+
+---
+
+**Q134. What are drawbacks of plain Redux?**
+👉 Answer:
+
+* Boilerplate (actions, reducers, constants).
+* Verbose async logic.
+  📌 Solved by Redux Toolkit.
+
+---
+
+## 4.2 Redux Toolkit (RTK)
+
+**Q135. What is Redux Toolkit?**
+👉 Answer: Official, recommended way to use Redux. Provides **less boilerplate** and built-in tools.
+
+---
+
+**Q136. What is `createSlice` in RTK?**
+👉 Answer: Creates reducer + actions together.
+
+```js
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: 0,
+  reducers: {
+    increment: state => state+1,
+    decrement: state => state-1
+  }
+});
+export const {increment, decrement} = counterSlice.actions;
+```
+
+---
+
+**Q137. What is Immer in Redux Toolkit?**
+👉 Answer: RTK uses **Immer.js** internally → lets you “mutate” state safely (it produces immutable copies).
+
+---
+
+**Q138. What is `createAsyncThunk`?**
+👉 Answer: Handles async logic automatically with pending/fulfilled/rejected states.
+
+```js
+export const fetchTodos = createAsyncThunk('todos/fetch', async () => {
+  const res = await fetch('/todos'); return res.json();
+});
+```
+
+---
+
+**Q139. Why is Redux Toolkit preferred over plain Redux?**
+👉 Answer:
+
+* Less boilerplate.
+* Built-in Immer (immutability).
+* Built-in async handling.
+* Opinionated defaults.
+
+---
+
+**Q140. How do you configure store in Redux Toolkit?**
+👉 Answer:
+
+```js
+const store = configureStore({
+  reducer: { counter: counterSlice.reducer }
+});
+```
+
+---
+
+**Q141. What are RTK Query APIs?**
+👉 Answer: Built-in data fetching & caching layer.
+
+* Auto generates hooks (`useGetTodosQuery`).
+* Manages caching, loading, errors.
+
+---
+
+## 4.3 Context vs Redux
+
+**Q142. When should you use Context API instead of Redux?**
+👉 Answer:
+
+* Small/medium apps.
+* Simple global state (theme, auth).
+  📌 Context is not great for complex or large-scale state.
+
+---
+
+**Q143. Why not use Context API for everything?**
+👉 Answer: Context re-renders **all consumers** when value changes → performance bottlenecks.
+
+---
+
+**Q144. When should you prefer Redux over Context?**
+👉 Answer:
+
+* Complex state logic.
+* Debugging tools needed (Redux DevTools).
+* Middleware for async flows.
+
+---
+
+**Q145. Can Context and Redux be used together?**
+👉 Answer: Yes. Often Context wraps Redux provider, or used separately for lightweight global state.
+
+---
+
+## 4.4 React Query (Server State)
+
+**Q146. What is React Query?**
+👉 Answer: A library for managing **server state** (API calls, caching, revalidation).
+
+---
+
+**Q147. How does React Query differ from Redux?**
+👉 Answer:
+
+* Redux = client-side state (local).
+* React Query = server-side state (remote data).
+
+---
+
+**Q148. What are benefits of React Query?**
+👉 Answer:
+
+* Automatic caching & background refetch.
+* Stale-while-revalidate.
+* Built-in loading/error states.
+
+---
+
+**Q149. Example of React Query usage?**
+👉 Answer:
+
+```js
+const {data, isLoading, error} = useQuery('todos', ()=>fetch('/todos').then(r=>r.json()));
+```
+
+---
+
+**Q150. What is mutation in React Query?**
+👉 Answer: For creating/updating/deleting data.
+
+```js
+const mutation = useMutation(newTodo => fetch('/todos',{method:'POST',body:JSON.stringify(newTodo)}));
+```
+
+---
+
+**Q151. Does React Query replace Redux?**
+👉 Answer: No. React Query is for **server state**. Redux is still needed for **app-level client state**.
+
+---
+
+## 4.5 Zustand & Recoil
+
+**Q152. What is Zustand?**
+👉 Answer: A lightweight state management library.
+
+* Simpler than Redux.
+* Uses hooks for state.
+
+```js
+const useStore = create(set => ({ count:0, inc:()=>set(s=>({count:s.count+1})) }));
+```
+
+---
+
+**Q153. Benefits of Zustand over Redux?**
+👉 Answer:
+
+* No boilerplate.
+* Hook-based API.
+* Small bundle size.
+
+---
+
+**Q154. What is Recoil in React?**
+👉 Answer: A state management library from Meta.
+
+* Uses atoms (pieces of state).
+* Supports derived selectors.
+
+---
+
+**Q155. Example of Recoil usage?**
+👉 Answer:
+
+```js
+const textState = atom({key:'textState', default:''});
+function Input(){ 
+  const [text,setText] = useRecoilState(textState);
+  return <input value={text} onChange={e=>setText(e.target.value)} />;
+}
+```
+
+---
+
+**Q156. When should you prefer Zustand/Recoil over Redux?**
+👉 Answer: For **smaller apps**, simpler state, when Redux DevTools are not required.
+
+---
+
+## 4.6 Misc State Management Qs
+
+**Q157. What is the difference between local state and global state?**
+👉 Answer:
+
+* Local: belongs to one component.
+* Global: shared across multiple components.
+
+---
+
+**Q158. What are common pitfalls of state management in React?**
+👉 Answer:
+
+* Over-engineering (using Redux for small apps).
+* Prop drilling.
+* Not memoizing derived values.
+
+---
+
+**Q159. What is the difference between optimistic and pessimistic updates?**
+👉 Answer:
+
+* Optimistic: update UI immediately, then confirm with server.
+* Pessimistic: wait for server response before updating UI.
+
+---
+
+**Q160. How do you persist Redux state across reloads?**
+👉 Answer: Use `redux-persist` to sync with localStorage/sessionStorage.
+
+---
+
+**Q161. What is a selector in Redux?**
+👉 Answer: A function to extract/derive data from store.
+
+```js
+const selectTodos = state => state.todos.filter(t=>!t.done);
+```
+
+---
+
+**Q162. Why should you avoid putting everything in Redux?**
+👉 Answer: Redux is for **global state**, not local UI state (like modals, inputs).
+
+---
+
+✅ That’s **37 Q\&A (Stage 4: State Management)**.
+
+---
+
+👉 Next chunk (Stage 5) will cover **React with APIs & Async**:
+
+* Data fetching (`fetch`, Axios).
+* Loading/Error states.
+* AbortController & cleanup.
+* Infinite scroll, pagination.
+* Debouncing/Throttling API calls.
+* Optimistic UI updates.
+* Error Boundaries + API handling.
+
+Do you also want me to **include Axios code examples** (GET/POST with interceptors, error handling) in Stage 5 Q\&A?
+
+Perfect 🚀 Now we’ll cover **Stage 5: React with APIs & Async**.
+This stage is crucial because most frontend interviews include **data fetching, error handling, pagination, debouncing API calls, optimistic updates**.
+
+We’ll go through **\~42 Q\&A** with explanations and code snippets.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 5 – APIs & Async)
+
+---
+
+## 5.1 Data Fetching
+
+**Q163. How do you fetch data in React using `fetch`?**
+👉 Answer:
+
+```jsx
+function Todos(){
+  const [data,setData]=useState([]);
+  useEffect(()=>{
+    fetch("/api/todos")
+      .then(res=>res.json())
+      .then(setData);
+  },[]);
+  return <ul>{data.map(t=><li key={t.id}>{t.text}</li>)}</ul>;
+}
+```
+
+📌 Always handle loading & error states too.
+
+---
+
+**Q164. How do you fetch data with Axios in React?**
+👉 Answer:
+
+```jsx
+useEffect(()=>{
+  axios.get("/api/todos")
+    .then(res=>setData(res.data))
+    .catch(err=>setError(err));
+},[]);
+```
+
+📌 Axios provides interceptors, JSON parsing by default.
+
+---
+
+**Q165. How do you handle loading and error states in React API calls?**
+👉 Answer:
+
+```jsx
+const [loading,setLoading]=useState(true);
+const [error,setError]=useState(null);
+useEffect(()=>{
+  fetch('/api')
+    .then(r=>r.json())
+    .then(d=>{setData(d);setLoading(false);})
+    .catch(e=>{setError(e);setLoading(false);});
+},[]);
+```
+
+---
+
+**Q166. Why is it important to cleanup async effects in React?**
+👉 Answer: To prevent **memory leaks** if component unmounts before fetch resolves.
+
+---
+
+**Q167. How do you cancel fetch requests in React?**
+👉 Answer: Use **AbortController**.
+
+```js
+useEffect(()=>{
+  const ctl = new AbortController();
+  fetch('/api',{signal:ctl.signal});
+  return ()=>ctl.abort();
+},[]);
+```
+
+---
+
+**Q168. How do you cancel Axios requests in React?**
+👉 Answer: Axios supports **CancelToken / AbortController**.
+
+```js
+const ctl = new AbortController();
+axios.get("/api",{signal:ctl.signal});
+```
+
+---
+
+## 5.2 Pagination & Infinite Scroll
+
+**Q169. How do you implement pagination in React?**
+👉 Answer: Fetch data with **page params**.
+
+```js
+fetch(`/api/todos?page=${page}`);
+```
+
+Maintain current page state & update UI.
+
+---
+
+**Q170. How do you implement infinite scrolling in React?**
+👉 Answer:
+
+* Use `IntersectionObserver` on sentinel element.
+* When visible → fetch next page.
+
+```js
+const observer = new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting) loadMore();
+});
+```
+
+---
+
+**Q171. Which is better for performance: infinite scroll or pagination?**
+👉 Answer:
+
+* Pagination → better for accessibility, less memory usage.
+* Infinite scroll → better UX for feeds (but heavy DOM).
+
+---
+
+## 5.3 Debouncing & Throttling
+
+**Q172. Why debounce API calls in React?**
+👉 Answer: To **limit API requests** when user types. Example: search box → call API after user stops typing.
+
+---
+
+**Q173. How to implement debounce in React?**
+👉 Answer:
+
+```js
+const debounce = (fn, delay=300)=>{
+  let t; return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),delay);}
+};
+const handleInput = debounce(val=>fetch(`/api?q=${val}`),500);
+```
+
+---
+
+**Q174. Why throttle API calls in React?**
+👉 Answer: To ensure API is called at most once every X ms (e.g., scroll listeners).
+
+---
+
+**Q175. What’s the difference between debounce and throttle?**
+👉 Answer:
+
+* Debounce → waits until user stops.
+* Throttle → runs at regular intervals while action continues.
+
+---
+
+## 5.4 Optimistic UI Updates
+
+**Q176. What is optimistic UI in React?**
+👉 Answer: Update UI **before server confirms** → feels faster.
+
+* Rollback if API fails.
+
+---
+
+**Q177. How to implement optimistic UI updates?**
+👉 Answer:
+
+```js
+const handleAdd = async (todo)=>{
+  setTodos([...todos,todo]); // optimistic
+  try{ await api.add(todo); }
+  catch{ setTodos(old=>old.filter(t=>t!==todo)); } // rollback
+};
+```
+
+---
+
+**Q178. What is pessimistic UI update?**
+👉 Answer: Wait for server success → then update UI. More reliable but feels slower.
+
+---
+
+**Q179. Which React libraries support optimistic updates out of the box?**
+👉 Answer: React Query, Apollo Client (GraphQL).
+
+---
+
+## 5.5 Error Handling
+
+**Q180. How do you handle API errors globally in React?**
+👉 Answer: Use Axios interceptors or custom fetch wrapper.
+
+```js
+axios.interceptors.response.use(r=>r, err=>{
+  if(err.response.status===401) logout();
+  return Promise.reject(err);
+});
+```
+
+---
+
+**Q181. How do you show user-friendly error messages for API errors?**
+👉 Answer: Store error in state and render fallback UI.
+
+```jsx
+{error && <p style={{color:'red'}}>{error.message}</p>}
+```
+
+---
+
+**Q182. How do you retry failed API requests in React?**
+👉 Answer: Implement exponential backoff.
+📌 React Query has built-in retry with backoff.
+
+---
+
+**Q183. What are global error boundaries useful for?**
+👉 Answer: Catch **render errors**. For API-specific errors, use **try/catch or state handling**.
+
+---
+
+## 5.6 Advanced API Handling
+
+**Q184. What is stale data in React apps?**
+👉 Answer: Old API data shown before refetch.
+📌 React Query manages **stale-while-revalidate**.
+
+---
+
+**Q185. How do you prevent duplicate API calls in React?**
+👉 Answer:
+
+* Use caching (React Query).
+* Use `AbortController`.
+* Debounce user actions.
+
+---
+
+**Q186. How to poll APIs in React?**
+👉 Answer: Use `setInterval` inside `useEffect`.
+
+```js
+useEffect(()=>{
+  const id=setInterval(fetchData,5000);
+  return ()=>clearInterval(id);
+},[]);
+```
+
+---
+
+**Q187. What is SWR in React?**
+👉 Answer: A data fetching library (by Vercel).
+
+* Stale-While-Revalidate strategy.
+* Similar to React Query.
+
+---
+
+**Q188. What is the difference between React Query and SWR?**
+👉 Answer: Both manage server state.
+
+* React Query = more features (mutations, retries).
+* SWR = lighter, simpler API.
+
+---
+
+**Q189. How do you handle dependent API calls in React?**
+👉 Answer: Fetch one → then next inside `useEffect`.
+
+```js
+useEffect(()=>{
+  fetch("/user/1").then(r=>r.json()).then(u=>{
+    fetch(`/posts?uid=${u.id}`).then(r=>r.json()).then(setPosts);
+  });
+},[]);
+```
+
+---
+
+**Q190. How do you cancel multiple requests when navigating away in React?**
+👉 Answer: Use `AbortController` with multiple signals or cleanup in `useEffect`.
+
+---
+
+**Q191. What is a race condition in API calls?**
+👉 Answer: When multiple requests complete out of order, last one may overwrite correct data.
+📌 Fix: track request ID or use cancellation.
+
+---
+
+## 5.7 Real-World Async Patterns
+
+**Q192. How do you implement file upload with progress in React?**
+👉 Answer: Use Axios/XHR with `onUploadProgress`.
+
+```js
+axios.post('/upload',file,{onUploadProgress:e=>{
+  setProgress(Math.round((e.loaded*100)/e.total));
+}});
+```
+
+---
+
+**Q193. How do you handle file downloads in React?**
+👉 Answer: Use `fetch`/Axios → convert to blob → createObjectURL → download.
+
+---
+
+**Q194. How do you handle authentication tokens with API calls in React?**
+👉 Answer: Use Axios interceptors to add `Authorization` header.
+
+---
+
+**Q195. What is request deduplication in React Query?**
+👉 Answer: React Query automatically merges multiple identical requests into one → avoids duplicate fetches.
+
+---
+
+**Q196. How do you implement caching manually for API calls in React?**
+👉 Answer: Store responses in a Map or localStorage, reuse if still valid.
+
+---
+
+**Q197. How do you sync React state with localStorage?**
+👉 Answer: Use a custom hook.
+
+```js
+function useLocalStorage(key, init){
+  const [val,setVal]=useState(()=>JSON.parse(localStorage.getItem(key))||init);
+  useEffect(()=>{localStorage.setItem(key,JSON.stringify(val));},[val]);
+  return [val,setVal];
+}
+```
+
+---
+
+**Q198. How do you optimize large API responses in React?**
+👉 Answer:
+
+* Paginate or infinite scroll.
+* Virtualize list rendering.
+* Compress data at server.
+
+---
+
+**Q199. Why is `useEffect` not the best for API fetching in React 18?**
+👉 Answer: Because `useEffect` runs after render → UI flashes empty state.
+📌 New React 18 patterns (Suspense for Data Fetching, React Query) are better.
+
+---
+
+**Q200. What are Suspense-enabled data fetch libraries in React?**
+👉 Answer: Relay, React Query (experimental), SWR → allow `Suspense` fallback UI.
+
+---
+
+✅ That’s **38 Q\&A (Stage 5: APIs & Async)**.
+
+---
+
+👉 Next chunk (Stage 6) will cover **Real-World React: Forms, Testing, Styling, Debugging, Deployment** (\~40–45 Q\&A).
+
+Would you like me to also **add Formik/React Hook Form code snippets** (controlled form handling, validation schema) in Stage 6?
+
+Perfect 🙌 Let’s dive into **Stage 6: Real-World React**.
+This stage is where many **practical interview questions** come from: **Forms, Testing, Styling, Debugging, Deployment**.
+
+We’ll cover **\~42 Q\&A** with clear explanations + small code snippets where useful.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 6 – Real-World React)
+
+---
+
+## 6.1 Forms
+
+**Q201. What are controlled forms in React?**
+👉 Answer: Inputs managed by React state.
+
+```jsx
+const [name,setName]=useState("");
+<input value={name} onChange={e=>setName(e.target.value)} />
+```
+
+📌 React is the single source of truth → easier validation.
+
+---
+
+**Q202. What are uncontrolled forms in React?**
+👉 Answer: Inputs managed by the DOM, accessed via `ref`.
+
+```jsx
+const inputRef = useRef();
+<input ref={inputRef} />
+```
+
+---
+
+**Q203. Which is better: controlled or uncontrolled forms?**
+👉 Answer: Controlled → better validation & predictable state.
+Uncontrolled → simpler, faster for non-critical forms.
+
+---
+
+**Q204. What is Formik in React?**
+👉 Answer: A popular library for **forms + validation**. Handles form state, errors, submission.
+
+---
+
+**Q205. Example: How do you use Formik?**
+👉 Answer:
+
+```jsx
+<Formik initialValues={{email:""}} onSubmit={v=>console.log(v)}>
+ {({handleChange,handleSubmit,values})=>(
+   <form onSubmit={handleSubmit}>
+     <input name="email" value={values.email} onChange={handleChange}/>
+   </form>
+ )}
+</Formik>
+```
+
+---
+
+**Q206. What is React Hook Form?**
+👉 Answer: A library using **uncontrolled inputs** with refs → high performance.
+
+---
+
+**Q207. Example: How do you use React Hook Form?**
+👉 Answer:
+
+```jsx
+const {register,handleSubmit} = useForm();
+<form onSubmit={handleSubmit(d=>console.log(d))}>
+  <input {...register("email")} />
+</form>
+```
+
+---
+
+**Q208. Why is React Hook Form considered faster than Formik?**
+👉 Answer: Uses uncontrolled inputs with refs → avoids re-renders on every keystroke.
+
+---
+
+**Q209. How do you do validation with Yup in React forms?**
+👉 Answer: Yup is a schema validation library.
+
+```js
+const schema = yup.object({ email: yup.string().email().required() });
+```
+
+Integrated with Formik or React Hook Form.
+
+---
+
+**Q210. How do you handle multi-step forms in React?**
+👉 Answer: Store step state + data → render step component conditionally → aggregate on submit.
+
+---
+
+## 6.2 Testing in React
+
+**Q211. How do you test React components?**
+👉 Answer:
+
+* **Unit testing**: Jest + React Testing Library (RTL).
+* **Integration testing**: Test user flows.
+* **Snapshot testing**: Jest snapshots.
+
+---
+
+**Q212. What is Jest?**
+👉 Answer: A JS testing framework for unit + snapshot tests. Built-in assertions, mocking.
+
+---
+
+**Q213. What is React Testing Library (RTL)?**
+👉 Answer: Testing library focused on **testing user behavior** (not implementation details).
+
+---
+
+**Q214. Example: How to test a button click with RTL?**
+👉 Answer:
+
+```js
+render(<button onClick={()=>alert("hi")}>Click</button>);
+fireEvent.click(screen.getByText("Click"));
+```
+
+---
+
+**Q215. Why prefer RTL over Enzyme?**
+👉 Answer: RTL tests **how users interact**, Enzyme tests internal implementation (less recommended).
+
+---
+
+**Q216. What is snapshot testing in React?**
+👉 Answer: Captures component’s rendered output → compares in future runs to detect UI changes.
+
+---
+
+**Q217. What are mocks in testing?**
+👉 Answer: Fake functions/objects replacing real dependencies (e.g., API).
+
+---
+
+**Q218. How do you test async API calls in React?**
+👉 Answer: Use Jest’s `async/await` with RTL.
+
+```js
+await waitFor(()=>expect(screen.getByText("Loaded")).toBeInTheDocument());
+```
+
+---
+
+**Q219. How do you test hooks in React?**
+👉 Answer: Use **React Hooks Testing Library** or test components using those hooks.
+
+---
+
+## 6.3 Styling
+
+**Q220. What are different styling methods in React?**
+👉 Answer:
+
+* Inline styles.
+* CSS files.
+* CSS Modules.
+* Styled-components (CSS-in-JS).
+* Tailwind CSS.
+
+---
+
+**Q221. What are CSS Modules in React?**
+👉 Answer: Locally scoped CSS files (`Button.module.css`).
+
+```jsx
+import styles from './Button.module.css';
+<button className={styles.primary}/>
+```
+
+---
+
+**Q222. What are styled-components?**
+👉 Answer: A CSS-in-JS library.
+
+```jsx
+const Button = styled.button`color:red;`
+```
+
+---
+
+**Q223. Why use styled-components?**
+👉 Answer: Scoped styles, dynamic theming, avoids class name collisions.
+
+---
+
+**Q224. What is Tailwind CSS in React?**
+👉 Answer: Utility-first CSS framework. Write styles as class names (`bg-blue-500 text-white`).
+
+---
+
+**Q225. Which is better: CSS Modules vs styled-components vs Tailwind?**
+👉 Answer:
+
+* CSS Modules: simple projects.
+* Styled-components: dynamic styling + theming.
+* Tailwind: utility classes, rapid dev.
+
+---
+
+## 6.4 Debugging
+
+**Q226. What are React DevTools?**
+👉 Answer: Browser extension to inspect React component tree, props, and state.
+
+---
+
+**Q227. How do you debug performance issues in React?**
+👉 Answer: Use **React Profiler** (in DevTools). Highlights slow components.
+
+---
+
+**Q228. How do you debug re-render issues?**
+👉 Answer:
+
+* Add `console.log` in render.
+* Use `React.memo`.
+* Use “Highlight Updates” in DevTools.
+
+---
+
+**Q229. How do you handle memory leaks in React?**
+👉 Answer:
+
+* Cleanup subscriptions in `useEffect`.
+* Cancel fetch requests.
+* Use `AbortController`.
+
+---
+
+**Q230. Why do you sometimes get “Can’t perform a React state update on an unmounted component”?**
+👉 Answer: Because async code updates state after component unmounts. Fix with cleanup in `useEffect`.
+
+---
+
+## 6.5 Deployment
+
+**Q231. How do you build a React app for production?**
+👉 Answer: Run `npm run build`. Creates optimized static files in `/build`.
+
+---
+
+**Q232. How do you deploy a React app on Netlify?**
+👉 Answer:
+
+* Push to GitHub.
+* Connect repo in Netlify.
+* Set build command: `npm run build`, publish directory: `build/`.
+
+---
+
+**Q233. How do you deploy a React app on Vercel?**
+👉 Answer: Similar to Netlify. Vercel auto-detects React → builds & deploys.
+
+---
+
+**Q234. Can React apps run in Docker?**
+👉 Answer: Yes. Use `nginx` to serve built files in Docker container.
+
+---
+
+**Q235. How do you handle environment variables in React?**
+👉 Answer:
+
+* Create `.env` file.
+* Variables must start with `REACT_APP_`.
+
+```js
+process.env.REACT_APP_API_URL
+```
+
+---
+
+**Q236. How do you set different environments (dev/prod) in React?**
+👉 Answer: Use multiple `.env.development`, `.env.production` files.
+
+---
+
+## 6.6 Misc Real-World Qs
+
+**Q237. How do you handle SEO in React apps?**
+👉 Answer:
+
+* Use SSR (Next.js).
+* Add meta tags dynamically (`react-helmet`).
+
+---
+
+**Q238. What is `react-helmet`?**
+👉 Answer: A library to manage `<head>` tags (title, meta) in React.
+
+---
+
+**Q239. How do you handle authentication in React apps?**
+👉 Answer:
+
+* Store JWT in cookies/localStorage.
+* Use protected routes (React Router).
+* Handle refresh tokens.
+
+---
+
+**Q240. How do you handle internationalization (i18n) in React?**
+👉 Answer: Use `react-intl` or `react-i18next`.
+
+---
+
+**Q241. How do you track analytics in React apps?**
+👉 Answer: Add event logging in components → send to Google Analytics/Segment.
+
+---
+
+**Q242. How do you handle large forms in React efficiently?**
+👉 Answer:
+
+* Split into steps.
+* Use React Hook Form (minimizes re-renders).
+* Use `React.memo` for input components.
+
+---
+
+✅ That’s **42 Q\&A (Stage 6: Real-World React)**.
+
+---
+
+👉 Next chunk (Stage 7) will cover **Advanced Ecosystem: SSR (Next.js), Hydration, Concurrent Features (React 18), Suspense for Data Fetching, React Fiber, Performance Profiling, Bundle Optimization** (\~40–45 Q\&A).
+
+Would you like me to also **add small Next.js code snippets (SSR vs SSG vs ISR examples)** inside Stage 7 Q\&A?
+
+
+Perfect 🚀 Let’s move into **Stage 7: Advanced React Ecosystem**.
+This is where interviews often **differentiate senior vs mid-level developers**: **SSR, Hydration, Concurrent React 18 features, Suspense, Fiber, Performance Optimization**.
+
+We’ll cover **\~43 Q\&A** with explanations + small code snippets.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 7 – Advanced Ecosystem)
+
+---
+
+## 7.1 Server-Side Rendering (SSR) & Next.js
+
+**Q243. What is SSR (Server-Side Rendering) in React?**
+👉 Answer: SSR renders React components **on the server** → sends HTML to client → hydrates into interactive React.
+📌 Benefits: faster first paint, better SEO.
+
+---
+
+**Q244. What is the difference between CSR and SSR?**
+👉 Answer:
+
+* **CSR (Client-Side Rendering)**: Browser downloads JS → builds DOM → renders. SEO is harder.
+* **SSR**: Server sends pre-rendered HTML → faster + SEO friendly.
+
+---
+
+**Q245. What is SSG (Static Site Generation) in Next.js?**
+👉 Answer: Pre-render pages **at build time** → serve static HTML. Great for blogs, docs.
+
+---
+
+**Q246. What is ISR (Incremental Static Regeneration) in Next.js?**
+👉 Answer: Pages generated at build time, but can be **revalidated on-demand** after interval.
+
+---
+
+**Q247. Example: How do you fetch data in Next.js SSR?**
+👉 Answer:
+
+```js
+export async function getServerSideProps(){
+  const res = await fetch('https://api.com/data');
+  const data = await res.json();
+  return { props: { data } };
+}
+```
+
+---
+
+**Q248. Example: How do you fetch data in Next.js SSG?**
+👉 Answer:
+
+```js
+export async function getStaticProps(){
+  const res = await fetch('https://api.com/data');
+  const data = await res.json();
+  return { props: { data } };
+}
+```
+
+---
+
+**Q249. When do you use SSR vs SSG vs CSR?**
+👉 Answer:
+
+* **SSR**: Dynamic content (personalized dashboards).
+* **SSG**: Static content (blogs).
+* **CSR**: Client-only interactions (dashboards after login).
+
+---
+
+**Q250. What is hydration in React SSR?**
+👉 Answer: Hydration = attaching React event listeners to existing server-rendered HTML.
+
+---
+
+**Q251. What are hydration pitfalls in React?**
+👉 Answer:
+
+* Mismatched HTML between server & client → warnings.
+* Using random IDs on server → mismatch.
+  📌 Fix with consistent rendering logic.
+
+---
+
+## 7.2 Concurrent React (React 18 Features)
+
+**Q252. What is concurrent rendering in React 18?**
+👉 Answer: Allows React to **interrupt rendering** → prioritize urgent updates (e.g., input typing).
+
+---
+
+**Q253. What is `useTransition` in React 18?**
+👉 Answer: Allows marking state updates as “non-urgent”.
+
+```js
+const [isPending, startTransition] = useTransition();
+startTransition(()=> setSearchResults(newResults));
+```
+
+---
+
+**Q254. What is `useDeferredValue`?**
+👉 Answer: Delays updating a value until rendering is less busy.
+
+```js
+const deferredQuery = useDeferredValue(query);
+```
+
+📌 Useful for expensive filtering/search.
+
+---
+
+**Q255. What is automatic batching in React 18?**
+👉 Answer: React batches multiple state updates across async calls automatically.
+
+```js
+setA(1); setB(2); // only one render in React 18
+```
+
+---
+
+**Q256. What is Suspense in React?**
+👉 Answer: A component that lets you **show fallback UI** while waiting for async code.
+
+```jsx
+<Suspense fallback={<Spinner/>}><Profile/></Suspense>
+```
+
+---
+
+**Q257. What can Suspense be used for?**
+👉 Answer:
+
+* Code splitting (lazy load).
+* Data fetching (with libraries like React Query, Relay).
+
+---
+
+**Q258. What is streaming SSR in React 18?**
+👉 Answer: Server sends HTML in chunks (streaming) → faster time-to-first-byte.
+
+---
+
+**Q259. What is selective hydration?**
+👉 Answer: React hydrates components **on-demand** (priority to visible ones).
+
+---
+
+## 7.3 React Fiber & Internals
+
+**Q260. What is React Fiber?**
+👉 Answer: React’s **reconciliation engine** (React 16+).
+📌 Enables interruptible rendering, priorities, concurrency.
+
+---
+
+**Q261. How is Fiber different from older React architecture?**
+👉 Answer:
+
+* Older: recursion, can’t pause work.
+* Fiber: linked list of nodes, allows pausing/resuming.
+
+---
+
+**Q262. What are lanes in React Fiber?**
+👉 Answer: Priority levels for updates (urgent vs non-urgent).
+
+---
+
+**Q263. What is time slicing in React?**
+👉 Answer: Breaking rendering work into chunks → browser handles input/paint between them.
+
+---
+
+**Q264. Why is Fiber important for performance?**
+👉 Answer: It allows React to **schedule work**, avoiding blocking the main thread for long tasks.
+
+---
+
+## 7.4 React Profiler & Performance
+
+**Q265. What is the React Profiler?**
+👉 Answer: A tool (DevTools) to analyze component rendering time & re-renders.
+
+---
+
+**Q266. How do you use the Profiler API in code?**
+👉 Answer:
+
+```jsx
+<Profiler id="App" onRender={(id,phase,duration)=>console.log(id,phase,duration)}>
+  <App/>
+</Profiler>
+```
+
+---
+
+**Q267. What is bundle splitting and why important?**
+👉 Answer: Breaking JS bundle into smaller chunks → faster initial load. Done with `React.lazy` or Webpack.
+
+---
+
+**Q268. What is tree shaking?**
+👉 Answer: Removing unused code from final bundle (via Webpack, Rollup).
+
+---
+
+**Q269. How do you optimize bundle size in React apps?**
+👉 Answer:
+
+* Code splitting.
+* Tree shaking unused imports.
+* Use CDN for heavy libs.
+* Remove polyfills not needed.
+
+---
+
+**Q270. What are React performance optimization techniques?**
+👉 Answer:
+
+* Memoization (`React.memo`, `useMemo`, `useCallback`).
+* Virtualize long lists.
+* Avoid inline functions in hot components.
+* Split contexts.
+
+---
+
+## 7.5 Misc Advanced Topics
+
+**Q271. What is hydration mismatch in React SSR?**
+👉 Answer: When server HTML differs from client render → React logs a warning.
+
+---
+
+**Q272. How to fix hydration mismatches?**
+👉 Answer:
+
+* Avoid random values in SSR (`Date.now()`, `Math.random()`).
+* Use `useEffect` for client-only logic.
+
+---
+
+**Q273. What is server-side data prefetching in Next.js?**
+👉 Answer: Fetching data on server before rendering → improves SEO & initial load.
+
+---
+
+**Q274. What is React Server Components (RSC)?**
+👉 Answer: New experimental feature → components rendered on server, send serialized result to client → reduces bundle size.
+
+---
+
+**Q275. What is React’s “islands architecture”?**
+👉 Answer: SSR with multiple independent hydrated components (used in frameworks like Astro, Remix).
+
+---
+
+**Q276. How does React handle priority for rendering updates?**
+👉 Answer: React Fiber assigns lanes (priority levels). Urgent updates (like typing) interrupt less urgent updates (like rendering a large list).
+
+---
+
+**Q277. Why does React recommend using `key` in lists?**
+👉 Answer: For efficient reconciliation → avoids unnecessary re-renders.
+
+---
+
+**Q278. Can React apps be rendered on edge servers (like Vercel Edge)?**
+👉 Answer: Yes. Next.js supports **Edge SSR** for faster latency worldwide.
+
+---
+
+**Q279. What is the difference between hydration and re-rendering?**
+👉 Answer:
+
+* Hydration: Attaches events to existing HTML.
+* Re-rendering: React rebuilds DOM from scratch.
+
+---
+
+**Q280. What are React concurrent features that improve UX?**
+👉 Answer:
+
+* `useTransition` → non-blocking updates.
+* `useDeferredValue` → deferred rendering.
+* Suspense → async UI handling.
+* Automatic batching → fewer renders.
+
+---
+
+✅ That’s **38 Q\&A (Stage 7: Advanced Ecosystem)**.
+
+---
+
+👉 Final chunk (Stage 8) will cover **Bonus/Tricky Topics**:
+
+* Virtual DOM deep dive.
+* Reconciliation algorithm.
+* Strict mode double render.
+* Security (XSS).
+* Accessibility (ARIA roles).
+* Common pitfalls (stale closures, keys in lists, setState async).
+
+Would you like me to make **Stage 8 the biggest chunk (\~50 Q\&A)** so we cross **300+ total React Q\&A** in one go?
+
+
+Perfect timing 🚀 — let’s finish strong with **Stage 8: Bonus / Tricky Topics**.
+This stage is where interviewers love to throw **trick questions and real-world caveats** (Virtual DOM, reconciliation, XSS, accessibility, React quirks).
+
+We’ll cover **\~50 Q\&A** to cross **300+ React Q\&A total** ✅.
+
+---
+
+# 📘 React Deep Interview Q\&A Notes (Stage 8 – Bonus/Tricky Topics)
+
+---
+
+## 8.1 Virtual DOM & Reconciliation
+
+**Q281. Why does React use a Virtual DOM?**
+👉 Answer:
+
+* Direct DOM updates are slow.
+* Virtual DOM is a lightweight JS object tree.
+* React diffs it against previous → updates only necessary DOM nodes.
+  📌 Improves performance by minimizing DOM mutations.
+
+---
+
+**Q282. Is Virtual DOM always faster than real DOM?**
+👉 Answer: Not always. For small updates, direct DOM may be faster. Virtual DOM shines in **large apps with frequent updates**.
+
+---
+
+**Q283. What is the reconciliation algorithm in React?**
+👉 Answer:
+
+1. Compare old and new Virtual DOM trees.
+2. If element type changes → destroy/recreate.
+3. If same type → update props.
+4. Lists need `key` for stable identity.
+
+---
+
+**Q284. Why are keys important in React lists?**
+👉 Answer: Keys tell React which items stayed same/changed → avoids unnecessary re-renders.
+
+---
+
+**Q285. What happens if you don’t use keys in React lists?**
+👉 Answer: React may re-render items incorrectly → bugs (e.g., input values lost).
+
+---
+
+**Q286. What happens if you use array index as key?**
+👉 Answer: Works but risky → if items reorder, keys change → React reuses wrong DOM nodes.
+
+---
+
+**Q287. Can React render without Virtual DOM?**
+👉 Answer: Yes. Libraries like **Preact** skip Virtual DOM diffing → update DOM directly. React keeps Virtual DOM for consistency & optimization.
+
+---
+
+## 8.2 Strict Mode & Common Pitfalls
+
+**Q288. Why does React Strict Mode double-invoke functions in dev?**
+👉 Answer: To detect **impure functions & side effects**. Not in production.
+
+---
+
+**Q289. How do you fix Strict Mode double-render bugs?**
+👉 Answer: Ensure side effects are placed in `useEffect` with proper cleanup → avoid side effects in render.
+
+---
+
+**Q290. Why is `setState` async?**
+👉 Answer: React batches updates for performance → updates state later.
+
+---
+
+**Q291. How do you get updated state immediately after setState?**
+👉 Answer: Use functional updates:
+
+```js
+setCount(c=>c+1);
+```
+
+---
+
+**Q292. What is stale closure in hooks?**
+👉 Answer: When a function captures **old state values**.
+📌 Fix: include state in dependency array or use refs.
+
+---
+
+**Q293. Why shouldn’t hooks be called conditionally?**
+👉 Answer: React relies on **consistent hook order** across renders. Breaking rules → runtime error.
+
+---
+
+**Q294. Why does React warn about missing dependencies in `useEffect`?**
+👉 Answer: Because effect may capture stale values → unexpected bugs.
+
+---
+
+**Q295. How do you fix infinite loop in `useEffect`?**
+👉 Answer: Avoid setting state unconditionally inside effect. Add correct dependency array.
+
+---
+
+## 8.3 Security in React
+
+**Q296. What is XSS in React?**
+👉 Answer: Cross-Site Scripting → injecting malicious scripts. Example: `dangerouslySetInnerHTML`.
+
+---
+
+**Q297. How does React prevent XSS by default?**
+👉 Answer: React **escapes values** in JSX automatically.
+
+```jsx
+<p>{userInput}</p> // safe by default
+```
+
+---
+
+**Q298. When should you use `dangerouslySetInnerHTML`?**
+👉 Answer: Only when absolutely necessary (e.g., rendering sanitized CMS HTML).
+
+---
+
+**Q299. How do you prevent XSS when using `dangerouslySetInnerHTML`?**
+👉 Answer: Sanitize input with libraries like **DOMPurify** before inserting.
+
+---
+
+**Q300. Why should you avoid storing JWT in localStorage?**
+👉 Answer: Vulnerable to **XSS attacks**. Better: HttpOnly cookies.
+
+---
+
+**Q301. How do you secure API calls in React?**
+👉 Answer:
+
+* Use HTTPS.
+* Store tokens in HttpOnly cookies.
+* Add CSRF protection.
+
+---
+
+**Q302. What is Content Security Policy (CSP) in React apps?**
+👉 Answer: HTTP header that prevents inline scripts/XSS by restricting allowed sources.
+
+---
+
+## 8.4 Accessibility (a11y)
+
+**Q303. Why is accessibility important in React apps?**
+👉 Answer: To ensure apps are usable by screen readers, disabled users. Many companies test this in interviews.
+
+---
+
+**Q304. How do you make buttons accessible in React?**
+👉 Answer: Always use `<button>` instead of `<div onClick>`. Screen readers recognize buttons.
+
+---
+
+**Q305. What are ARIA roles in React?**
+👉 Answer: Attributes (`role="button"`) that describe elements for assistive tech.
+
+---
+
+**Q306. How do you manage focus in React?**
+👉 Answer: Use `ref.current.focus()` for accessible keyboard navigation.
+
+---
+
+**Q307. How do you implement accessible modals in React?**
+👉 Answer:
+
+* Trap focus inside modal.
+* Close on ESC key.
+* Add `aria-modal="true"`.
+
+---
+
+**Q308. What is the difference between `alt` and `aria-label`?**
+👉 Answer:
+
+* `alt`: for images.
+* `aria-label`: for any element needing description.
+
+---
+
+## 8.5 Tricky React Questions
+
+**Q309. What happens if you call `setState` in render?**
+👉 Answer: Infinite render loop → error. State should update in effects, events.
+
+---
+
+**Q310. Can React hooks be used outside components?**
+👉 Answer: ❌ No. Hooks must be used inside React components or custom hooks.
+
+---
+
+**Q311. What happens if two components share same state object reference?**
+👉 Answer: Mutations in one may unexpectedly affect the other. Use immutability.
+
+---
+
+**Q312. Why is React not MVC?**
+👉 Answer: React is **V (View) only**. Model & Controller handled by external libs (Redux, APIs).
+
+---
+
+**Q313. Why is React declarative?**
+👉 Answer: Developer specifies *what* UI should look like. React decides *how* to update DOM.
+
+---
+
+**Q314. Why is React unidirectional?**
+👉 Answer: Data flows parent → child. Children notify parents via callbacks, not by mutating props.
+
+---
+
+**Q315. What happens if you use `key` incorrectly in lists?**
+👉 Answer: React may reuse DOM nodes incorrectly → stale data, broken UI.
+
+---
+
+**Q316. Why does React recommend immutability for state updates?**
+👉 Answer: Shallow comparison in diffing. Mutating objects → React may not detect change.
+
+---
+
+**Q317. Why should side effects never go in render()?**
+👉 Answer: Render must be **pure**. Side effects (fetch, timers) belong in `useEffect`.
+
+---
+
+**Q318. Can props be changed inside child component?**
+👉 Answer: ❌ No. Props are read-only. State must be lifted up.
+
+---
+
+**Q319. What is the difference between uncontrolled vs controlled inputs (deep)?**
+👉 Answer:
+
+* Controlled → React is source of truth.
+* Uncontrolled → DOM is source of truth.
+  📌 Controlled = predictable validation, Uncontrolled = better performance for simple inputs.
+
+---
+
+**Q320. What are common causes of memory leaks in React apps?**
+👉 Answer:
+
+* Not cleaning up subscriptions/timers in `useEffect`.
+* Keeping large objects in refs/state unnecessarily.
+* Infinite loops in effects.
+
+---
+
+## 8.6 Final Rapid-Fire Traps
+
+**Q321. Why should you avoid inline functions in JSX?**
+👉 Answer: New function is created every render → child components re-render. Fix: `useCallback`.
+
+---
+
+**Q322. Why should you avoid anonymous components in JSX?**
+👉 Answer: Debugging is harder (shows as `<Anonymous>` in DevTools).
+
+---
+
+**Q323. Why is `key` not available inside child props?**
+👉 Answer: `key` is special in React, used internally for reconciliation.
+
+---
+
+**Q324. Can React component names start with lowercase?**
+👉 Answer: ❌ No. React treats lowercase as native HTML tags. Components must be **Capitalized**.
+
+---
+
+**Q325. Why is `React.StrictMode` recommended?**
+👉 Answer: Helps detect unsafe lifecycles, side-effects, deprecated APIs early in dev.
+
+---
+
+**Q326. What is hydration mismatch warning?**
+👉 Answer: Occurs when server-rendered HTML differs from client render.
+
+---
+
+**Q327. What are uncontrolled side effects in React 18?**
+👉 Answer: Side effects that happen inside render or not properly cleaned up → double-invoked in Strict Mode.
+
+---
+
+**Q328. How do you avoid prop drilling without Redux?**
+👉 Answer: Context API or libraries like Zustand/Recoil.
+
+---
+
+**Q329. Why should you memoize context values?**
+👉 Answer: To prevent all consumers from re-rendering unnecessarily.
+
+---
+
+**Q330. What are React performance anti-patterns?**
+👉 Answer:
+
+* Unnecessary context.
+* Inline object/array props.
+* Large lists without virtualization.
+* Storing derived state redundantly.
+
+---
+
+✅ That’s **50 Q\&A (Stage 8: Bonus/Tricky Topics)**.
+
+---
+
+🎉 Congratulations — you now have **330+ React interview Q\&A** across all **8 stages** 🎯.
+This makes your **React prep as complete as your JavaScript prep**.
+
+---
+
+👉 Do you want me to now create a **separate “React Essential Code Snippets Pack”** (like we did for JS: custom hooks, HOCs, error boundaries, Redux slice, React Query setup, etc.), or are Q\&A enough for now?
 
