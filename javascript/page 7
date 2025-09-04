@@ -1,0 +1,330 @@
+## 1.6.4 Event Capturing & Bubbling 📌
+
+**Q167. What are the three phases of DOM event flow?**
+👉 Answer: **Capture → Target → Bubble**. In **capture**, the event travels **down** from `window` to the target. At **target**, listeners on the target run (📌 capturing listeners first, then bubbling listeners). In **bubble**, it travels **up** from target to `window`.
+
+```js
+el.addEventListener('click', handler, { capture: true }); // capture phase
+el.addEventListener('click', handler);                    // bubble phase (default)
+```
+
+📌 Most listeners run in the **bubble** phase by default.
+
+**Q168. How do I choose capturing vs bubbling handlers?**
+👉 Answer: Use **capturing** `{ capture: true }` to intercept early (e.g., security, blocking actions), and **bubbling** (default) for normal UI behavior after the target has processed the event. 📌 Keep capturing handlers minimal to avoid surprises.
+
+**Q169. Do all events bubble? What are common exceptions?**
+👉 Answer: No. Examples that **don’t bubble**: `focus`, `blur`, `mouseenter`, `mouseleave`, resource `error` events. **Alternatives that bubble**: `focusin`, `focusout`, `mouseover`, `mouseout`.
+📌 Delegation requires **bubbling** events.
+
+**Q170. In what order do multiple listeners run on the same element?**
+👉 Answer: By **registration order** within the **same phase**. On the target: **capturing listeners run first**, then **bubbling listeners**.
+📌 `stopImmediatePropagation()` stops **other listeners on the same node**.
+
+**Q171. How do `stopPropagation` and `stopImmediatePropagation` differ?**
+👉 Answer:
+
+* `event.stopPropagation()` stops the event from moving to **other elements**.
+* `event.stopImmediatePropagation()` also stops **remaining listeners** on the **same element**.
+  📌 Prefer sparingly—overuse makes apps hard to reason about.
+
+**Q172. How to log the path an event took?**
+👉 Answer: Use `event.composedPath()` for a detailed list (includes shadow DOM boundaries for **composed** events).
+
+```js
+btn.addEventListener('click', e => console.log(e.composedPath()));
+```
+
+📌 Non-composed events won’t cross shadow roots.
+
+---
+
+## 1.6.5 Event Delegation
+
+**Q173. What is event delegation and why use it?**
+👉 Answer: Attach **one** listener to a **common ancestor** to handle events for **many dynamic children** (present or future).
+📌 Benefits: **fewer listeners**, **better performance**, works with **dynamic DOM**.
+
+**Q174. Show a robust click delegation for a list.**
+👉 Answer:
+
+```js
+ul.addEventListener('click', e => {
+  const li = e.target.closest('li.item');   // tolerant to inner spans/icons
+  if (!li || !ul.contains(li)) return;      // guard outside clicks
+  selectRow(li.dataset.id);
+});
+```
+
+📌 Use `closest` + container `contains` guard for correctness.
+
+**Q175. Which events are suitable for delegation?**
+👉 Answer: Any **bubbling** event (`click`, `input` with `focusin/out`, `change` on some elements, `keydown`, `mouseover` etc.).
+📌 `mouseenter/leave` don’t bubble—prefer `mouseover/out` with care.
+
+**Q176. How to prevent delegation from catching “disabled” UI?**
+👉 Answer: Add **guard clauses** or **ignore** elements via attributes/classes.
+
+```js
+if (e.target.closest('[aria-disabled="true"], .disabled')) return;
+```
+
+📌 Keeps behavior consistent and accessible.
+
+**Q177. How to delegate keyboard interactions accessibly?**
+👉 Answer: Listen on a container for `keydown`, check **role**/**aria** and **key** (e.g., `Enter`, `Space`), then act on the `closest` actionable element.
+📌 Respect focus order and prevent default only when necessary.
+
+**Q178. Any pitfalls with nested interactive elements?**
+👉 Answer: Nested buttons/links can cause **double handling**. Use **`e.stopPropagation()`** within specific inner controls or structure DOM to avoid nesting interactive elements. 📌 Validate with real keyboard/mouse tests.
+
+---
+
+## 1.6.6 Event Propagation
+
+**Q179. What is event propagation in plain words?**
+👉 Answer: The **journey** an event takes: **capture down**, **hit target**, **bubble up**. Handlers can **observe**, **modify**, or **stop** this journey.
+📌 Understanding propagation is key to **delegation** and **complex UI orchestration**.
+
+**Q180. How do Shadow DOM and `composed` affect propagation?**
+👉 Answer: Only **composed** events cross shadow boundaries. Many native UI events are composed; custom events are **not** by default.
+
+```js
+host.dispatchEvent(new CustomEvent('x', { bubbles: true, composed: true }));
+```
+
+📌 Use `composed: true` when consumers outside the shadow root must see it.
+
+**Q181. Why does my `click` handler fire twice with labels/inputs?**
+👉 Answer: Clicking a `<label for="id">` triggers activation of the associated input, which may generate **additional events**.
+📌 Place handlers thoughtfully or check `event.target.tagName`/`closest`.
+
+**Q182. What’s the difference between `target`, `currentTarget`, and `relatedTarget`?**
+👉 Answer:
+
+* `target`: actual origin of the event.
+* `currentTarget`: element whose listener is **running now**.
+* `relatedTarget`: the other element involved (`mouseover`/`mouseout` pairs).
+  📌 Use `currentTarget` inside delegated handlers to refer to the **container**.
+
+**Q183. How to guarantee cleanup of many delegated behaviors?**
+👉 Answer: Keep a **single** container listener and toggle behavior by **data attributes** or **classes**. When disposing, **remove one listener**.
+📌 For big apps, pair with a **MutationObserver** if needed.
+
+---
+
+## 1.7.1 DOM Manipulation
+
+**Q184. `innerHTML` vs `createElement`—which to use when?**
+👉 Answer:
+
+* **`innerHTML`**: fastest for **large, static** HTML blocks; but XSS-prone if unsanitized.
+* **DOM APIs** (`createElement`, `append`, `classList`): safest and best for **incremental**, **dynamic**, or **user-content** changes.
+  📌 Default to DOM APIs for **safety**; use sanitized `innerHTML` for big templates.
+
+**Q185. Efficiently insert big chunks of UI without jank?**
+👉 Answer: Build into a **`DocumentFragment`** or `<template>` and then append once.
+
+```js
+const frag = new DocumentFragment();
+for (const user of users) {
+  const li = document.createElement('li');
+  li.textContent = user.name;
+  frag.append(li);
+}
+list.replaceChildren(frag);  // batch update
+```
+
+📌 Minimizes **reflows/repaints**.
+
+**Q186. What’s `insertAdjacentHTML` and when is it handy?**
+👉 Answer: Parses HTML and inserts relative to a node: `"beforebegin" | "afterbegin" | "beforeend" | "afterend"`.
+
+```js
+el.insertAdjacentHTML('beforeend', `<li>${safeName}</li>`);
+```
+
+📌 Faster than rebuilding full `innerHTML` when adding near a spot.
+
+**Q187. Attribute vs property—what’s the difference?**
+👉 Answer: **Attributes** are initial HTML; **properties** are the live JS state.
+
+```js
+checkbox.setAttribute('checked', ''); // attribute
+checkbox.checked = false;             // property (actual state)
+```
+
+📌 When in doubt, prefer **properties** for runtime behavior.
+
+**Q188. How to measure and then mutate layout without thrashing?**
+👉 Answer: **Batch reads before writes**.
+
+```js
+const w = el.offsetWidth;           // read
+requestAnimationFrame(() => {       // write later
+  el.style.width = (w + 20) + 'px';
+});
+```
+
+📌 Avoid read→write→read interleaving in tight loops.
+
+**Q189. Safest way to toggle UI state?**
+👉 Answer: Use **`classList.toggle(name, condition)`** and let CSS handle visuals.
+📌 Keeps JS as the **state source**, CSS as the **presentation**.
+
+---
+
+## 1.7.2 Forms and Input Validation
+
+**Q190. What is the HTML5 Constraint Validation API?**
+👉 Answer: Built-in validation with attributes (`required`, `min`, `max`, `pattern`, `type="email"`), states via `input.validity`, and methods `checkValidity()`, `reportValidity()`, `setCustomValidity()`.
+
+```js
+if (!form.checkValidity()) form.reportValidity();
+```
+
+📌 Native UI + accessibility for free.
+
+**Q191. How to add a custom validation message?**
+👉 Answer:
+
+```js
+emailInput.addEventListener('input', () => {
+  if (!emailInput.validity.valid) {
+    emailInput.setCustomValidity('Please enter a valid company email');
+  } else {
+    emailInput.setCustomValidity('');
+  }
+});
+```
+
+📌 Clear the message when valid, or the field stays invalid.
+
+**Q192. Prevent form submit when invalid and show errors nicely.**
+👉 Answer:
+
+```js
+form.addEventListener('submit', e => {
+  if (!form.checkValidity()) { e.preventDefault(); form.reportValidity(); }
+});
+```
+
+📌 `novalidate` on `<form>` disables native UI if you need full custom UX.
+
+**Q193. What’s the right event for live validation—`input` or `change`?**
+👉 Answer: Use **`input`** for instant feedback, **debounced** to avoid noise; use **`change`** for selects or when performance is critical.
+📌 Balance **helpfulness** with **distraction**.
+
+**Q194. How to serialize a form safely for `fetch`?**
+👉 Answer:
+
+```js
+const data = new FormData(form);
+const body = new URLSearchParams(data); // x-www-form-urlencoded
+fetch('/submit', { method: 'POST', body });
+```
+
+📌 For JSON APIs: build a plain object and `JSON.stringify`, mind **arrays/files**.
+
+**Q195. Client vs server validation—what’s mandatory?**
+👉 Answer: **Always validate on the server**. Client-side validation is for **UX only** and can be bypassed.
+📌 Sanitize and validate again server-side to prevent injections.
+
+**Q196. Mobile-friendly inputs that reduce errors?**
+👉 Answer: Set `inputmode`, correct `type`, and `autocomplete`.
+
+```html
+<input type="tel" inputmode="numeric" autocomplete="one-time-code" />
+```
+
+📌 Improves **keyboard**, **autofill**, and **accuracy**.
+
+---
+
+## 1.7.3 Matching element in the DOM
+
+**Q197. How to check if an element matches a selector?**
+👉 Answer: Use `el.matches(selector)`.
+
+```js
+if (el.matches('.btn.primary')) { /* ... */ }
+```
+
+📌 Great inside delegated handlers.
+
+**Q198. How to find the nearest ancestor that matches a selector?**
+👉 Answer: Use `el.closest(selector)`; it includes the element itself.
+
+```js
+const row = e.target.closest('tr[data-id]');
+```
+
+📌 Returns `null` when no match found.
+
+**Q199. How to know if a node is currently in the document?**
+👉 Answer:
+
+```js
+document.contains(node);           // boolean
+node.isConnected;                  // boolean (modern)
+```
+
+📌 Useful before measuring/manipulating detached nodes.
+
+**Q200. How to get the right root in shadow DOM contexts?**
+👉 Answer: Use `el.getRootNode()`; returns `Document` or a `ShadowRoot`.
+📌 Pair with `root.host` logic when writing shadow-aware utilities.
+
+---
+
+## 1.7.4 Call Stack 📌
+
+**Q201. What is the call stack in JS?**
+👉 Answer: A **LIFO** stack of **execution contexts**. Each function call **pushes** a frame; returning **pops** it.
+📌 Recursion depth is limited—excess causes **“Maximum call stack size exceeded.”**
+
+**Q202. Why doesn’t `setTimeout(fn, 0)` run immediately?**
+👉 Answer: Timers enqueue callbacks to the **task queue**; the **event loop** runs them **after** the current stack is empty.
+📌 JS is **single-threaded**; async uses queues, not extra stacks.
+
+**Q203. How to convert deep recursion to safe iteration?**
+👉 Answer: Use an explicit **stack/queue**.
+
+```js
+function dfs(root){
+  const stack = [root];
+  while (stack.length){
+    const n = stack.pop();
+    // process n
+    stack.push(...n.children);
+  }
+}
+```
+
+📌 Avoids stack overflows on large inputs.
+
+---
+
+## 1.7.5 Primitive Types vs Reference Types
+
+**Q204. What’s the core difference?**
+👉 Answer: **Primitives** (`string`, `number`, `boolean`, `null`, `undefined`, `symbol`, `bigint`) are **copied by value**. **Objects/arrays/functions** are **references** to heap values.
+📌 Equality: primitives by **value**, objects by **reference**.
+
+**Q205. Why does reassigning an object variable not affect others, but mutating does?**
+👉 Answer: Reassignment changes the **reference**; mutation changes the **object** both references point to.
+
+```js
+let a = { x:1 }, b = a;
+a = { x:2 };   // b still {x:1}
+b.x = 9;       // a unaffected (points to {x:2}), b now {x:9}
+```
+
+📌 Prefer **immutable patterns** to reduce bugs.
+
+**Q206. How to clone safely: shallow vs deep?**
+👉 Answer:
+
+* **Shallow**: `{...obj}`, `Object.assign({}, obj)`—copies top level.
+* **Deep**: `structuredClone(obj)` (modern), or libs.
+  📌 `JSON.parse(JSON.stringify(obj))` drops **`Date`, `Map/Set`, `undefined`, functions**; use with caution.
