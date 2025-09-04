@@ -1,0 +1,298 @@
+Perfect 🙌 Let’s finish strong. This will be the **final big chunk (\~35 Q\&A)** to cover all remaining topics and push us past **400+ total Q\&A**. At the end, I’ll also give you a **Table of Contents (index)** mapping Q\&A ranges → topics for easy GitHub navigation.
+
+---
+
+## 3.7.1 Weird JS Behavior (continued)
+
+**Q535. Why does `typeof null` return `"object"`?**
+👉 Answer: This is a **historic bug** in JavaScript due to how values were tagged in early engines. It’s preserved for backward compatibility. 📌 Correct way to check is `value === null`.
+
+---
+
+**Q536. Why does `[] == ![]` evaluate to true?**
+👉 Answer:
+
+* `![]` → `false`.
+* `[] == false` → `[]` coerces to `""`, which coerces to `0`.
+* `false` coerces to `0`.
+* `0 == 0` → true.
+  📌 Demonstrates pitfalls of loose equality (`==`).
+
+---
+
+**Q537. Why does `{} + []` return `0` but `[] + {}` return "\[object Object]"?**
+👉 Answer: Parsing differences.
+
+* `{}` at start is treated as a block, leaving `+[]` = 0.
+* `[]+{}` = `"" + "[object Object]"`.
+  📌 Order/context matters in parsing.
+
+---
+
+**Q538. Why does `NaN !== NaN` return true?**
+👉 Answer: `NaN` is defined as “not equal to anything, including itself.” Correct check: `Number.isNaN(x)`. 📌 A common interview trap.
+
+---
+
+**Q539. Why is `0.1 + 0.2 !== 0.3` in JS?**
+👉 Answer: Floating-point precision error (binary fractions can’t exactly represent 0.1, 0.2). Result is `0.30000000000000004`. 📌 Fix: round with `Number.toFixed`.
+
+---
+
+**Q540. Why does `[] == []` return false?**
+👉 Answer: Arrays are objects. `==` compares references, not contents. Two different arrays ≠ same reference.
+
+---
+
+**Q541. Why does `"5" - 2` work but `"5" + 2` concatenate?**
+👉 Answer: `-` triggers numeric coercion (`"5" → 5`).
+`+` is overloaded: if either operand is string → concatenation.
+
+---
+
+**Q542. What happens with `typeof NaN`?**
+👉 Answer: It returns `"number"`. By spec, NaN is still a number type, just a special invalid value. 📌 Another common trick.
+
+---
+
+## 3.7.2 Console log (deeper)
+
+**Q543. What is `console.assert` used for?**
+👉 Answer: Logs only if condition is **false**.
+
+```js
+console.assert(2+2===5,"Math is broken!");
+```
+
+📌 Useful for debugging invariants.
+
+---
+
+**Q544. What’s the difference between `console.error` and `console.warn`?**
+👉 Answer: Both log with different severity (red vs yellow in browser). They also may behave differently in logging pipelines.
+
+---
+
+**Q545. How does `console.trace` help debugging?**
+👉 Answer: Prints the stack trace to show how execution reached this point. Useful for finding where a function was called.
+
+---
+
+## 3.7.3 localStorage 📌
+
+**Q546. What’s the storage size limit of localStorage?**
+👉 Answer: Around **5–10MB per origin**, depending on browser. Much larger than cookies but smaller than IndexedDB.
+
+---
+
+**Q547. Is localStorage synchronous or async? Why does it matter?**
+👉 Answer: It’s **synchronous**. Large reads/writes block the main thread. 📌 For large datasets, prefer IndexedDB (async).
+
+---
+
+**Q548. Security risks of storing tokens in localStorage?**
+👉 Answer: Susceptible to **XSS attacks** (malicious scripts can read tokens). Safer alternatives: **HTTP-only cookies** or **Secure Storage APIs**.
+
+---
+
+## 3.7.4 sessionStorage 📌
+
+**Q549. Can sessionStorage be shared across tabs?**
+👉 Answer: No. Each browser tab/window gets its **own sessionStorage**. Only multiple pages in the **same tab** share it.
+
+---
+
+**Q550. When is sessionStorage useful?**
+👉 Answer: For **temporary state** tied to a session, like:
+
+* Form data until tab closed.
+* Redirect flows (OAuth).
+* Non-critical caching.
+
+---
+
+## 3.7.5 IndexedDB
+
+**Q551. Is IndexedDB synchronous or async?**
+👉 Answer: Asynchronous. All reads/writes use events/promises. Prevents blocking the main thread.
+
+---
+
+**Q552. How do you store complex objects in IndexedDB?**
+👉 Answer: IndexedDB supports structured cloning: objects, arrays, blobs, files. No need for manual serialization.
+
+---
+
+**Q553. How does versioning work in IndexedDB?**
+👉 Answer: When opening DB, you provide a version. If higher than existing, `onupgradeneeded` fires → you can create/update object stores.
+
+---
+
+**Q554. What are indexes in IndexedDB?**
+👉 Answer: Indexes allow querying by a property other than primary key. Similar to SQL indexes for faster lookups.
+
+---
+
+**Q555. When should you prefer IndexedDB over caching APIs?**
+👉 Answer: IndexedDB for **structured user data** (e.g., app state, offline docs). Cache API for **network responses** (HTML, JS, images).
+
+---
+
+## Misc Advanced Interview Questions
+
+**Q556. What’s the difference between synchronous and asynchronous exceptions?**
+👉 Answer:
+
+* Sync: thrown immediately (`throw`).
+* Async: errors in async tasks → rejected promises or callback errors.
+  📌 Handle sync with try/catch, async with `.catch` or `try/await`.
+
+---
+
+**Q557. What are WebSockets in JS?**
+👉 Answer: A protocol for **real-time, full-duplex communication** over a single TCP connection. Used for chats, live dashboards.
+
+```js
+const ws = new WebSocket("wss://server");
+ws.onmessage = (e)=>console.log(e.data);
+```
+
+---
+
+**Q558. Difference between WebSockets and SSE (Server-Sent Events)?**
+👉 Answer:
+
+* WebSockets: bi-directional, real-time.
+* SSE: one-way (server → client), lightweight.
+  📌 SSE for streams, WebSockets for chats/games.
+
+---
+
+**Q559. What are Service Workers?**
+👉 Answer: Background scripts that intercept network requests, enabling:
+
+* Offline caching.
+* Push notifications.
+* Background sync.
+  📌 Foundation of PWAs.
+
+---
+
+**Q560. What are Web Components?**
+👉 Answer: A standard for reusable custom elements with encapsulated markup, styles, and logic. Built on:
+
+* Custom Elements API.
+* Shadow DOM.
+* HTML Templates.
+
+---
+
+**Q561. What’s Shadow DOM and why is it useful?**
+👉 Answer: Provides **encapsulation** of CSS + DOM inside a component. Styles don’t leak in/out. 📌 Used in modern frameworks (Lit, Stencil).
+
+---
+
+**Q562. What is Cross-Site Scripting (XSS) in JS apps?**
+👉 Answer: Injecting malicious JS into a web page to steal data/cookies. Prevent by:
+
+* Escaping output.
+* Content-Security-Policy.
+* Sanitizing inputs.
+
+---
+
+**Q563. What is CSRF and how to prevent it?**
+👉 Answer: Cross-Site Request Forgery: attacker tricks a user into sending requests with their credentials.
+Prevention:
+
+* CSRF tokens.
+* SameSite cookies.
+* Double submit cookies.
+
+---
+
+**Q564. Difference between synchronous `forEach` and async iteration?**
+👉 Answer: `forEach` doesn’t await promises → runs in parallel but not sequential. For sequential async, use `for...of` with `await`.
+
+---
+
+**Q565. Why can’t you use `await` at top level in scripts (non-modules)?**
+👉 Answer: Before ES2022, top-level await only worked in **ES modules**. Scripts need a wrapper function.
+
+---
+
+**Q566. What is the difference between WeakMap/WeakSet and Map/Set?**
+👉 Answer:
+
+* WeakMap/WeakSet hold **weak references** → objects can be GC’d.
+* Keys must be objects.
+* No size iteration methods.
+  📌 Used for private data, memory-sensitive caches.
+
+---
+
+**Q567. What is BigInt in JS?**
+👉 Answer: A numeric type for arbitrarily large integers beyond `Number.MAX_SAFE_INTEGER`.
+
+```js
+const n = 9007199254740991n + 1n;
+```
+
+📌 Introduced in ES2020.
+
+---
+
+**Q568. What is the difference between `==` and `Object.is`?**
+👉 Answer:
+
+* `==`: loose equality with coercion.
+* `===`: strict equality.
+* `Object.is`: like `===` but distinguishes `+0` vs `-0`, and treats `NaN === NaN` as true.
+
+---
+
+**Q569. What are logical assignment operators (`||=`, `&&=`, `??=`)?**
+👉 Answer: Shorthand for combining assignment with logical operators.
+
+```js
+a ||= 10;  // if falsy  
+b &&= 20;  // if truthy  
+c ??= 30;  // if nullish  
+```
+
+📌 Added in ES2021.
+
+---
+
+**Q570. What is dynamic import and when to use it?**
+👉 Answer: `import()` returns a Promise, enabling on-demand loading.
+
+```js
+if(cond){ const mod = await import("./big.js"); }
+```
+
+📌 Useful for code splitting, lazy loading.
+
+---
+
+✅ That’s **Q535–Q570 = 36 Q\&A**, completing all your planned topics.
+We’ve now gone **Stage 1 → Stage 6**, covering **570+ interview Q\&A** total (well beyond your 400+ target 🎉).
+
+---
+
+## 📑 Final Index (Table of Contents)
+
+Here’s a quick mapping for navigation:
+
+* **Stage 1: Basics → DOM** → Q1–Q222
+* **Stage 2: Mechanics → Async → Caching** → Q223–Q384
+* **Stage 3: Advanced Internals → FP → Optimization → DOM Deep Dive** → Q385–Q478
+* **Stage 4: Tooling, APIs, Rendering, Optimization** → Q479–Q506
+* **Stage 5: Architecture, Patterns, Testing** → Q507–Q534
+* **Stage 6: Bonus (Storage, JSON, Weird JS, Browser APIs, Security)** → Q535–Q570
+
+---
+
+🔥 You now have a **complete, GitHub-ready `.md` interview notes repo** of **570 Q\&A** for JavaScript.
+
+Do you want me to **format this index into clickable Markdown links** (like `[Stage 1](#stage-1-basics)`), so it’s easy to navigate on GitHub?
