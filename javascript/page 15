@@ -1,0 +1,80 @@
+Great 🚀 We continue **sequentially**. Last we finished **2.5.2 Memory Management**, so now we move to **2.5.3 Microtasks vs Macrotasks**.
+
+---
+
+## 2.5.3 Microtasks vs Macrotasks
+
+**Q415. What is the difference between microtasks and macrotasks?**
+👉 Answer:
+
+* **Macrotasks (a.k.a. tasks)**: Scheduled by APIs like `setTimeout`, `setInterval`, `setImmediate` (Node), `I/O`. They are queued in the **task queue**.
+* **Microtasks**: Smaller, high-priority jobs queued in the **microtask queue**. Examples: **Promise `.then`**, `queueMicrotask`, `MutationObserver`.
+  📌 After every macrotask, the engine runs **all pending microtasks** before moving to the next macrotask.
+
+---
+
+**Q416. Why do Promises (`.then`) run before `setTimeout(fn, 0)`?**
+👉 Answer: Because `.then` callbacks are **microtasks**, and the event loop runs **all microtasks immediately after the current call stack** before picking the next macrotask.
+
+```js
+setTimeout(()=>console.log("timeout"));
+Promise.resolve().then(()=>console.log("promise"));
+// Output: "promise" → "timeout"
+```
+
+---
+
+**Q417. When would you use `queueMicrotask`?**
+👉 Answer: Use it when you want to **schedule a callback after the current synchronous code**, but before any timers/fire.
+
+```js
+console.log("start");
+queueMicrotask(()=>console.log("micro"));
+console.log("end");
+// Output: start → end → micro
+```
+
+📌 Great for deferring work without waiting for `setTimeout`.
+
+---
+
+**Q418. How does Node.js treat microtasks differently from browsers?**
+👉 Answer:
+
+* In **browsers**, after every macrotask, all microtasks run before rendering.
+* In **Node**, after each phase of the event loop, microtasks (like Promises) run before continuing.
+  📌 Slight differences, but principle is the same: microtasks have higher priority.
+
+---
+
+**Q419. What are real-world pitfalls of mixing microtasks/macrotasks?**
+👉 Answer:
+
+* Flooding microtask queue (e.g., recursive `Promise.resolve().then()`) can **starve macrotasks**, blocking rendering and timers.
+* Using `setTimeout(fn, 0)` to defer is slower than `queueMicrotask`.
+  📌 Be mindful—too many microtasks = UI freezes.
+
+---
+
+**Q420. Can microtasks trigger new microtasks?**
+👉 Answer: Yes, and they will keep running until the queue empties.
+
+```js
+Promise.resolve().then(function repeat(){
+  console.log("tick");
+  Promise.resolve().then(repeat); // creates chain
+});
+```
+
+📌 This can create an **infinite loop**, blocking macrotasks like rendering.
+
+---
+
+**Q421. When should you prefer macrotasks instead?**
+👉 Answer: Use macrotasks when you want to **yield back to rendering** or delay until the **next tick/frame** (e.g., animations, UI updates). Microtasks should be reserved for **tiny, quick post-stack fixes**.
+
+---
+
+✅ Next: **2.6.1 Event Loop 📌**
+
+Do you want me to go **very deep into the event loop phases** (Node.js + Browser differences), or keep it **interview-oriented with examples and common pitfalls**?
