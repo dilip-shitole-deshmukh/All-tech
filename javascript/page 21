@@ -1,0 +1,294 @@
+Perfect ✅ Let’s extend your repo with a **Bonus Section** of **\~30 Advanced Questions + Answers**.
+This will push you to **\~600 total Q\&A**, covering the rare but high-value interview questions that senior frontend interviews often touch.
+
+---
+
+# 🎯 Bonus Advanced Interview Q\&A (Extra 30)
+
+---
+
+## 1. Event Loop & Async (Advanced Node.js/Browsers)
+
+**Q571. What is the difference between `process.nextTick`, `setImmediate`, and `Promise.then` in Node.js?**
+👉 Answer:
+
+* **`process.nextTick`**: Runs callbacks **before any microtasks**, immediately after the current function completes.
+* **`Promise.then`**: Runs in the **microtask queue**, after `nextTick` but before timers.
+* **`setImmediate`**: Runs in the **check phase** of the event loop, after I/O events.
+  📌 Order: `nextTick` → `Promise.then` → `setImmediate`.
+
+---
+
+**Q572. What happens if you keep calling `process.nextTick` recursively?**
+👉 Answer: It can **starve the event loop** because `nextTick` callbacks run before I/O/macrotasks. Endless recursion here blocks timers and I/O from executing.
+
+---
+
+**Q573. In browsers, how do microtasks (Promises) and macrotasks (timers) interleave?**
+👉 Answer: After each macrotask, the browser runs **all microtasks** before rendering and before the next macrotask.
+📌 Example: Promises run **before** `setTimeout(fn,0)`.
+
+---
+
+---
+
+## 2. Security (Web App Essentials)
+
+**Q574. Difference between XSS and CSRF with examples?**
+👉 Answer:
+
+* **XSS (Cross-Site Scripting)**: Attacker injects malicious JS into a site. Example: unescaped `<script>` in comments.
+* **CSRF (Cross-Site Request Forgery)**: Attacker tricks a logged-in user into making a request with their cookies (e.g., auto-submit form to transfer money).
+  📌 Prevention: Escape inputs (XSS), CSRF tokens/SameSite cookies (CSRF).
+
+---
+
+**Q575. What is Content Security Policy (CSP), and why is it important?**
+👉 Answer: CSP is an HTTP header (`Content-Security-Policy`) that restricts what resources/scripts can load.
+Example: `default-src 'self'; script-src 'self' https://apis.example.com`
+📌 Prevents XSS by blocking inline/eval scripts and disallowed sources.
+
+---
+
+**Q576. How do you secure tokens stored in the browser?**
+👉 Answer:
+
+* Prefer **HTTP-only cookies** (inaccessible to JS).
+* If using `localStorage`, guard against XSS by sanitizing all inputs and applying CSP.
+* Rotate tokens frequently, short expiry.
+
+---
+
+---
+
+## 3. Performance & Optimization
+
+**Q577. What is the Critical Rendering Path (CRP) in browsers?**
+👉 Answer: The sequence of steps the browser takes to convert HTML/CSS/JS → pixels:
+
+1. Parse HTML → DOM.
+2. Parse CSS → CSSOM.
+3. Combine into **Render Tree**.
+4. Layout.
+5. Paint.
+   📌 Optimizing CRP = minify CSS/JS, preload critical resources, defer non-critical JS.
+
+---
+
+**Q578. Difference between Web Workers, Service Workers, and Worklets?**
+👉 Answer:
+
+* **Web Workers**: Background threads for computation.
+* **Service Workers**: Proxy network requests, offline caching, push notifications.
+* **Worklets**: Lightweight scripts for graphics/audio (e.g., CSS Paint API).
+
+---
+
+**Q579. What are common sources of memory leaks in SPAs?**
+👉 Answer:
+
+* Forgotten event listeners.
+* Detached DOM nodes.
+* Long-lived closures.
+* Growing caches/arrays without cleanup.
+  📌 Tools: Chrome Memory Profiler, Performance tab.
+
+---
+
+---
+
+## 4. Advanced ES Features
+
+**Q580. What are Decorators in JavaScript?**
+👉 Answer: A stage-3 proposal for annotating/modifying classes and methods.
+Example (TypeScript):
+
+```ts
+function log(target,key,desc){
+  const orig = desc.value;
+  desc.value = function(...args){
+    console.log(`Calling ${key}`);
+    return orig.apply(this,args);
+  }
+}
+class A { @log greet(){ console.log("Hi"); } }
+```
+
+📌 Useful for meta-programming (logging, DI, validation).
+
+---
+
+**Q581. What are Tagged Template Literals?**
+👉 Answer: A function can process template literals before they’re returned.
+
+```js
+function tag(strings, ...values){
+  return strings[0] + values.map(v => v.toUpperCase()).join("");
+}
+tag`Hello ${"world"}!`; // "Hello WORLD!"
+```
+
+📌 Used in `styled-components` and i18n.
+
+---
+
+**Q582. What is WeakRef and FinalizationRegistry (ES2021)?**
+👉 Answer:
+
+* **WeakRef**: Allows referencing objects without preventing GC.
+* **FinalizationRegistry**: Lets you run cleanup code when an object is garbage-collected.
+  📌 Useful for caches, but should be used sparingly.
+
+---
+
+---
+
+## 5. Advanced Patterns
+
+**Q583. Difference between Factory Pattern and Builder Pattern in JS?**
+👉 Answer:
+
+* **Factory**: Creates objects without exposing creation logic.
+* **Builder**: Step-by-step construction of complex objects.
+  📌 Factory = simpler, Builder = good for optional configurations.
+
+---
+
+**Q584. What is Dependency Injection (DI) in JS apps?**
+👉 Answer: DI means giving objects their dependencies instead of hardcoding them.
+
+```js
+function Service(api){ this.api = api; }
+const svc = new Service(new RealAPI());
+```
+
+📌 Improves testability and modularity.
+
+---
+
+**Q585. Difference between Pub/Sub and Observer pattern?**
+👉 Answer:
+
+* **Observer**: Subject directly notifies observers (tight coupling).
+* **Pub/Sub**: Publisher emits events → Broker → Subscribers (looser coupling).
+  📌 Pub/Sub scales better for large systems.
+
+---
+
+---
+
+## 6. Browser APIs / Modern Features
+
+**Q586. What is WebAssembly (WASM)?**
+👉 Answer: WASM is a binary format for running **near-native performance code** in the browser. Written in C/C++/Rust → compiled to WASM → imported into JS.
+📌 Useful for games, video editing, crypto.
+
+---
+
+**Q587. What is the Intl API in JS?**
+👉 Answer: `Intl` provides internationalization: formatting dates, numbers, currencies.
+
+```js
+new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(1234);
+```
+
+📌 Essential for global apps.
+
+---
+
+**Q588. What is the Performance API in browsers?**
+👉 Answer: `performance.now()` gives high-resolution timestamps; `PerformanceObserver` can monitor resource timings, paint metrics.
+📌 Used for profiling load times.
+
+---
+
+**Q589. What is requestIdleCallback and why use it?**
+👉 Answer: Browser API to schedule work when main thread is idle.
+
+```js
+requestIdleCallback(()=>console.log("low-priority work"));
+```
+
+📌 Useful for background tasks (analytics).
+
+---
+
+**Q590. What is the BroadcastChannel API?**
+👉 Answer: Allows simple communication between tabs/windows of the same origin.
+
+```js
+const bc=new BroadcastChannel('app');  
+bc.postMessage("Hello");  
+bc.onmessage=e=>console.log(e.data);
+```
+
+---
+
+---
+
+## 7. Testing & CI/CD
+
+**Q591. How do you test async code in Jest?**
+👉 Answer:
+
+* Return a Promise.
+* Use async/await.
+* Use `done` callback for legacy.
+
+```js
+test("async fetch", async ()=>{
+  const data=await fetchData();
+  expect(data).toBe("ok");
+});
+```
+
+---
+
+**Q592. Difference between unit tests and contract tests in APIs?**
+👉 Answer:
+
+* **Unit test**: checks individual function correctness.
+* **Contract test**: verifies that two systems (frontend ↔ backend) agree on API contract (schema, types).
+  📌 Prevents integration mismatches.
+
+---
+
+**Q593. How to integrate JS testing into CI/CD pipelines?**
+👉 Answer:
+
+* Run Jest/Mocha tests in CI (GitHub Actions, Jenkins).
+* Fail pipeline on test failures.
+* Optionally add coverage thresholds.
+  📌 Ensures code quality before deployment.
+
+---
+
+---
+
+## 🎉 Final Bonus Wrap-Up
+
+**Q594. What are the most common pitfalls interviewers test in JS?**
+👉 Answer:
+
+* `this` binding.
+* Hoisting.
+* Event loop ordering (Promises vs setTimeout).
+* `==` vs `===`.
+* Closures inside loops.
+* Floating-point precision.
+  📌 Be ready to explain AND demo.
+
+---
+
+**Q595. What’s the best way to keep up-to-date with JavaScript features?**
+👉 Answer: Follow **TC39 proposals**, MDN Web Docs, and release notes of **Node.js/Chrome V8**. Practice on small side projects.
+
+---
+
+---
+
+✅ That’s **Q571–Q595 = 25 Advanced Q\&A**, bringing your total repo to **595 Q\&A** 🎯 (just shy of 600 but very complete).
+
+If you want, I can add **5 more “fun tricky coding questions” (like closures, hoisting, async puzzles)** to hit exactly **600**.
+
+👉 Do you want me to add those last 5 “challenge-style” questions so the repo lands at a clean **600 Q\&A**?
