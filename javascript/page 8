@@ -1,0 +1,275 @@
+## 1.8.1 Hoisting 📌
+
+**Q207. What is hoisting, conceptually?**
+👉 Answer: Hoisting is the engine’s **two-phase** execution: a **creation phase** (bindings are set up) and an **execution phase** (statements run). In creation, **function declarations** are hoisted with their definitions; `var` names are hoisted and initialized to **`undefined`**; `let/const/class` are hoisted but stay in the **Temporal Dead Zone (TDZ)** until their declaration line. 📌 Think: “**names first, values later**,” with TDZ for `let/const/class`.
+
+**Q208. How do `var`, `let`, and `const` hoist differently?**
+👉 Answer:
+
+* `var` → name hoisted to **function** scope; initialized to `undefined`.
+* `let/const` → name hoisted to **block** scope but **uninitialized** (TDZ) until the declaration executes.
+
+```js
+console.log(a); // undefined (var)
+var a = 1;
+
+console.log(b); // ReferenceError (TDZ)
+let b = 2;
+```
+
+📌 TDZ prevents accidental use-before-declaration bugs.
+
+**Q209. How are function declarations vs expressions/arrow functions hoisted?**
+👉 Answer:
+
+* **Function declarations** are hoisted with their **body** (callable before source line).
+* **Function expressions / arrow functions** are values assigned to variables; only the **variable** is hoisted. With `var`, it’s `undefined` until assignment; with `let/const` you hit TDZ.
+
+```js
+foo();             // ✅ works
+function foo() {}
+
+bar();             // ❌ TypeError (bar is undefined)
+var bar = function(){};
+```
+
+**Q210. Are `class` declarations hoisted?**
+👉 Answer: They’re hoisted **into TDZ** (like `let/const`). Accessing before the declaration throws.
+
+```js
+new C(); // ReferenceError (TDZ)
+class C {}
+```
+
+📌 Class bodies run in **strict mode**.
+
+**Q211. Why does this code log `undefined` then `10`?**
+👉 Answer: Because `var x` is hoisted and initialized to `undefined` during creation; assignment happens later.
+
+```js
+console.log(x); // undefined
+var x = 10;
+console.log(x); // 10
+```
+
+📌 With `let x = 10`, the first `console.log(x)` would throw (TDZ).
+
+**Q212. What exactly is the Temporal Dead Zone (TDZ)?**
+👉 Answer: The TDZ is the span **from scope entry until the declaration executes** where a `let/const/class` binding exists but is **uninitialized**. Any read/write during TDZ → **ReferenceError**.
+
+```js
+{
+  // TDZ for y
+  // y; // ReferenceError
+  let y = 3;
+}
+```
+
+**Q213. Why does `typeof x` sometimes throw?**
+👉 Answer: `typeof` is only “safe” for **undeclared globals**. If `x` is a **block-scoped binding in TDZ**, `typeof x` still throws.
+
+```js
+{
+  // TDZ for x
+  // typeof x; // ReferenceError
+  let x = 1;
+}
+```
+
+📌 Don’t probe TDZ bindings with `typeof`.
+
+**Q214. Why do `for` loops with `var` and closures often misbehave?**
+👉 Answer: `var` is **function-scoped**; all callbacks share the **same** `i`. Use `let` (new binding per iteration) or capture with an IIFE.
+
+```js
+for (var i=0;i<3;i++) setTimeout(()=>console.log(i)); // 3,3,3
+for (let i=0;i<3;i++) setTimeout(()=>console.log(i)); // 0,1,2
+```
+
+📌 Each `let` iteration gets its **own** `i`.
+
+---
+
+## 1.8.2 IIFE (Immediately Invoked Function Expressions)
+
+**Q215. What is an IIFE and why was it popular?**
+👉 Answer: An IIFE is a function **defined and executed immediately** to create a **private scope** (avoid global pollution) before modules existed.
+
+```js
+(function(){ /* private */ })();
+(() => { /* private */ })();
+```
+
+📌 Today, use **ES modules** or blocks with `let/const`.
+
+**Q216. How do IIFEs accept parameters/return values?**
+👉 Answer: Pass args at call-site; return a value (often an API).
+
+```js
+const api = (function(win, doc){
+  const secret = 42;
+  return { get: () => secret };
+})(window, document);
+api.get(); // 42
+```
+
+**Q217. IIFE vs block with `let/const`—when to choose which?**
+👉 Answer: If you only need **scoping**, a `{ ... }` block with `let/const` is simpler. Use an IIFE when you also need a **return value** or to **parameterize** the scope.
+
+**Q218. Why do some IIFEs start with a semicolon?**
+👉 Answer: To guard against **ASI pitfalls** when the previous statement didn’t end with `;`.
+
+```js
+;(() => {})(); // leading ; ensures this starts a new statement
+```
+
+**Q219. Can IIFEs be async?**
+👉 Answer: Yes, with `async` functions.
+
+```js
+(async () => {
+  const data = await fetch('/api').then(r=>r.json());
+  console.log(data);
+})();
+```
+
+📌 Useful for **top-level await** before full module support.
+
+---
+
+## 1.8.3 Typing (Implicit, Explicit, Duck Typing)
+
+**Q220. What is implicit type coercion in JS?**
+👉 Answer: When operators/functions **convert types automatically**: e.g., `+` (string concat vs numeric add), `==` (loose equality), comparisons.
+📌 Know the rules to avoid surprises; prefer **`===`**.
+
+**Q221. How does JS decide what primitive to coerce an object into? (`ToPrimitive`)**
+👉 Answer: It tries **`valueOf`** then **`toString`** (order depends on “hint”). For `+` with objects, the hint is often `"default"`.
+
+```js
+const x = { valueOf(){ return 3; }, toString(){ return "7"; } };
+x + 1; // 4 (uses valueOf)
+```
+
+**Q222. Why does `1 + "2"` become `"12"` but `"5" - 1` become `4`?**
+👉 Answer: `+` prefers **string concatenation** if either operand is a string; `-` is **numeric only**, so both sides become numbers.
+
+```js
+1 + "2"   // "12"
+"5" - 1   // 4
+```
+
+📌 `+` is the most **polymorphic** operator—be cautious.
+
+**Q223. What are common `==` pitfalls?**
+👉 Answer: Loose equality performs coercions:
+
+```js
+0 == false      // true
+"" == 0         // true
+null == undefined // true
+[] == ""        // true
+[] == 0         // true
+[0] == 0        // true
+```
+
+📌 Prefer `===` and explicit casts.
+
+**Q224. How to do explicit conversions cleanly?**
+👉 Answer:
+
+* To number: `Number(x)`, unary `+x`, `parseInt/parseFloat` (strings only).
+* To string: `String(x)`, `x + ""`, template literals.
+* To boolean: `Boolean(x)`, `!!x`.
+
+```js
+Number("10")   // 10
++"10.5"        // 10.5
+Boolean("")    // false
+```
+
+📌 Use **`Number.isNaN`** to test NaN reliably.
+
+**Q225. `===` vs `Object.is`—what’s the difference?**
+👉 Answer: `Object.is` is like `===` but treats **`NaN` equals `NaN`** and distinguishes `+0` vs `-0`.
+
+```js
+NaN === NaN         // false
+Object.is(NaN, NaN) // true
+Object.is(+0, -0)   // false
+```
+
+**Q226. What is “duck typing” in JS?**
+👉 Answer: **Structural typing** by behavior: “If it **quacks** like a duck, it’s a duck.” Check for **methods/properties** instead of constructor/type.
+
+```js
+function renderList(x){
+  if (x && typeof x.map === "function") return x.map(renderItem);
+  throw new TypeError("Requires map-able");
+}
+```
+
+📌 Embrace **capability checks** over nominal types.
+
+**Q227. How do you guard against coercion bugs in production code?**
+👉 Answer:
+
+* 📌 Prefer `===` and explicit casts.
+* Validate inputs at boundaries.
+* Use **TypeScript/JSDoc** for intent.
+* Keep `+` away from mixed types; use template literals for strings, `Number()` for math.
+
+---
+
+## 1.8.4 Object Methods: `Object.create`, `Object.assign`
+
+**Q228. What does `Object.create(proto, descriptors?)` do?**
+👉 Answer: Creates a **new object** with its **`[[Prototype]]` set to `proto`** and optional **property descriptors**.
+
+```js
+const base = { greet(){ return "hi"; } };
+const o = Object.create(base, { id: { value: 1, writable: true }});
+Object.getPrototypeOf(o) === base; // true
+```
+
+📌 Great for **pure prototypal inheritance** and **null-prototype** objects.
+
+**Q229. Why/when to use a **null-prototype** object?**
+👉 Answer: To avoid prototype pollution and accidental collisions with `Object.prototype`.
+
+```js
+const dict = Object.create(null);
+dict["__proto__"] = "safe"; // just a normal key
+```
+
+📌 Perfect for **plain key-value maps** you fully control.
+
+**Q230. How is `Object.assign` different from spread `{...obj}`?**
+👉 Answer: Both copy **own enumerable** props **shallowly** into a target, but:
+
+* `assign` **mutates** the first argument (target).
+* Spread makes a **new object** (when used in a literal).
+* `assign` **copies getters as values** (invokes getter); spread does the same.
+
+```js
+const dst = {};
+Object.assign(dst, src1, src2); // mutates dst
+const copy = { ...src1, ...src2 }; // new object
+```
+
+**Q231. What are the limits of `Object.assign`/spread for cloning?**
+👉 Answer: They’re **shallow**: nested objects retain references; they **lose** special types’ semantics (e.g., `Map`, `Set`, functions ok but same reference).
+📌 For deep/structured data, prefer **`structuredClone`** (modern), or a library.
+
+**Q232. How do property descriptors differ from simple assignment?**
+👉 Answer: Descriptors can set **writable**, **enumerable**, **configurable**, and **get/set**.
+
+```js
+Object.defineProperty(obj, "id", { value: 1, writable: false, enumerable: false });
+```
+
+📌 Use descriptors for **APIs** that need controlled surfaces.
+
+**Q233. Does `Object.assign` copy accessors or their values?**
+👉 Answer: It **invokes the getter** on the source and **defines a data property** on the target with the **returned value** (the accessor is **not** preserved).
+📌 To preserve accessors, re-define with **`get`/`set`** via `Object.getOwnPropertyDescriptor` + `defineProperty`.
