@@ -1,0 +1,513 @@
+Here’s a **focused code pack** of the **most interview-useful snippets**, mapped to your topics. I’ll keep each one tight: **what it is**, **when to use**, and the **code**. I’ll send more chunks like this if you want.
+
+---
+
+## 1) Core Utilities (Closures, Scope, `this`, Polyfills)
+
+### 1.1 `once` (closure + state privacy)
+
+```js
+const once = fn => {
+  let called = false, val;
+  return (...args) => (called ? val : (called = true, val = fn(...args)));
+};
+```
+
+### 1.2 Simple `memoize` (pure fn cache)
+
+```js
+const memoize = (fn) => {
+  const cache = new Map();
+  return (...args) => {
+    const k = JSON.stringify(args);
+    if (cache.has(k)) return cache.get(k);
+    const v = fn(...args); cache.set(k, v); return v;
+  };
+};
+```
+
+### 1.3 `bind` polyfill (supports `new`)
+
+```js
+Function.prototype.myBind = function (ctx, ...preset) {
+  const fn = this;
+  function bound(...rest) {
+    const isNew = this instanceof bound;
+    return fn.apply(isNew ? this : ctx, [...preset, ...rest]);
+  }
+  bound.prototype = Object.create(fn.prototype);
+  return bound;
+};
+```
+
+### 1.4 `new` polyfill (constructor behavior)
+
+```js
+const myNew = (Ctor, ...args) => {
+  const obj = Object.create(Ctor.prototype);
+  const ret = Ctor.apply(obj, args);
+  return (ret && (typeof ret === 'object' || typeof ret === 'function')) ? ret : obj;
+};
+```
+
+### 1.5 Debounce & Throttle (leading/trailing)
+
+```js
+const debounce = (fn, wait=300, {leading=false, trailing=true}={}) => {
+  let t, lastArgs, called=false;
+  return (...args) => {
+    if (!t && leading) { fn(...args); called = true; }
+    clearTimeout(t); lastArgs = args;
+    t = setTimeout(() => { if (trailing && (!leading || called)) fn(...lastArgs); t=null; called=false; }, wait);
+  };
+};
+
+const throttle = (fn, wait=300) => {
+  let last=0, t;
+  return (...args) => {
+    const now=Date.now(), rem = wait - (now - last);
+    if (rem <= 0) { last=now; fn(...args); }
+    else if (!t) t=setTimeout(()=>{ t=null; last=Date.now(); fn(...args); }, rem);
+  };
+};
+```
+
+---
+
+## 2) Arrays/Objects (Polyfills, Flatten, Clone, Deep Freeze)
+
+### 2.1 `map` / `filter` / `reduce` polyfill style (spec-ish skeletons)
+
+```js
+if (!Array.prototype.map) Array.prototype.map = function(cb, thisArg){
+  const O = Object(this), len = O.length >>> 0, A = new Array(len);
+  for (let i=0;i<len;i++) if (i in O) A[i] = cb.call(thisArg, O[i], i, O);
+  return A;
+};
+if (!Array.prototype.filter) Array.prototype.filter = function(cb, thisArg){
+  const O = Object(this), len = O.length >>> 0, A = [];
+  for (let i=0;i<len;i++) if (i in O && cb.call(thisArg, O[i], i, O)) A.push(O[i]);
+  return A;
+};
+if (!Array.prototype.reduce) Array.prototype.reduce = function(cb, init){
+  const O = Object(this), len = O.length >>> 0; let i=0, acc;
+  if (arguments.length>1) acc = init;
+  else { while(i<len && !(i in O)) i++; if (i>=len) throw TypeError('empty'); acc=O[i++]; }
+  for (;i<len;i++) if (i in O) acc = cb(acc, O[i], i, O);
+  return acc;
+};
+```
+
+### 2.2 Flatten nested arrays (iterative)
+
+```js
+const flatten = (xs) => {
+  const out = [], stack = [...xs];
+  while (stack.length) {
+    const v = stack.pop();
+    Array.isArray(v) ? stack.push(...v) : out.push(v);
+  }
+  return out.reverse();
+};
+```
+
+### 2.3 Flatten/unflatten objects (dot paths + \[i])
+
+```js
+const flattenAny = (x, p="", out={}) => {
+  if (Array.isArray(x)) x.forEach((v,i)=>flattenAny(v, `${p}[${i}]`, out));
+  else if (x && typeof x === 'object') for (const k of Object.keys(x)) flattenAny(x[k], p?`${p}.${k}`:k, out);
+  else out[p]=x;
+  return out;
+};
+```
+
+### 2.4 Deep clone (prefer `structuredClone`)
+
+```js
+const deepClone = obj =>
+  typeof structuredClone === 'function'
+    ? structuredClone(obj)
+    : JSON.parse(JSON.stringify(obj)); // caveats: drops Date/Map/Set/undefined
+```
+
+### 2.5 Deep freeze (avoid cycles in prod)
+
+```js
+const deepFreeze = (o, seen=new WeakSet()) => {
+  if (o && typeof o === 'object' && !seen.has(o)) {
+    seen.add(o); Object.freeze(o);
+    Object.getOwnPropertyNames(o).forEach(k => deepFreeze(o[k], seen));
+  }
+  return o;
+};
+```
+
+---
+
+## 3) Functional (Compose/Pipe, Currying, Lazy via Generators)
+
+### 3.1 Compose / Pipe
+
+```js
+const compose = (...fns) => x => fns.reduceRight((v, f) => f(v), x);
+const pipe    = (...fns) => x => fns.reduce((v, f) => f(v), x);
+```
+
+### 3.2 Curry
+
+```js
+const curry = (fn) => function curried(...args){
+  return args.length >= fn.length ? fn.apply(this,args) : (...next)=>curried(...args,...next);
+};
+```
+
+### 3.3 Lazy map/filter (generators)
+
+```js
+function* lazyMap(it, fn){ for (const x of it) yield fn(x); }
+function* lazyFilter(it, pred){ for (const x of it) if (pred(x)) yield x; }
+// usage: [...lazyFilter(lazyMap([1,2,3], x=>x*x), x=>x>2)]
+```
+
+---
+
+## 4) Async Power Kit (Promises, Sequence/Parallel, Retry/Timeout/Cancel)
+
+### 4.1 Sequential execution
+
+```js
+const inSequence = async (items, worker) => {
+  const out = [];
+  for (const it of items) out.push(await worker(it));
+  return out;
+};
+```
+
+### 4.2 Parallel with limit (pool)
+
+```js
+const mapLimit = async (items, limit, worker) => {
+  const out = new Array(items.length);
+  let i = 0; const running = new Set();
+  const run = async () => {
+    if (i >= items.length) return;
+    const idx = i++, p = Promise.resolve(worker(items[idx]))
+      .then(v => out[idx]=v)
+      .finally(() => { running.delete(p); run(); });
+    running.add(p);
+  };
+  for (let k=0; k<Math.min(limit, items.length); k++) run();
+  await Promise.all([...running]);
+  return out;
+};
+```
+
+### 4.3 Retry with backoff + jitter
+
+```js
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const retry = async (fn, {retries=3, base=300, factor=2, jitter=true, retryIf=e=>!e || e.status>=500}={}) => {
+  let attempt = 0;
+  for (;;) try { return await fn(); }
+  catch (e) {
+    if (attempt++ >= retries || !retryIf(e)) throw e;
+    const delay = (base * (factor ** (attempt-1))) * (jitter ? (0.5 + Math.random()) : 1);
+    await sleep(delay);
+  }
+};
+```
+
+### 4.4 Timeout + Abort for fetch
+
+```js
+const fetchWithTimeout = async (url, ms=8000, init={}) => {
+  const ctl = new AbortController(), t = setTimeout(()=>ctl.abort(), ms);
+  try { return await fetch(url, { ...init, signal: ctl.signal }); }
+  finally { clearTimeout(t); }
+};
+```
+
+### 4.5 Cancelable wrapper (drop results)
+
+```js
+const makeCancelable = (p) => {
+  let canceled = false;
+  const promise = new Promise((res, rej) => {
+    p.then(v => canceled ? undefined : res(v),
+           e => canceled ? undefined : rej(e));
+  });
+  return { promise, cancel: () => { canceled = true; } };
+};
+```
+
+---
+
+## 5) Fetch & APIs (Requests, Query, Safe JSON, SW Caching)
+
+### 5.1 Build URLs safely
+
+```js
+const withQuery = (base, params) => {
+  const u = new URL(base, location.origin);
+  u.search = new URLSearchParams(params);
+  return u.toString();
+};
+```
+
+### 5.2 JSON POST helper
+
+```js
+const postJSON = async (url, body, init={}) => {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(init.headers||{}) },
+    body: JSON.stringify(body),
+    ...init
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${await res.text()}`);
+  return res.json();
+};
+```
+
+### 5.3 Safe `stringify` with cycles
+
+```js
+const safeStringify = (obj, space=0) => {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (k, v) => {
+    if (v && typeof v === 'object') { if (seen.has(v)) return '[Circular]'; seen.add(v); }
+    return v;
+  }, space);
+};
+```
+
+### 5.4 Service Worker caching (stale-while-revalidate sketch)
+
+```js
+// sw.js
+self.addEventListener('fetch', e => {
+  e.respondWith((async () => {
+    const cache = await caches.open('v1');
+    const cached = await cache.match(e.request);
+    const network = fetch(e.request).then(res => { cache.put(e.request, res.clone()); return res; });
+    return cached || network;
+  })());
+});
+```
+
+---
+
+## 6) DOM & Events (Delegation, Safe HTML, Forms)
+
+### 6.1 Event delegation
+
+```js
+const delegate = (root, type, selector, handler) => {
+  root.addEventListener(type, e => {
+    const el = e.target.closest(selector);
+    if (el && root.contains(el)) handler(e, el);
+  });
+};
+// usage: delegate(ul, 'click', 'li.item', (e, li) => select(li.dataset.id));
+```
+
+### 6.2 Minimal HTML sanitizer (very conservative)
+
+```js
+const sanitize = (html) => {
+  const tpl = document.createElement('template'); tpl.innerHTML = html;
+  const rm = (node) => {
+    [...node.querySelectorAll('script,style,iframe,link,object,embed')].forEach(n => n.remove());
+    [...node.querySelectorAll('*')].forEach(el => [...el.attributes].forEach(a => {
+      if (/^on/i.test(a.name) || /^(javascript:)/i.test(a.value)) el.removeAttribute(a.name);
+    }));
+  };
+  rm(tpl.content); return tpl.innerHTML;
+};
+```
+
+### 6.3 Form → object (for JSON APIs)
+
+```js
+const formToObject = (form) => {
+  const data = new FormData(form), obj = {};
+  for (const [k, v] of data.entries()) obj[k] = obj[k] ? [].concat(obj[k], v) : v;
+  return obj;
+};
+```
+
+---
+
+## 7) Error Handling (Custom Errors, Global Handlers)
+
+### 7.1 Custom error with cause
+
+```js
+class HttpError extends Error {
+  constructor(message, status, url, cause) { super(message, { cause }); this.name='HttpError'; this.status=status; this.url=url; }
+}
+```
+
+### 7.2 Global browser handlers
+
+```js
+window.addEventListener('error', e => { /* report runtime/resource */ }, true);
+window.addEventListener('unhandledrejection', e => { /* report promise errors */ });
+```
+
+---
+
+## 8) OOP & Proxies (Classes, Private, Proxy/Reflect)
+
+### 8.1 Class with private field + static factory
+
+```js
+class Wallet {
+  #balance = 0;
+  static from(amount){ const w = new Wallet(); w.deposit(amount); return w; }
+  deposit(x){ if (x>0) this.#balance += x; }
+  get balance(){ return this.#balance; }
+}
+```
+
+### 8.2 Proxy for validation/logging
+
+```js
+const withValidation = (obj) => new Proxy(obj, {
+  set(t, p, v){ if (p === 'age' && (v<0 || v>150)) throw RangeError('age'); return Reflect.set(t, p, v); },
+  get(t, p, r){ console.debug('get', p); return Reflect.get(t, p, r); }
+});
+```
+
+---
+
+## 9) Workers & IndexedDB (Performance/Offline)
+
+### 9.1 Web Worker (offload CPU)
+
+```js
+// main.js
+const worker = new Worker('w.js');
+worker.postMessage({ n: 42 });
+worker.onmessage = e => console.log('result', e.data);
+
+// w.js
+onmessage = e => { const { n } = e.data; postMessage(n * 2); };
+```
+
+### 9.2 Tiny IndexedDB helper (Dexie.js recommended in prod)
+
+```js
+const idbOpen = (name, version, onUpgrade) =>
+  new Promise((res, rej) => { const req = indexedDB.open(name, version);
+    req.onupgradeneeded = e => onUpgrade(req.result, e.oldVersion, e.newVersion);
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  });
+
+const idbPut = (db, store, value, key) =>
+  new Promise((res, rej) => { const tx = db.transaction(store, 'readwrite'); tx.objectStore(store).put(value, key);
+    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+  });
+```
+
+---
+
+## 10) Modules & Code Splitting (ESM, Dynamic Import)
+
+### 10.1 ESM basics
+
+```js
+// utils.js
+export const sum = (a,b) => a+b;
+// main.js
+import { sum } from './utils.js';
+```
+
+### 10.2 Dynamic import (lazy load)
+
+```js
+const loadChart = async () => {
+  const { drawChart } = await import('./chart.js'); // loaded on demand
+  drawChart();
+};
+```
+
+---
+
+## 11) Generators & Async Generators (Streaming)
+
+### 11.1 Async generator (progressive fetch)
+
+```js
+async function* fetchTexts(urls){
+  for (const u of urls) yield fetch(u).then(r => r.text());
+}
+(async () => {
+  for await (const chunk of fetchTexts(['/a','/b'])) console.log(chunk);
+})();
+```
+
+---
+
+## 12) Security Helpers (CSP hint, Safe redirect)
+
+### 12.1 Safe redirect helper
+
+```js
+const safeRedirect = (url, allowedOrigins=[location.origin]) => {
+  try {
+    const u = new URL(url, location.origin);
+    if (!allowedOrigins.includes(u.origin)) throw new Error('blocked');
+    location.href = u.toString();
+  } catch { /* log & ignore */ }
+};
+```
+
+---
+
+## 13) Misc (Equality, ToPrimitive, BigInt rounding)
+
+### 13.1 Stable `Object.is` fallback
+
+```js
+const is = Object.is || ((a, b) => (a === b ? a !== 0 || 1 / a === 1 / b : a !== a && b !== b));
+```
+
+### 13.2 Custom `toPrimitive` for smart logging
+
+```js
+const price = {
+  amount: 99,
+  [Symbol.toPrimitive](hint){ return hint === 'string' ? `₹${this.amount}` : this.amount; }
+};
+```
+
+---
+
+## 14) React/SPA Practical (just 2 essentials)
+
+### 14.1 Route-level code split (React)
+
+```jsx
+const Page = React.lazy(() => import('./Page'));
+<Suspense fallback={<Spinner/>}><Page/></Suspense>
+```
+
+### 14.2 List virtualization (concept hook stub)
+
+```js
+// Use libraries (react-window) in production; interview: discuss windowing to avoid DOM bloat.
+```
+
+---
+
+If you want, I can send the **next chunk** with:
+
+* **Advanced data structures** in JS (Map/Set/WeakMap use patterns)
+* **More DOM perf tricks** (batching reads/writes, `IntersectionObserver` lazy images)
+* **More fetch patterns** (ETag/If-None-Match flow, exponential backoff + token refresh)
+* **SSR hydration pitfalls** & **isomorphic utilities**
+* **5–10 mini coding challenges** (closures, hoisting, event loop puzzles) with solutions
+
+Say the word and I’ll drop the next pack.
