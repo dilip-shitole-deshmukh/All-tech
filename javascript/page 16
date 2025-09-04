@@ -1,0 +1,260 @@
+Perfect ✅ — I’ll continue **sequentially**, breaking into chunks of about **20–30 Q\&A** so it’s easier to read and track.
+
+We stopped at **2.6.6 Functional Programming (Q440)** → now we continue with **2.7.x Functional Techniques**.
+
+---
+
+## 2.7.1 Currying 📌
+
+**Q441. What is currying in JavaScript?**
+👉 Answer: Currying transforms a function with multiple arguments into a sequence of functions that each take **one argument at a time**.
+
+```js
+function curryAdd(a){ return b => a+b; }
+curryAdd(2)(3); // 5
+```
+
+📌 Useful for **partial application**, reusability, and composing functions.
+
+---
+
+**Q442. How does currying differ from partial application?**
+👉 Answer:
+
+* **Currying**: Always transforms into **1 arg per function**.
+* **Partial application**: Fixes **some arguments** of a function, but not necessarily to one.
+
+```js
+// partial
+const add = (a,b,c) => a+b+c;
+const add5 = add.bind(null, 5); // partial with 1 arg
+```
+
+---
+
+**Q443. Why is currying useful in practice?**
+👉 Answer:
+
+* Reuse: `filter(isType("car"))`.
+* Configuration: `log(level)("msg")`.
+* Function composition: break problems into smaller reusable steps.
+
+---
+
+**Q444. Write a curry utility function.**
+👉 Answer:
+
+```js
+function curry(fn){
+  return function curried(...args){
+    return args.length >= fn.length
+      ? fn.apply(this,args)
+      : (...next)=>curried(...args,...next);
+  };
+}
+```
+
+---
+
+## 2.7.2 Recursion
+
+**Q445. What is recursion and when to use it?**
+👉 Answer: Recursion is when a function **calls itself** until a **base case** is reached.
+
+```js
+function factorial(n){ return n<=1 ? 1 : n*factorial(n-1); }
+```
+
+📌 Good for problems with **nested/recursive structure**: trees, graphs, divide & conquer.
+
+---
+
+**Q446. What are the risks of recursion in JS?**
+👉 Answer:
+
+* **Stack overflow** for deep recursion (`RangeError`).
+* **Performance** (function call overhead).
+  📌 Convert to iteration or use **tail-call optimization** (in limited engines).
+
+---
+
+**Q447. How do you safely traverse a deep tree in JS?**
+👉 Answer: Prefer **explicit stacks/queues**:
+
+```js
+function dfs(root){
+  const stack=[root];
+  while(stack.length){
+    const n=stack.pop();
+    if(!n) continue;
+    stack.push(...n.children);
+  }
+}
+```
+
+---
+
+## 2.7.3 Memoization
+
+**Q448. What is memoization?**
+👉 Answer: Memoization caches function results based on arguments, so repeated calls with the same input return instantly.
+
+```js
+function memoize(fn){
+  const cache={};
+  return (...args)=>{
+    const key=JSON.stringify(args);
+    return key in cache ? cache[key] : cache[key]=fn(...args);
+  };
+}
+```
+
+📌 Optimizes expensive pure functions.
+
+---
+
+**Q449. When should you avoid memoization?**
+👉 Answer: Avoid when:
+
+* Input space is **huge** (cache explosion).
+* Function is **impure** (results may change).
+  📌 Use with **pure + expensive** functions like Fibonacci, API caching.
+
+---
+
+**Q450. How does memoization differ from caching in general?**
+👉 Answer:
+
+* **Memoization**: cache results of **function calls**.
+* **Caching**: broader concept (store any data).
+  📌 Memoization = special-case caching.
+
+---
+
+## 2.7.4 Pipe and Compose functions
+
+**Q451. What is function composition?**
+👉 Answer: Combining smaller functions into larger ones, passing the output of one as the input of another.
+
+```js
+const compose = (f,g) => x => f(g(x));
+```
+
+📌 Encourages modular, reusable code.
+
+---
+
+**Q452. Difference between `pipe` and `compose`?**
+👉 Answer:
+
+* `pipe`: left-to-right. `pipe(f,g)(x) = g(f(x))`
+* `compose`: right-to-left. `compose(f,g)(x) = f(g(x))`
+  📌 Same idea, different direction.
+
+---
+
+**Q453. Example: implement `pipe`.**
+👉 Answer:
+
+```js
+const pipe = (...fns)=>x=>fns.reduce((v,fn)=>fn(v),x);
+const result = pipe(x=>x+1, x=>x*2)(5); // (5+1)*2=12
+```
+
+---
+
+**Q454. Why is composition important in FP?**
+👉 Answer: Encourages:
+
+* Small, **testable** units.
+* Declarative pipelines (`map → filter → reduce`).
+* Avoids side effects.
+  📌 Common in **RxJS, Redux, Ramda**.
+
+---
+
+## 2.7.5 Lazy Evaluation
+
+**Q455. What is lazy evaluation?**
+👉 Answer: A strategy where computation is **deferred until needed**.
+Example: Generators in JS produce values only when iterated.
+
+```js
+function* naturals(){ let i=0; while(true) yield i++; }
+```
+
+---
+
+**Q456. Why is lazy evaluation useful?**
+👉 Answer:
+
+* Works with **infinite sequences**.
+* Saves computation/memory until required.
+* Improves performance when not all values are consumed.
+
+---
+
+**Q457. How can you implement lazy mapping in JS?**
+👉 Answer: With generators:
+
+```js
+function* map(iterable, fn){
+  for(const x of iterable) yield fn(x);
+}
+```
+
+📌 Avoids creating full arrays.
+
+---
+
+**Q458. What libraries use lazy evaluation in JS?**
+👉 Answer:
+
+* **RxJS** (lazy streams of events).
+* **Lodash/fp** with `_.chain` sometimes defers until `.value()`.
+* Native **iterators/generators**.
+  📌 Great for pipelines on **large/streaming data**.
+
+---
+
+## 2.8.1 Debounce & Throttle 📌
+
+**Q459. What is debouncing?**
+👉 Answer: Debounce delays function execution until **after inactivity**. Useful for “type → search” inputs.
+
+```js
+function debounce(fn, wait){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); };
+}
+```
+
+---
+
+**Q460. What is throttling?**
+👉 Answer: Throttle ensures a function runs at most **once per interval**. Useful for scroll/resize handlers.
+
+```js
+function throttle(fn, wait){
+  let last=0; return (...args)=>{
+    const now=Date.now();
+    if(now-last>=wait){ last=now; fn(...args); }
+  };
+}
+```
+
+---
+
+**Q461. When to use debounce vs throttle?**
+👉 Answer:
+
+* **Debounce**: wait for quiet (e.g., search box).
+* **Throttle**: limit frequency (e.g., scroll events).
+  📌 Both improve **performance + UX**.
+
+---
+
+✅ That’s **20 Q\&A (Q441–Q461)** covered.
+
+Next chunk will continue from **2.8.2 Debouncing with leading/trailing calls → Proxy/Reflect → Shallow vs Deep Copy → DOM Deep Dive**, etc.
+
+Would you like me to keep the **same pace (20–25 Q\&A per chunk)** until all stages are done?
