@@ -1,0 +1,154 @@
+Perfect 👍 We’ll keep moving **sequentially** through your entire outline until every point is covered, with **detailed, interview-ready explanations**.
+
+We just finished **2.4.7 Caching**, so now we continue with **Stage 3: Advanced Internals (2.5.x → 2.6.x)**.
+
+---
+
+## 2.5.1 JavaScript Engines and V8 Engine 📌
+
+**Q400. What is a JavaScript engine?**
+👉 Answer: A JS engine is the program that **parses, compiles, and executes JavaScript code**. It implements the **ECMAScript spec**.
+Examples:
+
+* **V8** (Chrome, Node.js, Deno)
+* **SpiderMonkey** (Firefox)
+* **JavaScriptCore** (Safari)
+* **Chakra** (old Edge)
+
+📌 Each engine optimizes code differently but all follow ECMAScript standards.
+
+---
+
+**Q401. How does the V8 engine execute JS code?**
+👉 Answer:
+
+1. **Parsing**: Source code → AST (Abstract Syntax Tree).
+2. **Ignition (interpreter)**: Quickly converts AST → bytecode and starts running.
+3. **Profiler**: Watches for hot code paths.
+4. **Turbofan (JIT compiler)**: Optimizes hot code into machine code.
+5. **Deoptimization**: If assumptions break (e.g., hidden class change), V8 falls back to bytecode.
+
+📌 This pipeline balances **startup speed** and **runtime performance**.
+
+---
+
+**Q402. What are “hidden classes” in V8?**
+👉 Answer: V8 uses hidden classes (similar to C++ classes) to optimize object property lookups.
+
+* Objects with the same shape (same property order/type) share a hidden class.
+* Adding properties in the same order helps optimization.
+  📌 Changing property order/types can cause **deoptimization**.
+
+```js
+function Point(x,y){ this.x=x; this.y=y; } // stable hidden class
+```
+
+---
+
+**Q403. What’s inline caching and why does V8 use it?**
+👉 Answer: Inline caching stores **previous lookup results** (like which hidden class property offset to use).
+
+* On repeated calls, V8 skips property resolution and directly accesses memory.
+  📌 Greatly speeds up **method/property access**.
+
+---
+
+**Q404. How does garbage collection work in V8?**
+👉 Answer: V8 uses **generational garbage collection**:
+
+* **New space**: short-lived objects (young gen). Collected frequently with **scavenging**.
+* **Old space**: long-lived objects promoted here. Collected less often with **mark-and-sweep/compact**.
+  📌 GC pauses are minimized by **incremental & concurrent GC**.
+
+---
+
+**Q405. How does V8 handle memory limits?**
+👉 Answer: In Node.js, by default V8 limits heap to \~**2GB (32-bit)** or \~**4GB (64-bit)**. You can raise it with flags:
+
+```bash
+node --max-old-space-size=8192 app.js   # 8GB
+```
+
+📌 Knowing this is important for memory-heavy apps.
+
+---
+
+**Q406. Why is V8 so fast compared to older engines?**
+👉 Answer:
+
+* **JIT compilation** → optimized machine code.
+* **Hidden classes + inline caching**.
+* **Optimistic optimizations** (then deopt).
+* **Garbage collector optimizations** (incremental, concurrent).
+  📌 V8 trades memory for speed.
+
+---
+
+**Q407. How does V8 handle async code internally?**
+👉 Answer: The **engine only executes JS**. Async tasks (I/O, timers, fetch) are handled by the **runtime environment** (browser APIs or Node’s libuv). When tasks complete, callbacks are queued, and V8’s event loop executes them. 📌 Engine ≠ runtime.
+
+---
+
+## 2.5.2 Memory Management & Garbage Collection
+
+**Q408. How does JS manage memory if there’s no manual `free`?**
+👉 Answer: JS uses **automatic garbage collection (GC)**. The engine tracks **reachable objects** (from roots: `window`, `global`, active stack, closures). Anything unreachable is garbage-collected. 📌 Developers don’t `malloc/free`.
+
+---
+
+**Q409. What is reference counting and why isn’t it enough?**
+👉 Answer: Simple GC counts references to objects. If count=0 → free.
+📌 Fails on **cyclic references** (two objects referencing each other but unreachable from roots). That’s why modern engines use **mark-and-sweep**.
+
+---
+
+**Q410. What is the mark-and-sweep algorithm?**
+👉 Answer:
+
+1. **Mark**: Start at roots, recursively mark reachable objects.
+2. **Sweep**: Collect unmarked (unreachable) objects.
+   📌 Handles cycles correctly.
+
+---
+
+**Q411. What is generational GC? Why does V8 use it?**
+👉 Answer: Objects are allocated in **young generation (new space)**. Most die quickly (temporary variables). Survivors are promoted to **old generation**.
+📌 Optimizes for the common case: “most objects die young.”
+
+---
+
+**Q412. How can developers cause memory leaks in JS?**
+👉 Answer:
+
+* Global variables that never get cleared.
+* Event listeners not removed.
+* Closures holding references unnecessarily.
+* Caches/maps growing without eviction.
+* Detached DOM nodes kept in memory.
+  📌 Tools: Chrome DevTools Memory tab, `performance.memory`.
+
+---
+
+**Q413. What’s the difference between shallow vs deep leaks?**
+👉 Answer:
+
+* **Shallow leak**: simple forgotten global reference.
+* **Deep leak**: hidden references in closures, event handlers, data structures. Harder to spot.
+  📌 Both keep objects “reachable,” so GC won’t reclaim them.
+
+---
+
+**Q414. How can you optimize memory usage in JS apps?**
+👉 Answer:
+
+* Nullify references when done (`obj = null`).
+* Remove event listeners (`element.removeEventListener`).
+* Use **WeakMap/WeakSet** for caches (keys auto-GC’d).
+* Profile memory with DevTools.
+  📌 Memory-efficient code improves **performance and stability**.
+
+---
+
+✅ Next in sequence: **2.5.3 Microtasks vs Macrotasks**
+
+Would you like me to go **even deeper into engine internals** (like how event loop interacts with microtasks/macrotasks in V8/Node), or keep explanations **more interview-focused (definitions, code, pitfalls)**?
