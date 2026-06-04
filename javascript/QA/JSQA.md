@@ -3242,3 +3242,735 @@ user.hasOwnProperty("name");
 Because almost all JavaScript applications exchange data using objects.
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q16. What is Scope in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Scope defines where a variable can be accessed in a JavaScript program.
+
+JavaScript mainly has three types of scope:
+
+- Global Scope
+- Function Scope
+- Block Scope
+
+Understanding scope is extremely important because it directly affects variable visibility, memory usage, closures, hoisting, and debugging.
+
+Modern JavaScript applications mostly use block-scoped variables (`let` and `const`) to avoid accidental variable leakage.
+
+---
+
+## 🔹 Core Explanation
+
+## 1️⃣ Global Scope
+
+Variables declared outside any function or block.
+
+```js
+const company = "Google";
+
+function showCompany() {
+  console.log(company);
+}
+
+showCompany();
+```
+
+Output:
+
+```js
+Google;
+```
+
+Accessible everywhere.
+
+---
+
+## 2️⃣ Function Scope
+
+Variables declared inside a function.
+
+```js
+function greet() {
+  const name = "Dilip";
+
+  console.log(name);
+}
+
+greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+Outside function:
+
+```js
+console.log(name);
+```
+
+❌ Error
+
+```js
+ReferenceError;
+```
+
+---
+
+## 3️⃣ Block Scope
+
+Created by:
+
+```js
+{}
+if(){}
+for(){}
+while(){}
+```
+
+Example:
+
+```js
+if (true) {
+  let age = 30;
+}
+
+console.log(age);
+```
+
+❌ Error
+
+Because `let` is block-scoped.
+
+---
+
+## 📌 var vs let Scope
+
+### var
+
+```js
+if (true) {
+  var a = 10;
+}
+
+console.log(a);
+```
+
+✅ Works
+
+Output:
+
+```js
+10;
+```
+
+---
+
+### let
+
+```js
+if (true) {
+  let b = 20;
+}
+
+console.log(b);
+```
+
+❌ Error
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```jsx
+function UserCard() {
+  const user = {};
+
+  return <div></div>;
+}
+```
+
+`user` exists only inside component.
+
+---
+
+### Angular
+
+```ts
+saveUser() {
+   const response = {};
+}
+```
+
+Response accessible only within method.
+
+---
+
+### Loops
+
+```js
+for (let i = 0; i < 5; i++) {}
+```
+
+Keeps `i` local.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+for (var i = 0; i < 3; i++) {}
+console.log(i);
+```
+
+Output:
+
+```js
+3;
+```
+
+Because `var` is function-scoped.
+
+---
+
+### Trap 2
+
+Global Variable Pollution
+
+```js
+name = "Dilip";
+```
+
+Avoid creating globals accidentally.
+
+---
+
+### Trap 3
+
+Using var in large applications.
+
+Can cause bugs due to shared scope.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is Lexical Scope?
+
+Variables are resolved based on where functions are defined, not where they are called.
+
+---
+
+### ❓ Which variables are block scoped?
+
+✅ let
+
+✅ const
+
+---
+
+### ❓ Is var block scoped?
+
+❌ No
+
+Function scoped.
+
+---
+
+### ❓ Why prefer let and const?
+
+Better predictability and fewer bugs.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Scope controls variable accessibility.
+
+✅ Types:
+
+- Global
+- Function
+- Block
+
+✅ let and const are block-scoped.
+
+✅ var is function-scoped.
+
+✅ Scope is fundamental for closures and hoisting.
+
+---
+
+# 🟢 Q17. What is Hoisting in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Hoisting is JavaScript's behavior of moving declarations to the top of their scope during the compilation phase before code execution.
+
+Function declarations are fully hoisted, while variables declared with `var` are hoisted and initialized with `undefined`.
+
+Variables declared using `let` and `const` are also hoisted but remain inaccessible inside the Temporal Dead Zone (TDZ) until initialization.
+
+---
+
+## 🔹 Core Explanation
+
+### Variable Hoisting with var
+
+```js
+console.log(a);
+
+var a = 10;
+```
+
+Internally:
+
+```js
+var a;
+
+console.log(a);
+
+a = 10;
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+## Function Hoisting
+
+```js
+greet();
+
+function greet() {
+  console.log("Hello");
+}
+```
+
+Output:
+
+```js
+Hello;
+```
+
+Because entire function is hoisted.
+
+---
+
+## let and const Hoisting
+
+```js
+console.log(age);
+
+let age = 25;
+```
+
+Output:
+
+```js
+ReferenceError;
+```
+
+---
+
+## 🚨 Temporal Dead Zone (TDZ)
+
+Period between:
+
+```js
+Scope Creation
+```
+
+and
+
+```js
+Variable Initialization
+```
+
+Example:
+
+```js
+{
+  console.log(a);
+
+  let a = 10;
+}
+```
+
+Inside TDZ.
+
+---
+
+## 📌 Hoisting Visualization
+
+```js
+console.log(x);
+
+var x = 5;
+```
+
+Execution Phase:
+
+```js
+var x = undefined;
+
+console.log(x);
+
+x = 5;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Legacy Codebases
+
+```js
+var apiUrl;
+```
+
+Frequently relies on hoisting.
+
+---
+
+### React
+
+Modern React projects avoid relying on hoisting.
+
+```js
+const fetchUsers = () => {};
+```
+
+Preferred.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+console.log(user);
+
+let user = {};
+```
+
+❌ ReferenceError
+
+---
+
+### Trap 2
+
+Confusing undefined with ReferenceError.
+
+---
+
+### Trap 3
+
+Assuming Function Expressions are hoisted.
+
+```js
+greet();
+
+const greet = function () {};
+```
+
+❌ Error
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Are let and const hoisted?
+
+✅ Yes
+
+But inaccessible due to TDZ.
+
+---
+
+### ❓ What gets hoisted?
+
+| Type                 | Hoisted |
+| -------------------- | ------- |
+| var                  | Yes     |
+| let                  | Yes     |
+| const                | Yes     |
+| Function Declaration | Yes     |
+
+---
+
+### ❓ Why does var return undefined?
+
+Because declaration is hoisted and initialized.
+
+---
+
+### ❓ Are Arrow Functions hoisted?
+
+❌ Not like function declarations.
+
+Depends on variable declaration.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Hoisting occurs during compilation.
+
+✅ var → hoisted with undefined.
+
+✅ Function declarations → fully hoisted.
+
+✅ let/const → hoisted but TDZ applies.
+
+✅ Common product-company interview topic.
+
+---
+
+# 🟢 Q18. What is Error Handling in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Error handling is the process of identifying, managing, and recovering from runtime errors without crashing the application.
+
+JavaScript primarily uses:
+
+- try
+- catch
+- finally
+- throw
+
+Proper error handling improves application stability, debugging, monitoring, and user experience.
+
+In modern React and Angular applications, error handling is extensively used for API calls, form validation, authentication, and third-party integrations.
+
+---
+
+## 🔹 Core Explanation
+
+### Basic Syntax
+
+```js
+try {
+  // risky code
+} catch (error) {
+  // handle error
+} finally {
+  // always executes
+}
+```
+
+---
+
+## Example
+
+```js
+try {
+  const result = unknownVariable + 10;
+} catch (error) {
+  console.log(error.message);
+} finally {
+  console.log("Cleanup");
+}
+```
+
+Output:
+
+```js
+unknownVariable is not defined
+Cleanup
+```
+
+---
+
+## 📌 throw Statement
+
+Used to create custom errors.
+
+```js
+function validateAge(age) {
+  if (age < 18) {
+    throw new Error("Age must be 18+");
+  }
+}
+```
+
+---
+
+## 📌 Custom Error Handling
+
+```js
+try {
+  validateAge(15);
+} catch (error) {
+  console.log(error.message);
+}
+```
+
+Output:
+
+```js
+Age must be 18+
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Error Handling
+
+```js
+try {
+  const data = await fetchUsers();
+} catch (error) {
+  showErrorMessage();
+}
+```
+
+---
+
+### React
+
+```jsx
+try {
+  await saveUser();
+} catch (error) {
+  setError(error.message);
+}
+```
+
+---
+
+### Angular
+
+```ts
+this.http.get().subscribe({
+  error: (err) => {
+    console.log(err);
+  },
+});
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Empty catch block.
+
+```js
+catch(error){}
+```
+
+❌ Never do this.
+
+---
+
+### Trap 2
+
+Swallowing Errors
+
+```js
+catch(error){
+   return;
+}
+```
+
+Makes debugging difficult.
+
+---
+
+### Trap 3
+
+Using try-catch for normal logic.
+
+```js
+try{
+  if(user){
+  }
+}
+```
+
+Unnecessary.
+
+---
+
+## 📌 Common JavaScript Errors
+
+### Syntax Error
+
+```js
+console.log("Hello"
+```
+
+---
+
+### Reference Error
+
+```js
+console.log(user);
+```
+
+---
+
+### Type Error
+
+```js
+null.toUpperCase();
+```
+
+---
+
+### Range Error
+
+```js
+new Array(-1);
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is finally block?
+
+Runs regardless of success or failure.
+
+---
+
+### ❓ When should throw be used?
+
+When business validation fails.
+
+---
+
+### ❓ Can try-catch handle syntax errors?
+
+❌ No
+
+Only runtime errors.
+
+---
+
+### ❓ Why is error handling important?
+
+Prevents application crashes and improves UX.
+
+---
