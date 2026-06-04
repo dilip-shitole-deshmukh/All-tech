@@ -15032,3 +15032,597 @@ Browser rendering vs server rendering.
 Chrome's JavaScript engine.
 
 ---
+
+Perfect. Since your target is **JavaScript interviews (3–5 years)**, I would focus only on **pure JavaScript topics that are frequently asked but not fully covered in the index/PPT**.
+
+---
+
+# 🟢 Q301. WeakMap vs Map
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+WeakMap is similar to Map, but its keys must be objects and are weakly referenced. If there are no other references to the key object, it can be garbage collected automatically.
+
+Map maintains strong references and prevents garbage collection until entries are removed manually.
+
+WeakMap is commonly used for private data storage and memory-efficient caching.
+
+---
+
+## 🔹 Comparison
+
+| Feature            | Map | WeakMap      |
+| ------------------ | --- | ------------ |
+| Key Types          | Any | Objects Only |
+| Iterable           | ✅  | ❌           |
+| Size Property      | ✅  | ❌           |
+| Garbage Collection | ❌  | ✅           |
+
+---
+
+## 💻 Example
+
+```js
+const map = new Map();
+
+let user = {
+  name: "Dilip",
+};
+
+map.set(user, "Admin");
+
+user = null;
+```
+
+Memory still retained.
+
+---
+
+### WeakMap
+
+```js
+const weakMap = new WeakMap();
+
+let user = {
+  name: "Dilip",
+};
+
+weakMap.set(user, "Admin");
+
+user = null;
+```
+
+Eligible for GC.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why WeakMap exists?
+
+Prevent memory leaks.
+
+---
+
+## 🎯 Final Summary
+
+✅ Object keys only.
+
+✅ GC-friendly.
+
+✅ Used for private data.
+
+---
+
+# 🟢 Q302. WeakSet vs Set
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+WeakSet stores only objects and allows them to be garbage collected when no longer referenced elsewhere.
+
+Unlike Set, WeakSet is not iterable and does not expose size information.
+
+---
+
+## 🔹 Comparison
+
+| Feature          | Set | WeakSet |
+| ---------------- | --- | ------- |
+| Primitive Values | ✅  | ❌      |
+| Objects          | ✅  | ✅      |
+| Iterable         | ✅  | ❌      |
+| GC Friendly      | ❌  | ✅      |
+
+---
+
+## 💻 Example
+
+```js
+const weakSet = new WeakSet();
+
+let obj = {};
+
+weakSet.add(obj);
+
+obj = null;
+```
+
+Object becomes collectible.
+
+---
+
+## 🎯 Final Summary
+
+✅ Object-only collection.
+
+✅ Memory efficient.
+
+---
+
+# 🟢 Q303. Property Descriptors
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Every object property has metadata called property descriptors that control writability, enumerability, and configurability.
+
+Understanding descriptors helps explain why some properties behave differently from others.
+
+---
+
+## 💻 Example
+
+```js
+const user = {
+  name: "Dilip",
+};
+
+console.log(Object.getOwnPropertyDescriptor(user, "name"));
+```
+
+Output:
+
+```js
+{
+ value: "Dilip",
+ writable: true,
+ enumerable: true,
+ configurable: true
+}
+```
+
+---
+
+## 🔹 Define Property
+
+```js
+Object.defineProperty(
+  user,
+
+  "id",
+
+  {
+    value: 101,
+
+    writable: false,
+  },
+);
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ writable:false means?
+
+Property cannot be changed.
+
+---
+
+### ❓ enumerable:false means?
+
+Won't appear in loops.
+
+---
+
+## 🎯 Final Summary
+
+✅ Controls property behavior.
+
+✅ Used internally by frameworks.
+
+---
+
+# 🟢 Q304. Object.defineProperty()
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`Object.defineProperty()` allows creating or modifying object properties with fine-grained control.
+
+Before Proxy became popular, many frameworks used defineProperty to build reactivity systems.
+
+---
+
+## 💻 Example
+
+```js
+const user = {};
+
+Object.defineProperty(user, "name", {
+  value: "Dilip",
+  writable: false,
+});
+
+user.name = "Rahul";
+
+console.log(user.name);
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Vue 2 Reactivity
+
+Built heavily on:
+
+```js
+Object.defineProperty();
+```
+
+---
+
+## 🎯 Final Summary
+
+✅ Custom property behavior.
+
+✅ Foundation of older reactivity systems.
+
+---
+
+# 🟢 Q305. Dynamic Imports
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Dynamic imports allow JavaScript modules to be loaded on demand instead of during initial application startup.
+
+This enables code splitting and lazy loading.
+
+---
+
+## 💻 Example
+
+```js
+const module = await import("./utils.js");
+```
+
+---
+
+## 🔹 Why Better?
+
+Instead of:
+
+```js
+import utils from "./utils";
+```
+
+which loads immediately,
+
+dynamic import loads only when needed.
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Admin Modules
+
+### Large Charts
+
+### Payment SDKs
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Return type?
+
+Promise.
+
+---
+
+### ❓ Related to code splitting?
+
+✅ Yes.
+
+---
+
+## 🎯 Final Summary
+
+✅ Loads modules lazily.
+
+✅ Improves performance.
+
+---
+
+# 🟢 Q306. Tagged Template Literals
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Tagged Template Literals allow custom processing of template strings before producing the final output.
+
+Many libraries like Styled Components use this feature internally.
+
+---
+
+## 💻 Example
+
+```js
+function tag(strings, ...values) {
+  return strings[0] + values[0] + strings[1];
+}
+
+const name = "Dilip";
+
+console.log(tag`Hello ${name}`);
+```
+
+Output:
+
+```js
+Hello Dilip
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Styled Components
+
+### Localization Libraries
+
+---
+
+## 🎯 Final Summary
+
+✅ Custom string processing.
+
+✅ Advanced ES6 topic.
+
+---
+
+# 🟢 Q307. BigInt
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+BigInt is a primitive type used to represent integers larger than Number.MAX_SAFE_INTEGER.
+
+It helps avoid precision loss when working with very large numbers.
+
+---
+
+## 💻 Example
+
+```js
+const num = 9007199254740993n;
+
+console.log(num);
+```
+
+---
+
+## 🔹 Why Needed?
+
+```js
+Number.MAX_SAFE_INTEGER;
+```
+
+equals:
+
+```js
+9007199254740991;
+```
+
+Beyond this:
+
+```js
+Precision Issues
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Type of BigInt?
+
+```js
+typeof 10n;
+```
+
+Output:
+
+```js
+"bigint";
+```
+
+---
+
+## 🎯 Final Summary
+
+✅ Handles huge integers.
+
+✅ Primitive type.
+
+---
+
+# 🟢 Q308. Structured Clone Algorithm
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The Structured Clone Algorithm is the browser's native mechanism for deep copying objects.
+
+Modern JavaScript exposes it through `structuredClone()`.
+
+---
+
+## 💻 Example
+
+```js
+const user = {
+  name: "Dilip",
+
+  address: {
+    city: "Pune",
+  },
+};
+
+const copy = structuredClone(user);
+```
+
+---
+
+## 🔹 Why Better Than JSON?
+
+JSON approach:
+
+```js
+JSON.parse(JSON.stringify(obj));
+```
+
+Problems:
+
+❌ Loses Date
+
+❌ Loses Map
+
+❌ Loses Set
+
+---
+
+## 🎯 Final Summary
+
+✅ Native deep clone.
+
+✅ Handles complex structures.
+
+---
+
+# 🟢 Q309. JavaScript Memory Leak Patterns
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Memory leaks occur when objects remain reachable even though they are no longer needed.
+
+Over time, leaks increase memory usage and degrade performance.
+
+---
+
+## 🔹 Common Causes
+
+### Global Variables
+
+```js
+data = [];
+```
+
+---
+
+### Event Listeners
+
+```js
+button.addEventListener("click", fn);
+```
+
+Never removed.
+
+---
+
+### Timers
+
+```js
+setInterval(...)
+```
+
+Never cleared.
+
+---
+
+### Closures
+
+Holding large data.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Most common frontend leak?
+
+Event listeners.
+
+---
+
+## 🎯 Final Summary
+
+✅ Unused memory retained.
+
+✅ Event listeners are common culprit.
+
+---
+
+# 🟢 Q310. JavaScript Parsing vs Compilation vs Execution
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Modern JavaScript engines like V8 do not simply interpret code. They parse code into an AST, generate bytecode, optimize hot code paths, and then execute machine code.
+
+This multi-stage process is one reason modern JavaScript is extremely fast.
+
+---
+
+## 🔹 Flow
+
+```text
+JavaScript
+
+↓
+
+Parser
+
+↓
+
+AST
+
+↓
+
+Bytecode
+
+↓
+
+JIT Compiler
+
+↓
+
+Machine Code
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Is JavaScript interpreted?
+
+⚠️ Partially.
+
+Modern engines use JIT compilation.
+
+---
+
+### ❓ What is AST?
+
+Abstract Syntax Tree.
+
+---
