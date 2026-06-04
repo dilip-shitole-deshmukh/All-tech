@@ -10181,3 +10181,4854 @@ Data fetching solution built into Redux Toolkit.
 | No Middleware | Middleware Support |
 
 ---
+
+# 🟢 Q269. What is Babel? (Deep Dive)
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Babel is a JavaScript compiler (transpiler) that converts modern JavaScript code into older JavaScript syntax that can run in older browsers.
+
+It enables developers to use ES6+ features such as arrow functions, classes, optional chaining, and async/await while maintaining browser compatibility.
+
+Babel is a core part of modern React, Angular, and frontend build pipelines.
+
+---
+
+## 🔹 Why Babel?
+
+Modern JavaScript:
+
+```js
+const greet = () => {
+  console.log("Hello");
+};
+```
+
+Older browsers may not support it.
+
+---
+
+## 🔹 Babel Output
+
+```js
+var greet = function () {
+  console.log("Hello");
+};
+```
+
+Now works in older browsers.
+
+---
+
+## 🔹 Babel Workflow
+
+```text
+Modern JS
+
+↓
+
+Babel
+
+↓
+
+Compatible JS
+
+↓
+
+Browser
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Applications
+
+JSX → JavaScript
+
+---
+
+### Optional Chaining
+
+```js
+user?.address?.city;
+```
+
+converted to compatible syntax.
+
+---
+
+### Async/Await
+
+Converted for older browsers.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Babel bundles code.
+
+❌ Wrong
+
+Webpack/Vite bundles.
+
+Babel transpiles.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Is Babel a compiler?
+
+✅ Yes (Source-to-Source Compiler)
+
+---
+
+### ❓ Does Babel reduce bundle size?
+
+❌ No
+
+Main purpose is compatibility.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Babel = JavaScript Transpiler.
+
+✅ Converts modern JS → compatible JS.
+
+✅ Important for browser support.
+
+---
+
+# 🟢 Q270. Polyfills vs Transpilers
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Polyfills and Transpilers solve browser compatibility problems but in different ways.
+
+A Transpiler converts modern syntax into older syntax.
+
+A Polyfill adds missing browser functionality that older browsers do not implement.
+
+Modern applications often use both together.
+
+---
+
+## 🔹 Transpiler
+
+Example:
+
+```js
+const add = (a, b) => a + b;
+```
+
+Converted by Babel:
+
+```js
+var add = function (a, b) {
+  return a + b;
+};
+```
+
+---
+
+## 🔹 Polyfill
+
+Suppose browser doesn't support:
+
+```js
+Array.prototype.flat();
+```
+
+Polyfill adds implementation.
+
+```js
+if (!Array.prototype.flat) {
+  Array.prototype.flat = function () {
+    // implementation
+  };
+}
+```
+
+---
+
+## 🔹 Comparison
+
+| Feature           | Transpiler | Polyfill |
+| ----------------- | ---------- | -------- |
+| Converts Syntax   | ✅         | ❌       |
+| Adds Missing APIs | ❌         | ✅       |
+| Example           | Babel      | core-js  |
+| Arrow Functions   | ✅         | ❌       |
+| Promise Support   | ❌         | ✅       |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Babel
+
+```js
+Optional Chaining
+```
+
+---
+
+### core-js
+
+```js
+Promise;
+Map;
+Set;
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Babel adds Promise support.
+
+❌ No
+
+Needs Polyfill.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Arrow function compatibility?
+
+✅ Babel
+
+---
+
+### ❓ Promise compatibility?
+
+✅ Polyfill
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Babel → Syntax compatibility.
+
+✅ Polyfill → Feature compatibility.
+
+✅ Both commonly used together.
+
+---
+
+# 🟢 Q271. Browser Compatibility
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Browser compatibility refers to ensuring that a web application behaves consistently across different browsers and browser versions.
+
+Modern frontend applications achieve this through transpilers, polyfills, feature detection, responsive design, and testing strategies.
+
+---
+
+## 🔹 Common Compatibility Issues
+
+### ES6 Features
+
+```js
+let
+const
+Promise
+```
+
+---
+
+### CSS Features
+
+```css
+grid
+flexbox
+```
+
+---
+
+### Browser APIs
+
+```js
+IntersectionObserver;
+ResizeObserver;
+```
+
+---
+
+## 🔹 Solutions
+
+### Babel
+
+Syntax support.
+
+---
+
+### Polyfills
+
+Missing APIs.
+
+---
+
+### Feature Detection
+
+```js
+if ("serviceWorker" in navigator) {
+}
+```
+
+---
+
+### Can I Use
+
+Very common industry tool.
+
+Check support before implementation.
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Enterprise Applications
+
+Support older browsers.
+
+---
+
+### Banking Systems
+
+Often require compatibility checks.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Browser sniffing.
+
+```js
+navigator.userAgent;
+```
+
+Usually avoid.
+
+Prefer feature detection.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Browser Detection vs Feature Detection?
+
+Feature detection preferred.
+
+---
+
+### ❓ How ensure compatibility?
+
+Babel + Polyfills + Testing.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Consistent behavior across browsers.
+
+✅ Use Babel and Polyfills.
+
+✅ Prefer feature detection.
+
+---
+
+# 🟢 Q272. What is Proxy API?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The Proxy API allows developers to intercept and customize fundamental operations performed on objects such as property access, assignment, deletion, and function invocation.
+
+It acts as a wrapper around an object and is commonly used for validation, logging, reactivity systems, and state management libraries.
+
+Vue 3's reactivity system is built heavily on Proxies.
+
+---
+
+## 🔹 Basic Syntax
+
+```js
+const proxy = new Proxy(target, handler);
+```
+
+---
+
+## 💻 Example
+
+```js
+const user = {
+  name: "Dilip",
+};
+
+const proxy = new Proxy(user, {
+  get(target, prop) {
+    console.log(`Reading ${prop}`);
+
+    return target[prop];
+  },
+});
+```
+
+---
+
+### Usage
+
+```js
+console.log(proxy.name);
+```
+
+Output:
+
+```text
+Reading name
+
+Dilip
+```
+
+---
+
+## 🔹 set Trap
+
+```js
+const proxy = new Proxy(user, {
+  set(target, prop, value) {
+    target[prop] = value;
+
+    return true;
+  },
+});
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Vue Reactivity
+
+---
+
+### Form Validation
+
+---
+
+### Logging
+
+---
+
+### Access Control
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Proxy modifies original object.
+
+Proxy wraps object.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why use Proxy?
+
+Intercept operations.
+
+---
+
+### ❓ Which framework uses Proxy heavily?
+
+✅ Vue 3
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Intercepts object operations.
+
+✅ Used for reactivity and validation.
+
+✅ Modern JavaScript feature.
+
+---
+
+# 🟢 Q273. What is Reflect API?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The Reflect API provides methods for performing object operations programmatically.
+
+Most Reflect methods correspond to Proxy traps and provide a cleaner, standardized way to interact with objects.
+
+Proxy and Reflect are often used together.
+
+---
+
+## 🔹 Example
+
+Without Reflect:
+
+```js
+target[prop];
+```
+
+---
+
+With Reflect:
+
+```js
+Reflect.get(target, prop);
+```
+
+---
+
+## 💻 Example
+
+```js
+const user = {
+  name: "Dilip",
+};
+
+console.log(Reflect.get(user, "name"));
+```
+
+Output:
+
+```text
+Dilip
+```
+
+---
+
+## 💻 Proxy + Reflect
+
+```js
+const proxy = new Proxy(user, {
+  get(target, prop) {
+    return Reflect.get(target, prop);
+  },
+});
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Proxy Implementations
+
+---
+
+### Framework Internals
+
+---
+
+### Meta Programming
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Reflect and Proxy are same.
+
+❌ No
+
+Proxy intercepts.
+
+Reflect performs operations.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why use Reflect inside Proxy?
+
+Avoid manual implementation.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Standardized object operations.
+
+✅ Works closely with Proxy.
+
+✅ Useful for meta-programming.
+
+---
+
+# 🟢 Q274. What are Pipe and Compose Functions?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Pipe and Compose are functional programming techniques used to combine multiple functions into a single function.
+
+Pipe executes functions from left to right, whereas Compose executes from right to left.
+
+These concepts improve code readability, reusability, and maintainability.
+
+---
+
+## 🔹 Functions
+
+```js
+const add = (x) => x + 2;
+
+const multiply = (x) => x * 3;
+```
+
+---
+
+## 🔹 Pipe
+
+```js
+pipe(add, multiply)(5);
+```
+
+Flow:
+
+```text
+5
+
+↓
+
+add
+
+↓
+
+7
+
+↓
+
+multiply
+
+↓
+
+21
+```
+
+---
+
+## 💻 Pipe Implementation
+
+```js
+const pipe =
+  (...fns) =>
+  (value) =>
+    fns.reduce((acc, fn) => fn(acc), value);
+```
+
+---
+
+## 🔹 Compose
+
+```js
+compose(multiply, add)(5);
+```
+
+Flow:
+
+```text
+5
+
+↓
+
+add
+
+↓
+
+7
+
+↓
+
+multiply
+
+↓
+
+21
+```
+
+---
+
+## 💻 Compose Implementation
+
+```js
+const compose =
+  (...fns) =>
+  (value) =>
+    fns.reduceRight((acc, fn) => fn(acc), value);
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Redux
+
+Middleware chains.
+
+---
+
+### RxJS
+
+Operator pipelines.
+
+---
+
+### Functional Programming Libraries
+
+Lodash FP.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Pipe and Compose are identical.
+
+❌ Direction differs.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Pipe direction?
+
+Left → Right
+
+---
+
+### ❓ Compose direction?
+
+Right → Left
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Function composition.
+
+✅ Pipe → Left to Right.
+
+✅ Compose → Right to Left.
+
+---
+
+# 🟢 Q275. What is Lazy Evaluation?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Lazy Evaluation is a technique where computation is delayed until the result is actually needed.
+
+Instead of calculating everything immediately, JavaScript evaluates values only when required.
+
+This improves performance and memory efficiency, especially for large datasets.
+
+Generators are a common implementation of lazy evaluation.
+
+---
+
+## 🔹 Eager Evaluation
+
+```js
+const result = expensiveFunction();
+```
+
+Executes immediately.
+
+---
+
+## 🔹 Lazy Evaluation
+
+```js
+const lazy = () => expensiveFunction();
+```
+
+Not executed until:
+
+```js
+lazy();
+```
+
+---
+
+## 💻 Generator Example
+
+```js
+function* numbers() {
+  yield 1;
+
+  yield 2;
+
+  yield 3;
+}
+```
+
+Nothing executes until:
+
+```js
+gen.next();
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Infinite Data Streams
+
+---
+
+### Pagination
+
+---
+
+### Virtual Scrolling
+
+---
+
+### Large Dataset Processing
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Generators execute immediately.
+
+❌ No
+
+Execution starts on `next()`.
+
+---
+
+### Trap
+
+Lazy evaluation always faster.
+
+❌ Depends on use case.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which JS feature supports lazy evaluation?
+
+✅ Generators
+
+---
+
+### ❓ Main benefit?
+
+Reduced computation and memory usage.
+
+---
+
+# 🟢 Q276. What is the Difference Between an Expression and a Statement?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+An Expression is any piece of code that produces a value, while a Statement performs an action.
+
+Expressions can be assigned to variables, passed as arguments, or returned from functions because they evaluate to a value.
+
+Statements control program flow or perform operations but don't necessarily return a value.
+
+This is a surprisingly common JavaScript interview question.
+
+---
+
+## 🔹 Expression
+
+Produces a value.
+
+```js
+10 + 20;
+```
+
+Produces:
+
+```js
+30;
+```
+
+---
+
+### More Examples
+
+```js
+true;
+
+("user");
+
+5 * 10;
+
+a > b;
+
+myFunction();
+```
+
+All produce values.
+
+---
+
+## 💻 Example
+
+```js
+const result = 10 + 20;
+```
+
+Expression:
+
+```js
+10 + 20;
+```
+
+Value:
+
+```js
+30;
+```
+
+---
+
+## 🔹 Statement
+
+Performs an action.
+
+```js
+if (condition) {
+}
+```
+
+---
+
+### Examples
+
+```js
+if
+
+for
+
+while
+
+switch
+
+try-catch
+```
+
+---
+
+## 💻 Example
+
+```js
+if (age > 18) {
+  console.log("Adult");
+}
+```
+
+Entire block is a statement.
+
+---
+
+## 🔹 Interview Favorite
+
+Function Declaration:
+
+```js
+function greet() {}
+```
+
+Statement.
+
+---
+
+Function Expression:
+
+```js
+const greet = function () {};
+```
+
+Expression.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+```js
+if(condition)
+```
+
+Expression?
+
+❌ No
+
+Statement.
+
+---
+
+### Trap
+
+Arrow functions are expressions.
+
+```js
+const add = (a, b) => a + b;
+```
+
+✅ Expression.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Can an expression be assigned?
+
+✅ Yes
+
+---
+
+### ❓ Can a statement be assigned?
+
+❌ No
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Expression → Produces value.
+
+✅ Statement → Performs action.
+
+✅ Function Expression vs Function Declaration is a common follow-up.
+
+---
+
+# 🟢 Q277. Factory Functions vs Constructor Functions vs Classes
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+JavaScript provides multiple ways to create objects.
+
+- Factory Functions return objects explicitly.
+- Constructor Functions use the `new` keyword.
+- Classes are syntactic sugar over Constructor Functions.
+
+Modern applications generally prefer Classes or Factory Functions depending on the use case.
+
+---
+
+# 🔹 Factory Function
+
+```js
+function createUser(name) {
+  return {
+    name,
+
+    greet() {
+      console.log(`Hello ${name}`);
+    },
+  };
+}
+```
+
+---
+
+### Usage
+
+```js
+const user = createUser("Dilip");
+```
+
+---
+
+## 🔹 Constructor Function
+
+```js
+function User(name) {
+  this.name = name;
+}
+```
+
+---
+
+### Usage
+
+```js
+const user = new User("Dilip");
+```
+
+---
+
+## 🔹 Class
+
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+}
+```
+
+---
+
+### Usage
+
+```js
+const user = new User("Dilip");
+```
+
+---
+
+## 🔹 Comparison
+
+| Feature         | Factory | Constructor | Class     |
+| --------------- | ------- | ----------- | --------- |
+| Uses new        | ❌      | ✅          | ✅        |
+| Simple          | ✅      | ⚠️          | ⚠️        |
+| OOP Support     | Limited | Good        | Excellent |
+| Modern Projects | ✅      | Rare        | ✅        |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Factory
+
+Utility Objects.
+
+---
+
+### Classes
+
+Large Applications.
+
+---
+
+### React
+
+Class Components (legacy).
+
+---
+
+### Angular
+
+Services and Components use Classes.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Classes create new inheritance model.
+
+❌ No
+
+Still prototype-based.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Are classes prototype-based internally?
+
+✅ Yes
+
+---
+
+### ❓ Which is syntactic sugar?
+
+✅ Classes
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Factory → Returns object.
+
+✅ Constructor → Uses new.
+
+✅ Class → Modern OOP syntax.
+
+---
+
+# 🟢 Q278. What are Global Error Handlers?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Global Error Handlers catch unhandled errors that escape normal try-catch blocks.
+
+They help monitor production issues, send logs to monitoring systems, and prevent silent application failures.
+
+In enterprise applications, global error handling is considered essential.
+
+---
+
+## 🔹 Browser Error Handler
+
+```js
+window.onerror = function (message, source, line) {
+  console.log(message);
+};
+```
+
+---
+
+## 💻 Example
+
+```js
+undefinedFunction();
+```
+
+Captured by:
+
+```js
+window.onerror;
+```
+
+---
+
+## 🔹 Promise Error Handler
+
+```js
+window.addEventListener(
+  "unhandledrejection",
+
+  (event) => {
+    console.error(event.reason);
+  },
+);
+```
+
+---
+
+## 💻 Example
+
+```js
+Promise.reject("API Failed");
+```
+
+Captured globally.
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Logging Systems
+
+[Sentry](https://sentry.io?utm_source=chatgpt.com)
+
+---
+
+### Monitoring Platforms
+
+Track production crashes.
+
+---
+
+### Enterprise Dashboards
+
+Error reporting.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Global handlers replace try-catch.
+
+❌ No
+
+Both are required.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why use global error handlers?
+
+Catch unexpected production errors.
+
+---
+
+### ❓ Promise equivalent?
+
+```js
+unhandledrejection;
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Catch uncaught errors.
+
+✅ Production monitoring.
+
+✅ Important for enterprise apps.
+
+---
+
+# 🟢 Q279. How Do You Create Custom Errors?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Custom Errors allow developers to create meaningful domain-specific error types instead of relying on generic Error objects.
+
+They improve debugging, error handling, and code readability.
+
+Custom errors are very common in enterprise frontend applications.
+
+---
+
+## 🔹 Basic Custom Error
+
+```js
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "ValidationError";
+  }
+}
+```
+
+---
+
+## 💻 Usage
+
+```js
+throw new ValidationError("Email Required");
+```
+
+---
+
+## 💻 Catching
+
+```js
+try {
+  throw new ValidationError("Invalid Email");
+} catch (error) {
+  console.log(error.name);
+}
+```
+
+Output:
+
+```js
+ValidationError;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Form Validation
+
+---
+
+### API Layer
+
+---
+
+### Business Rules
+
+---
+
+### Payment Systems
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Using generic Error everywhere.
+
+Harder debugging.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why create custom errors?
+
+Specific error handling.
+
+---
+
+### ❓ Does custom error inherit Error?
+
+✅ Yes
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Extends Error.
+
+✅ Better debugging.
+
+✅ Enterprise best practice.
+
+---
+
+# 🟢 Q280. Error Management Strategies
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Error Management is the process of detecting, handling, logging, monitoring, and recovering from failures in an application.
+
+Senior frontend developers are expected not only to catch errors but also to provide graceful recovery mechanisms.
+
+---
+
+## 🔹 Layers of Error Management
+
+### Validation Layer
+
+```js
+Input Validation
+```
+
+---
+
+### Application Layer
+
+```js
+try-catch
+```
+
+---
+
+### API Layer
+
+```js
+HTTP Error Handling
+```
+
+---
+
+### Monitoring Layer
+
+```js
+Sentry;
+Datadog;
+```
+
+---
+
+## 💻 Example
+
+```js
+try {
+  const response = await fetch("/users");
+
+  if (!response.ok) {
+    throw new Error("API Error");
+  }
+} catch (error) {
+  showToast("Something went wrong");
+
+  logError(error);
+}
+```
+
+---
+
+## 🌍 Real-world Best Practices
+
+### User-Friendly Messages
+
+❌
+
+```text
+TypeError: x undefined
+```
+
+---
+
+✅
+
+```text
+Unable to load data.
+Please try again.
+```
+
+---
+
+### Logging
+
+Send errors to monitoring systems.
+
+---
+
+### Retry Logic
+
+Temporary network failures.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Showing technical errors to users.
+
+---
+
+### Trap
+
+Ignoring rejected promises.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is graceful degradation?
+
+App continues functioning despite errors.
+
+---
+
+### ❓ Why centralized error handling?
+
+Consistency and maintainability.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Catch.
+
+✅ Log.
+
+✅ Monitor.
+
+✅ Recover gracefully.
+
+---
+
+# 🟢 Q281. How Do You Match Elements in the DOM?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Matching elements means checking whether a DOM element satisfies a specific CSS selector.
+
+The `matches()` method is commonly used in event delegation, dynamic DOM manipulation, and custom component logic.
+
+---
+
+## 🔹 Syntax
+
+```js
+element.matches(selector);
+```
+
+---
+
+## 💻 Example
+
+```js
+const button = document.querySelector("button");
+
+console.log(button.matches(".primary-btn"));
+```
+
+Output:
+
+```js
+true;
+```
+
+or
+
+```js
+false;
+```
+
+---
+
+## 💻 Event Delegation Example
+
+```js
+document.addEventListener(
+  "click",
+
+  (event) => {
+    if (event.target.matches(".delete-btn")) {
+      console.log("Delete Clicked");
+    }
+  },
+);
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Event Delegation
+
+---
+
+### Dynamic Components
+
+---
+
+### Custom UI Libraries
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Difference from querySelector?
+
+querySelector finds element.
+
+matches checks element.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ matches() checks selectors.
+
+✅ Common with event delegation.
+
+---
+
+# 🟢 Q282. DOM Tree vs CSSOM vs Render Tree
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+When a browser renders a webpage, it creates multiple internal structures:
+
+- DOM Tree from HTML.
+- CSSOM from CSS.
+- Render Tree by combining DOM and CSSOM.
+
+The Render Tree is then used for layout calculation and painting.
+
+This is a favorite browser-rendering interview topic.
+
+---
+
+## 🔹 DOM Tree
+
+From:
+
+```html
+<body>
+  <h1>Hello</h1>
+</body>
+```
+
+Creates:
+
+```text
+body
+
+↓
+
+h1
+```
+
+---
+
+## 🔹 CSSOM
+
+From:
+
+```css
+h1 {
+  color: red;
+}
+```
+
+Creates style tree.
+
+---
+
+## 🔹 Render Tree
+
+```text
+DOM
+
++
+
+CSSOM
+
+↓
+
+Render Tree
+```
+
+---
+
+## 🔹 Rendering Pipeline
+
+```text
+HTML
+
+↓
+
+DOM
+
+↓
+
+CSSOM
+
+↓
+
+Render Tree
+
+↓
+
+Layout
+
+↓
+
+Paint
+
+↓
+
+Composite
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Performance Optimization
+
+---
+
+### Reflow/Repaint Questions
+
+---
+
+### Browser Rendering Interviews
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+DOM alone renders page.
+
+❌ CSSOM also required.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which tree is used for rendering?
+
+✅ Render Tree
+
+---
+
+### ❓ Does hidden element enter Render Tree?
+
+```css
+display: none;
+```
+
+❌ No
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ DOM from HTML.
+
+✅ CSSOM from CSS.
+
+✅ Render Tree combines both.
+
+---
+
+# 🟢 Q283. Performance Optimization with Chrome DevTools
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Chrome DevTools provides tools for analyzing performance, memory usage, rendering behavior, network activity, and JavaScript execution.
+
+Senior frontend developers frequently use it to identify bottlenecks and optimize applications.
+
+---
+
+## 🔹 Most Important Tabs
+
+### Performance
+
+Analyze:
+
+```text
+FPS
+
+Rendering
+
+JS Execution
+```
+
+---
+
+### Network
+
+Analyze:
+
+```text
+API Calls
+
+Bundle Size
+
+Caching
+```
+
+---
+
+### Memory
+
+Detect:
+
+```text
+Memory Leaks
+```
+
+---
+
+### Lighthouse
+
+Analyze:
+
+```text
+Performance
+
+SEO
+
+Accessibility
+```
+
+---
+
+## 🔹 Common Workflow
+
+```text
+Performance Tab
+
+↓
+
+Record
+
+↓
+
+Perform Action
+
+↓
+
+Stop Recording
+
+↓
+
+Analyze
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Slow React Pages
+
+---
+
+### Memory Leak Detection
+
+---
+
+### API Optimization
+
+---
+
+### Bundle Analysis
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Optimizing without measuring.
+
+---
+
+### Trap
+
+Ignoring Lighthouse reports.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which tab detects memory leaks?
+
+✅ Memory
+
+---
+
+### ❓ Which tab analyzes API requests?
+
+✅ Network
+
+---
+
+### ❓ Which tab analyzes rendering?
+
+✅ Performance
+
+---
+
+# 🟢 Q284. Weird JavaScript Behaviors (Most Asked Output Questions)
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+JavaScript has several surprising behaviors due to type coercion, scope rules, equality checks, and execution context.
+
+Product companies frequently ask output-based questions to test deep understanding rather than syntax knowledge.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log([] == false);
+```
+
+### Output
+
+```js
+true;
+```
+
+### Why?
+
+```js
+[] → ""
+false → 0
+"" → 0
+```
+
+Result:
+
+```js
+0 == 0;
+```
+
+✅ true
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log([] + []);
+```
+
+### Output
+
+```js
+"";
+```
+
+Both arrays become:
+
+```js
+"";
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+console.log([] + {});
+```
+
+### Output
+
+```js
+"[object Object]";
+```
+
+---
+
+# 🔹 Question 4
+
+```js
+console.log({} + []);
+```
+
+### Output (Browser)
+
+```js
+0;
+```
+
+🚨 Famous interview trap.
+
+Parser treats:
+
+```js
+{
+}
+```
+
+as block.
+
+Then:
+
+```js
++[];
+```
+
+becomes:
+
+```js
++0;
+```
+
+---
+
+# 🔹 Question 5
+
+```js
+console.log("5" - 2);
+```
+
+Output:
+
+```js
+3;
+```
+
+---
+
+# 🔹 Question 6
+
+```js
+console.log("5" + 2);
+```
+
+Output:
+
+```js
+"52";
+```
+
+---
+
+# 🔹 Question 7
+
+```js
+console.log(null == undefined);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+# 🔹 Question 8
+
+```js
+console.log(null === undefined);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+# 🔹 Question 9
+
+```js
+console.log(NaN == NaN);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Correct Check
+
+```js
+Number.isNaN(value);
+```
+
+---
+
+# 🔹 Question 10
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+🚨 Historical JavaScript bug.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Biggest JS weirdness?
+
+```js
+typeof null;
+```
+
+---
+
+### ❓ Why avoid == ?
+
+Implicit coercion.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Type coercion causes surprises.
+
+✅ Prefer ===.
+
+✅ Learn common output questions.
+
+---
+
+# 🟢 Q285. Advanced `this` Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`this` is determined by how a function is called, not where it is defined (except arrow functions).
+
+Output-based questions around `this` are among the most common JavaScript interview questions.
+
+---
+
+# 🔹 Question 1
+
+```js
+const user = {
+  name: "Dilip",
+
+  greet() {
+    console.log(this.name);
+  },
+};
+
+user.greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+function greet() {
+  console.log(this);
+}
+
+greet();
+```
+
+Browser:
+
+```js
+window;
+```
+
+Strict Mode:
+
+```js
+undefined;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet: () => {
+    console.log(this.name);
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+### Why?
+
+Arrow functions don't have their own `this`.
+
+---
+
+# 🔹 Question 4
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet() {
+    setTimeout(() => {
+      console.log(this.name);
+    });
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+Arrow inherits lexical `this`.
+
+---
+
+# 🔹 Question 5
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet() {
+    setTimeout(function () {
+      console.log(this.name);
+    });
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+(or window.name)
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Arrow functions create own `this`.
+
+❌ Wrong.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What decides this?
+
+How function is called.
+
+---
+
+### ❓ Arrow function this?
+
+Lexical this.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Normal Function → Dynamic this.
+
+✅ Arrow Function → Lexical this.
+
+✅ Frequently asked output topic.
+
+---
+
+# 🟢 Q286. Hoisting Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Hoisting is one of the most asked output-based topics.
+
+Interviewers usually combine hoisting with var, let, const, function declarations, and TDZ.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log(a);
+
+var a = 10;
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+### Internally
+
+```js
+var a;
+
+console.log(a);
+
+a = 10;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log(a);
+
+let a = 10;
+```
+
+Output:
+
+```js
+ReferenceError;
+```
+
+---
+
+### Why?
+
+TDZ.
+
+---
+
+# 🔹 Question 3
+
+```js
+sayHello();
+
+function sayHello() {
+  console.log("Hello");
+}
+```
+
+Output:
+
+```js
+Hello;
+```
+
+---
+
+# 🔹 Question 4
+
+```js
+sayHello();
+
+var sayHello = function () {
+  console.log("Hello");
+};
+```
+
+Output:
+
+```js
+TypeError;
+```
+
+---
+
+### Why?
+
+```js
+var sayHello;
+```
+
+becomes:
+
+```js
+undefined;
+```
+
+---
+
+### Then:
+
+```js
+undefined();
+```
+
+TypeError.
+
+---
+
+# 🔹 Question 5
+
+```js
+var x = 10;
+
+function test() {
+  console.log(x);
+
+  var x = 20;
+}
+
+test();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Function declaration hoisted?
+
+✅ Fully.
+
+---
+
+### ❓ Function expression hoisted?
+
+❌ Variable only.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ var → undefined.
+
+✅ let/const → TDZ.
+
+✅ Function declarations fully hoisted.
+
+---
+
+# 🟢 Q287. Event Loop Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Event Loop output questions test understanding of synchronous execution, microtasks, macrotasks, and async behavior.
+
+These are extremely common in product-company interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log("1");
+
+setTimeout(() => {
+  console.log("2");
+}, 0);
+
+console.log("3");
+```
+
+Output:
+
+```js
+1;
+3;
+2;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log("1");
+
+Promise.resolve().then(() => {
+  console.log("2");
+});
+
+console.log("3");
+```
+
+Output:
+
+```js
+1;
+3;
+2;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+console.log("1");
+
+setTimeout(() => {
+  console.log("2");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3");
+});
+
+console.log("4");
+```
+
+Output:
+
+```js
+1;
+4;
+3;
+2;
+```
+
+---
+
+### Why?
+
+Priority:
+
+```text
+Call Stack
+
+↓
+
+Microtasks
+
+↓
+
+Macrotasks
+```
+
+---
+
+# 🔹 Senior-Level Favorite
+
+```js
+setTimeout(() => {
+  console.log("A");
+});
+
+Promise.resolve().then(() => {
+  console.log("B");
+});
+
+queueMicrotask(() => {
+  console.log("C");
+});
+
+console.log("D");
+```
+
+Output:
+
+```js
+D;
+B;
+C;
+A;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which executes first?
+
+Promise callbacks.
+
+---
+
+### ❓ Microtask vs Macrotask?
+
+Microtask wins.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Sync first.
+
+✅ Microtasks second.
+
+✅ Macrotasks last.
+
+---
+
+# 🟢 Q288. Closure Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Closure questions test understanding of lexical scope and variable retention.
+
+They are extremely common in frontend interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+function outer() {
+  let count = 0;
+
+  return function () {
+    count++;
+
+    console.log(count);
+  };
+}
+
+const fn = outer();
+
+fn();
+
+fn();
+
+fn();
+```
+
+Output:
+
+```js
+1;
+2;
+3;
+```
+
+---
+
+### Why?
+
+Closure remembers:
+
+```js
+count;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  });
+}
+```
+
+Output:
+
+```js
+3;
+3;
+3;
+```
+
+---
+
+### Why?
+
+Single shared variable.
+
+---
+
+# 🔹 Question 3
+
+```js
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  });
+}
+```
+
+Output:
+
+```js
+0;
+1;
+2;
+```
+
+---
+
+### Why?
+
+New binding every iteration.
+
+---
+
+# 🔹 Interview Favorite Fix
+
+```js
+for (var i = 0; i < 3; i++) {
+  ((j) => {
+    setTimeout(() => {
+      console.log(j);
+    });
+  })(i);
+}
+```
+
+Output:
+
+```js
+0;
+1;
+2;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why closure useful?
+
+Data privacy.
+
+Memoization.
+
+Callbacks.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Closure remembers scope.
+
+✅ Common with loops.
+
+✅ Frequently asked.
+
+---
+
+# 🟢 Q289. Tricky Promise Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Promise output questions combine Event Loop, Microtasks, async/await, and execution order.
+
+These are very common in senior frontend interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log("A");
+
+Promise.resolve().then(() => {
+  console.log("B");
+});
+
+console.log("C");
+```
+
+Output:
+
+```js
+A;
+C;
+B;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log("A");
+
+setTimeout(() => {
+  console.log("B");
+});
+
+Promise.resolve().then(() => {
+  console.log("C");
+});
+
+console.log("D");
+```
+
+Output:
+
+```js
+A;
+D;
+C;
+B;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+async function test() {
+  console.log("1");
+
+  await Promise.resolve();
+
+  console.log("2");
+}
+
+console.log("3");
+
+test();
+
+console.log("4");
+```
+
+Output:
+
+```js
+3;
+1;
+4;
+2;
+```
+
+---
+
+### Why?
+
+After await:
+
+```js
+console.log("2");
+```
+
+becomes Microtask.
+
+---
+
+# 🔹 Product Company Favorite
+
+```js
+Promise.resolve()
+  .then(() => {
+    console.log("A");
+
+    return Promise.resolve();
+  })
+  .then(() => {
+    console.log("B");
+  });
+
+console.log("C");
+```
+
+Output:
+
+```js
+C;
+A;
+B;
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+await blocks JavaScript.
+
+❌ No
+
+Only pauses current async function.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Does await create microtask?
+
+✅ Yes
+
+---
+
+### ❓ Promise callback queue?
+
+✅ Microtask Queue.
+
+---
+
+# 🟢 Q284. Weird JavaScript Behaviors (Most Asked Output Questions)
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+JavaScript has several surprising behaviors due to type coercion, scope rules, equality checks, and execution context.
+
+Product companies frequently ask output-based questions to test deep understanding rather than syntax knowledge.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log([] == false);
+```
+
+### Output
+
+```js
+true;
+```
+
+### Why?
+
+```js
+[] → ""
+false → 0
+"" → 0
+```
+
+Result:
+
+```js
+0 == 0;
+```
+
+✅ true
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log([] + []);
+```
+
+### Output
+
+```js
+"";
+```
+
+Both arrays become:
+
+```js
+"";
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+console.log([] + {});
+```
+
+### Output
+
+```js
+"[object Object]";
+```
+
+---
+
+# 🔹 Question 4
+
+```js
+console.log({} + []);
+```
+
+### Output (Browser)
+
+```js
+0;
+```
+
+🚨 Famous interview trap.
+
+Parser treats:
+
+```js
+{
+}
+```
+
+as block.
+
+Then:
+
+```js
++[];
+```
+
+becomes:
+
+```js
++0;
+```
+
+---
+
+# 🔹 Question 5
+
+```js
+console.log("5" - 2);
+```
+
+Output:
+
+```js
+3;
+```
+
+---
+
+# 🔹 Question 6
+
+```js
+console.log("5" + 2);
+```
+
+Output:
+
+```js
+"52";
+```
+
+---
+
+# 🔹 Question 7
+
+```js
+console.log(null == undefined);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+# 🔹 Question 8
+
+```js
+console.log(null === undefined);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+# 🔹 Question 9
+
+```js
+console.log(NaN == NaN);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Correct Check
+
+```js
+Number.isNaN(value);
+```
+
+---
+
+# 🔹 Question 10
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+🚨 Historical JavaScript bug.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Biggest JS weirdness?
+
+```js
+typeof null;
+```
+
+---
+
+### ❓ Why avoid == ?
+
+Implicit coercion.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Type coercion causes surprises.
+
+✅ Prefer ===.
+
+✅ Learn common output questions.
+
+---
+
+# 🟢 Q285. Advanced `this` Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`this` is determined by how a function is called, not where it is defined (except arrow functions).
+
+Output-based questions around `this` are among the most common JavaScript interview questions.
+
+---
+
+# 🔹 Question 1
+
+```js
+const user = {
+  name: "Dilip",
+
+  greet() {
+    console.log(this.name);
+  },
+};
+
+user.greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+function greet() {
+  console.log(this);
+}
+
+greet();
+```
+
+Browser:
+
+```js
+window;
+```
+
+Strict Mode:
+
+```js
+undefined;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet: () => {
+    console.log(this.name);
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+### Why?
+
+Arrow functions don't have their own `this`.
+
+---
+
+# 🔹 Question 4
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet() {
+    setTimeout(() => {
+      console.log(this.name);
+    });
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+Arrow inherits lexical `this`.
+
+---
+
+# 🔹 Question 5
+
+```js
+const obj = {
+  name: "Dilip",
+
+  greet() {
+    setTimeout(function () {
+      console.log(this.name);
+    });
+  },
+};
+
+obj.greet();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+(or window.name)
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Arrow functions create own `this`.
+
+❌ Wrong.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What decides this?
+
+How function is called.
+
+---
+
+### ❓ Arrow function this?
+
+Lexical this.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Normal Function → Dynamic this.
+
+✅ Arrow Function → Lexical this.
+
+✅ Frequently asked output topic.
+
+---
+
+# 🟢 Q286. Hoisting Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Hoisting is one of the most asked output-based topics.
+
+Interviewers usually combine hoisting with var, let, const, function declarations, and TDZ.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log(a);
+
+var a = 10;
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+### Internally
+
+```js
+var a;
+
+console.log(a);
+
+a = 10;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log(a);
+
+let a = 10;
+```
+
+Output:
+
+```js
+ReferenceError;
+```
+
+---
+
+### Why?
+
+TDZ.
+
+---
+
+# 🔹 Question 3
+
+```js
+sayHello();
+
+function sayHello() {
+  console.log("Hello");
+}
+```
+
+Output:
+
+```js
+Hello;
+```
+
+---
+
+# 🔹 Question 4
+
+```js
+sayHello();
+
+var sayHello = function () {
+  console.log("Hello");
+};
+```
+
+Output:
+
+```js
+TypeError;
+```
+
+---
+
+### Why?
+
+```js
+var sayHello;
+```
+
+becomes:
+
+```js
+undefined;
+```
+
+---
+
+### Then:
+
+```js
+undefined();
+```
+
+TypeError.
+
+---
+
+# 🔹 Question 5
+
+```js
+var x = 10;
+
+function test() {
+  console.log(x);
+
+  var x = 20;
+}
+
+test();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Function declaration hoisted?
+
+✅ Fully.
+
+---
+
+### ❓ Function expression hoisted?
+
+❌ Variable only.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ var → undefined.
+
+✅ let/const → TDZ.
+
+✅ Function declarations fully hoisted.
+
+---
+
+# 🟢 Q287. Event Loop Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Event Loop output questions test understanding of synchronous execution, microtasks, macrotasks, and async behavior.
+
+These are extremely common in product-company interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log("1");
+
+setTimeout(() => {
+  console.log("2");
+}, 0);
+
+console.log("3");
+```
+
+Output:
+
+```js
+1;
+3;
+2;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log("1");
+
+Promise.resolve().then(() => {
+  console.log("2");
+});
+
+console.log("3");
+```
+
+Output:
+
+```js
+1;
+3;
+2;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+console.log("1");
+
+setTimeout(() => {
+  console.log("2");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3");
+});
+
+console.log("4");
+```
+
+Output:
+
+```js
+1;
+4;
+3;
+2;
+```
+
+---
+
+### Why?
+
+Priority:
+
+```text
+Call Stack
+
+↓
+
+Microtasks
+
+↓
+
+Macrotasks
+```
+
+---
+
+# 🔹 Senior-Level Favorite
+
+```js
+setTimeout(() => {
+  console.log("A");
+});
+
+Promise.resolve().then(() => {
+  console.log("B");
+});
+
+queueMicrotask(() => {
+  console.log("C");
+});
+
+console.log("D");
+```
+
+Output:
+
+```js
+D;
+B;
+C;
+A;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which executes first?
+
+Promise callbacks.
+
+---
+
+### ❓ Microtask vs Macrotask?
+
+Microtask wins.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Sync first.
+
+✅ Microtasks second.
+
+✅ Macrotasks last.
+
+---
+
+# 🟢 Q288. Closure Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Closure questions test understanding of lexical scope and variable retention.
+
+They are extremely common in frontend interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+function outer() {
+  let count = 0;
+
+  return function () {
+    count++;
+
+    console.log(count);
+  };
+}
+
+const fn = outer();
+
+fn();
+
+fn();
+
+fn();
+```
+
+Output:
+
+```js
+1;
+2;
+3;
+```
+
+---
+
+### Why?
+
+Closure remembers:
+
+```js
+count;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  });
+}
+```
+
+Output:
+
+```js
+3;
+3;
+3;
+```
+
+---
+
+### Why?
+
+Single shared variable.
+
+---
+
+# 🔹 Question 3
+
+```js
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  });
+}
+```
+
+Output:
+
+```js
+0;
+1;
+2;
+```
+
+---
+
+### Why?
+
+New binding every iteration.
+
+---
+
+# 🔹 Interview Favorite Fix
+
+```js
+for (var i = 0; i < 3; i++) {
+  ((j) => {
+    setTimeout(() => {
+      console.log(j);
+    });
+  })(i);
+}
+```
+
+Output:
+
+```js
+0;
+1;
+2;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why closure useful?
+
+Data privacy.
+
+Memoization.
+
+Callbacks.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Closure remembers scope.
+
+✅ Common with loops.
+
+✅ Frequently asked.
+
+---
+
+# 🟢 Q289. Tricky Promise Output-Based Questions
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Promise output questions combine Event Loop, Microtasks, async/await, and execution order.
+
+These are very common in senior frontend interviews.
+
+---
+
+# 🔹 Question 1
+
+```js
+console.log("A");
+
+Promise.resolve().then(() => {
+  console.log("B");
+});
+
+console.log("C");
+```
+
+Output:
+
+```js
+A;
+C;
+B;
+```
+
+---
+
+# 🔹 Question 2
+
+```js
+console.log("A");
+
+setTimeout(() => {
+  console.log("B");
+});
+
+Promise.resolve().then(() => {
+  console.log("C");
+});
+
+console.log("D");
+```
+
+Output:
+
+```js
+A;
+D;
+C;
+B;
+```
+
+---
+
+# 🔹 Question 3
+
+```js
+async function test() {
+  console.log("1");
+
+  await Promise.resolve();
+
+  console.log("2");
+}
+
+console.log("3");
+
+test();
+
+console.log("4");
+```
+
+Output:
+
+```js
+3;
+1;
+4;
+2;
+```
+
+---
+
+### Why?
+
+After await:
+
+```js
+console.log("2");
+```
+
+becomes Microtask.
+
+---
+
+# 🔹 Product Company Favorite
+
+```js
+Promise.resolve()
+  .then(() => {
+    console.log("A");
+
+    return Promise.resolve();
+  })
+  .then(() => {
+    console.log("B");
+  });
+
+console.log("C");
+```
+
+Output:
+
+```js
+C;
+A;
+B;
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+await blocks JavaScript.
+
+❌ No
+
+Only pauses current async function.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Does await create microtask?
+
+✅ Yes
+
+---
+
+### ❓ Promise callback queue?
+
+✅ Microtask Queue.
+
+---
+
+# 🟢 Q297. Machine Coding Round Expectations (Frontend - 3 to 5 Years)
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Machine Coding rounds evaluate how well a developer can design, structure, and implement a real-world feature within a limited time.
+
+Interviewers assess code quality, component design, state management, reusability, performance, edge-case handling, and communication—not just whether the feature works.
+
+For 3–5 years experience, clean architecture and maintainability matter more than completing every feature.
+
+---
+
+## 🔹 What Interviewers Actually Evaluate
+
+### Functional Requirements
+
+```text
+Feature Works Correctly
+```
+
+---
+
+### Code Structure
+
+```text
+Readable
+
+Maintainable
+
+Modular
+```
+
+---
+
+### Performance
+
+```text
+Debounce
+
+Memoization
+
+Optimization
+```
+
+---
+
+### Error Handling
+
+```text
+Loading States
+
+API Failures
+
+Edge Cases
+```
+
+---
+
+### Communication
+
+```text
+Explain Decisions
+```
+
+---
+
+# 🔹 Common Machine Coding Questions
+
+### Todo Application
+
+```text
+CRUD
+
+Filtering
+
+Search
+```
+
+---
+
+### Data Table
+
+```text
+Sorting
+
+Pagination
+
+Search
+
+Filtering
+```
+
+---
+
+### Autocomplete
+
+```text
+Debounce
+
+API Calls
+```
+
+---
+
+### Kanban Board
+
+```text
+Drag & Drop
+```
+
+---
+
+### E-commerce Product Listing
+
+```text
+Search
+
+Filters
+
+Pagination
+```
+
+---
+
+## 🌍 React Interview Expectations
+
+Expected:
+
+```text
+Custom Hooks
+
+Reusable Components
+
+Proper State Management
+```
+
+---
+
+Bad:
+
+```text
+Everything inside App.jsx
+```
+
+---
+
+## 🌍 Angular Interview Expectations
+
+Expected:
+
+```text
+Services
+
+Observables
+
+Lazy Modules
+
+Reusable Components
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Start coding immediately.
+
+❌
+
+---
+
+Better:
+
+```text
+Clarify Requirements
+
+Design Structure
+
+Then Code
+```
+
+---
+
+### Trap
+
+No Loading State.
+
+---
+
+### Trap
+
+No Error Handling.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ If feature incomplete?
+
+Explain tradeoffs.
+
+Interviewers appreciate reasoning.
+
+---
+
+### ❓ What matters most?
+
+Code quality + Communication.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Requirements first.
+
+✅ Modular code.
+
+✅ Error handling.
+
+✅ Performance optimization.
+
+✅ Communication matters.
+
+---
+
+# 🟢 Q298. Frontend System Design Basics
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Frontend System Design focuses on designing scalable, maintainable, and performant frontend applications.
+
+For 3–5 years experience, interviewers expect understanding of component architecture, state management, API communication, caching, performance optimization, and deployment strategies.
+
+---
+
+# 🔹 Example Question
+
+Design:
+
+```text
+E-Commerce Website
+```
+
+---
+
+## 🔹 High-Level Architecture
+
+```text
+UI Layer
+
+↓
+
+State Management
+
+↓
+
+API Layer
+
+↓
+
+Backend
+```
+
+---
+
+## 🔹 Component Design
+
+```text
+ProductList
+
+ProductCard
+
+Filters
+
+Pagination
+```
+
+Reusable.
+
+---
+
+## 🔹 State Management
+
+Local State:
+
+```text
+UI State
+```
+
+---
+
+Global State:
+
+```text
+Cart
+
+User
+
+Theme
+```
+
+---
+
+## 🔹 API Layer
+
+```text
+Axios Instance
+
+Interceptors
+
+Retry Logic
+```
+
+---
+
+## 🔹 Performance
+
+```text
+Code Splitting
+
+Lazy Loading
+
+Caching
+
+Memoization
+```
+
+---
+
+## 🔹 Security
+
+```text
+HTTPS
+
+Token Handling
+
+Input Validation
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### E-Commerce
+
+### Banking
+
+### CRM
+
+### SaaS Applications
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+Everything in Redux.
+
+❌
+
+Use local state when possible.
+
+---
+
+### Trap
+
+No caching strategy.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why code splitting?
+
+Reduce initial bundle size.
+
+---
+
+### ❓ Why caching?
+
+Reduce network calls.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Component architecture.
+
+✅ State management.
+
+✅ API layer.
+
+✅ Performance.
+
+✅ Security.
+
+---
+
+# 🟢 Q299. React vs Angular (Interview Perspective)
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+React is a UI library focused on rendering components, whereas Angular is a full-fledged framework providing routing, dependency injection, forms, HTTP clients, and state management support out of the box.
+
+React offers greater flexibility, while Angular provides a more structured architecture.
+
+The choice depends on project requirements and team preferences.
+
+---
+
+## 🔹 Core Difference
+
+| React                | Angular               |
+| -------------------- | --------------------- |
+| Library              | Framework             |
+| JSX                  | Templates             |
+| Virtual DOM          | Change Detection      |
+| Flexible             | Opinionated           |
+| Learning Curve Lower | Learning Curve Higher |
+
+---
+
+## 🔹 Architecture
+
+### React
+
+Choose your own:
+
+```text
+Routing
+
+State
+
+API Layer
+```
+
+---
+
+### Angular
+
+Built-in ecosystem.
+
+```text
+Router
+
+HttpClient
+
+DI
+```
+
+---
+
+## 🔹 State Management
+
+### React
+
+```text
+Context
+
+Redux Toolkit
+
+Zustand
+```
+
+---
+
+### Angular
+
+```text
+Services
+
+RxJS
+
+NgRx
+```
+
+---
+
+## 🔹 Performance
+
+### React
+
+```text
+Virtual DOM
+```
+
+---
+
+### Angular
+
+```text
+Change Detection
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```text
+Startups
+
+SaaS
+
+Product Companies
+```
+
+---
+
+### Angular
+
+```text
+Enterprise
+
+Banking
+
+Large Teams
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap
+
+React is faster than Angular.
+
+❌ Depends on implementation.
+
+---
+
+### Trap
+
+Angular uses Virtual DOM.
+
+❌ No.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which is easier to learn?
+
+✅ React
+
+---
+
+### ❓ Which provides Dependency Injection?
+
+✅ Angular
+
+---
+
+### ❓ Which uses JSX?
+
+✅ React
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ React = Library.
+
+✅ Angular = Framework.
+
+✅ React = Flexible.
+
+✅ Angular = Structured.
+
+---
+
+# 🟢 Q300. Top 50 Rapid-Fire JavaScript Interview Questions (3–5 Years Experience)
+
+---
+
+## ❓ What is Hoisting?
+
+Moving declarations to top during creation phase.
+
+---
+
+## ❓ What is TDZ?
+
+Temporal Dead Zone for let and const.
+
+---
+
+## ❓ Difference between var, let, const?
+
+Scope and reassignment behavior.
+
+---
+
+## ❓ What is Closure?
+
+Function remembers lexical scope.
+
+---
+
+## ❓ What is Lexical Scope?
+
+Scope determined by code location.
+
+---
+
+## ❓ What is Event Loop?
+
+Handles asynchronous execution.
+
+---
+
+## ❓ What is Call Stack?
+
+Tracks active function execution.
+
+---
+
+## ❓ Microtask vs Macrotask?
+
+Microtask has higher priority.
+
+---
+
+## ❓ Promise vs Async/Await?
+
+Async/Await is syntactic sugar over Promises.
+
+---
+
+## ❓ Promise.all vs Promise.allSettled?
+
+Fail-fast vs wait-for-all.
+
+---
+
+## ❓ Debounce vs Throttle?
+
+Wait vs limit frequency.
+
+---
+
+## ❓ Deep Copy vs Shallow Copy?
+
+Nested references copied vs shared.
+
+---
+
+## ❓ this in Arrow Function?
+
+Lexical this.
+
+---
+
+## ❓ call vs apply vs bind?
+
+Invocation vs binding differences.
+
+---
+
+## ❓ == vs ===?
+
+Coercion vs strict comparison.
+
+---
+
+## ❓ undefined vs null?
+
+Missing value vs intentional empty value.
+
+---
+
+## ❓ Map vs Object?
+
+Map supports any key type.
+
+---
+
+## ❓ Set?
+
+Collection of unique values.
+
+---
+
+## ❓ WeakMap?
+
+Garbage-collectable object keys.
+
+---
+
+## ❓ WeakSet?
+
+Garbage-collectable object values.
+
+---
+
+## ❓ Generator?
+
+Pause/resume execution using yield.
+
+---
+
+## ❓ Iterator?
+
+Sequential value access via next().
+
+---
+
+## ❓ Symbol?
+
+Unique primitive identifier.
+
+---
+
+## ❓ Optional Chaining?
+
+Safe nested property access.
+
+---
+
+## ❓ Nullish Coalescing?
+
+Default value only for null/undefined.
+
+---
+
+## ❓ Object.freeze?
+
+Prevent modifications.
+
+---
+
+## ❓ Object.seal?
+
+Prevent add/delete.
+
+---
+
+## ❓ Prototype?
+
+Mechanism for inheritance.
+
+---
+
+## ❓ Factory Function?
+
+Returns object.
+
+---
+
+## ❓ Constructor Function?
+
+Uses new keyword.
+
+---
+
+## ❓ Class?
+
+Syntactic sugar over prototypes.
+
+---
+
+## ❓ IIFE?
+
+Immediately executed function.
+
+---
+
+## ❓ Currying?
+
+Transform multi-argument function into chained functions.
+
+---
+
+## ❓ Memoization?
+
+Cache function results.
+
+---
+
+## ❓ HOF?
+
+Accepts/returns functions.
+
+---
+
+## ❓ Pure Function?
+
+No side effects.
+
+---
+
+## ❓ Event Delegation?
+
+Single listener on parent.
+
+---
+
+## ❓ Event Bubbling?
+
+Bottom → Top propagation.
+
+---
+
+## ❓ Event Capturing?
+
+Top → Bottom propagation.
+
+---
+
+## ❓ Fetch API?
+
+Modern HTTP API.
+
+---
+
+## ❓ REST API?
+
+Resource-based HTTP architecture.
+
+---
+
+## ❓ localStorage?
+
+Persistent browser storage.
+
+---
+
+## ❓ sessionStorage?
+
+Tab-level storage.
+
+---
+
+## ❓ IndexedDB?
+
+Browser database.
+
+---
+
+## ❓ JSON.stringify?
+
+Object → JSON string.
+
+---
+
+## ❓ Babel?
+
+JavaScript transpiler.
+
+---
+
+## ❓ Polyfill?
+
+Adds missing browser features.
+
+---
+
+## ❓ Code Splitting?
+
+Bundle division.
+
+---
+
+## ❓ Lazy Loading?
+
+Load on demand.
+
+---
+
+## ❓ CSR vs SSR?
+
+Browser rendering vs server rendering.
+
+---
+
+## ❓ V8 Engine?
+
+Chrome's JavaScript engine.
+
+---
