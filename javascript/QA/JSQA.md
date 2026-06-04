@@ -4723,3 +4723,752 @@ By reference.
 Because React relies heavily on immutability for change detection.
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q22. What is the Difference Between `null` and `undefined` in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`undefined` means a variable has been declared but has not yet been assigned a value.
+
+`null` is an intentional assignment that represents the absence of a value.
+
+In simple terms:
+
+- `undefined` → JavaScript assigned it.
+- `null` → Developer assigned it.
+
+This is a very common interview topic because it tests understanding of JavaScript's type system and memory model.
+
+---
+
+## 🔹 Core Explanation
+
+### 📌 undefined
+
+```js
+let user;
+
+console.log(user);
+```
+
+Output:
+
+```js
+undefined;
+```
+
+JavaScript automatically assigns `undefined`.
+
+---
+
+### 📌 null
+
+```js
+let user = null;
+
+console.log(user);
+```
+
+Output:
+
+```js
+null;
+```
+
+Developer intentionally assigned it.
+
+---
+
+## Comparison
+
+| Feature     | undefined              | null                |
+| ----------- | ---------------------- | ------------------- |
+| Assigned By | JavaScript             | Developer           |
+| Meaning     | Value not assigned yet | Intentionally empty |
+| Type        | undefined              | object (legacy bug) |
+| Primitive   | Yes                    | Yes                 |
+
+---
+
+## 💻 Example
+
+### API Loading Scenario
+
+```js
+let user;
+```
+
+Meaning:
+
+```text
+Data not loaded yet
+```
+
+---
+
+### User Not Found Scenario
+
+```js
+let user = null;
+```
+
+Meaning:
+
+```text
+User definitely does not exist
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```js
+const [user, setUser] = useState(null);
+```
+
+Common pattern.
+
+---
+
+### API Response
+
+```js
+{
+   "manager": null
+}
+```
+
+No manager assigned.
+
+---
+
+### Form Values
+
+```js
+let selectedCountry = null;
+```
+
+No selection made yet.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+null == undefined;
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Trap 2
+
+```js
+null === undefined;
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Trap 3
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+Historic JavaScript bug.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which is better: null or undefined?
+
+Use:
+
+✅ `undefined` → value not assigned
+
+✅ `null` → intentionally empty
+
+---
+
+### ❓ Why does typeof null return object?
+
+Legacy implementation bug retained for backward compatibility.
+
+---
+
+### ❓ Is null primitive?
+
+✅ Yes
+
+Despite:
+
+```js
+typeof null === "object";
+```
+
+---
+
+### ❓ Which value is returned when a function has no return?
+
+```js
+function greet() {}
+```
+
+Returns:
+
+```js
+undefined;
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ undefined → assigned by JavaScript.
+
+✅ null → assigned by developer.
+
+✅ null == undefined → true.
+
+✅ null === undefined → false.
+
+✅ typeof null → object (legacy bug).
+
+---
+
+# 🟢 Q23. What is the use of `typeof` Operator?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The `typeof` operator is used to determine the data type of a value or variable at runtime.
+
+It is commonly used for validation, defensive programming, API response verification, and debugging.
+
+In frontend applications, `typeof` helps ensure that data received from APIs is in the expected format before processing it.
+
+---
+
+## 🔹 Core Explanation
+
+### Syntax
+
+```js
+typeof value;
+```
+
+---
+
+### Examples
+
+```js
+typeof 10;
+```
+
+Output:
+
+```js
+"number";
+```
+
+---
+
+```js
+typeof "Dilip";
+```
+
+Output:
+
+```js
+"string";
+```
+
+---
+
+```js
+typeof true;
+```
+
+Output:
+
+```js
+"boolean";
+```
+
+---
+
+```js
+typeof undefined;
+```
+
+Output:
+
+```js
+"undefined";
+```
+
+---
+
+```js
+typeof function () {};
+```
+
+Output:
+
+```js
+"function";
+```
+
+---
+
+## 📌 Important Outputs
+
+| Value        | Result    |
+| ------------ | --------- |
+| 10           | number    |
+| "hello"      | string    |
+| true         | boolean   |
+| undefined    | undefined |
+| function(){} | function  |
+| {}           | object    |
+| []           | object    |
+| null         | object    |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Validation
+
+```js
+if (typeof response === "object") {
+  processResponse();
+}
+```
+
+---
+
+### Parameter Validation
+
+```js
+function add(a, b) {
+  if (typeof a !== "number") {
+    throw new Error("Invalid");
+  }
+}
+```
+
+---
+
+### React Props Validation Logic
+
+```js
+if (typeof userName !== "string") {
+  return;
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+typeof [];
+```
+
+Output:
+
+```js
+object;
+```
+
+Not array.
+
+---
+
+Correct:
+
+```js
+Array.isArray(arr);
+```
+
+---
+
+### Trap 2
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+object;
+```
+
+Unexpected but correct JavaScript behavior.
+
+---
+
+### Trap 3
+
+Using typeof to detect arrays.
+
+Not reliable.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ How do you detect arrays?
+
+```js
+Array.isArray(arr);
+```
+
+---
+
+### ❓ How do you detect null?
+
+```js
+value === null;
+```
+
+---
+
+### ❓ Why is typeof useful?
+
+Because JavaScript is dynamically typed.
+
+---
+
+### ❓ What does typeof function return?
+
+```js
+function
+```
+
+Special behavior.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ typeof determines value type.
+
+✅ Useful for validation and debugging.
+
+✅ typeof null → object.
+
+✅ typeof [] → object.
+
+✅ Use Array.isArray() for arrays.
+
+---
+
+# 🟢 Q24. What is Type Coercion in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Type Coercion is JavaScript's automatic conversion of one data type into another during operations or comparisons.
+
+Because JavaScript is loosely typed, it attempts to convert values when different data types interact.
+
+Type coercion is a major interview topic because it explains many unexpected JavaScript behaviors involving comparisons and arithmetic operations.
+
+---
+
+## 🔹 Core Explanation
+
+### Example 1
+
+```js
+console.log("5" + 5);
+```
+
+Output:
+
+```js
+"55";
+```
+
+Number converted to string.
+
+---
+
+### Example 2
+
+```js
+console.log("5" - 5);
+```
+
+Output:
+
+```js
+0;
+```
+
+String converted to number.
+
+---
+
+### Example 3
+
+```js
+console.log(true + 1);
+```
+
+Output:
+
+```js
+2;
+```
+
+Because:
+
+```js
+true = 1
+```
+
+---
+
+### Example 4
+
+```js
+console.log(false + 1);
+```
+
+Output:
+
+```js
+1;
+```
+
+Because:
+
+```js
+false = 0
+```
+
+---
+
+## 📌 Equality Coercion
+
+### Loose Equality
+
+```js
+console.log(1 == "1");
+```
+
+Output:
+
+```js
+true;
+```
+
+Type conversion occurs.
+
+---
+
+### Strict Equality
+
+```js
+console.log(1 === "1");
+```
+
+Output:
+
+```js
+false;
+```
+
+No conversion.
+
+---
+
+## 📌 Implicit vs Explicit Coercion
+
+### Implicit
+
+JavaScript converts automatically.
+
+```js
+"5" + 5;
+```
+
+---
+
+### Explicit
+
+Developer converts manually.
+
+```js
+Number("5");
+```
+
+---
+
+```js
+String(10);
+```
+
+---
+
+```js
+Boolean(1);
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Form Input
+
+```js
+const age = Number(input.value);
+```
+
+Convert string to number.
+
+---
+
+### API Data
+
+```js
+const price = Number(response.price);
+```
+
+---
+
+### Search Filters
+
+```js
+const id = String(userId);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+[] + [];
+```
+
+Output:
+
+```js
+"";
+```
+
+Very common interview puzzle.
+
+---
+
+### Trap 2
+
+```js
+[] == false;
+```
+
+Output:
+
+```js
+true;
+```
+
+Due to coercion.
+
+---
+
+### Trap 3
+
+```js
+null == undefined;
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Trap 4
+
+```js
+null === undefined;
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is implicit coercion?
+
+Automatic conversion by JavaScript.
+
+---
+
+### ❓ What is explicit coercion?
+
+Manual conversion by developer.
+
+---
+
+### ❓ Why is === preferred?
+
+Because it avoids unexpected coercion.
+
+---
+
+### ❓ Which operator performs coercion?
+
+```js
+==
+```
+
+---
+
+### ❓ Which operator avoids coercion?
+
+```js
+===
+```
+
+---
