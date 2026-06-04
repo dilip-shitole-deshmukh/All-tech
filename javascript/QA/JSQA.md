@@ -1129,4 +1129,716 @@ Supports forEach.
 
 ---
 
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q7. What is the Difference Between getElementById(), getElementsByClassName(), and getElementsByTagName()?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+These are DOM selector methods used to access elements from a webpage.
+
+`getElementById()` returns a single element based on its unique ID.
+
+`getElementsByClassName()` returns a collection of elements sharing the same class.
+
+`getElementsByTagName()` returns all elements with a specific HTML tag.
+
+In modern applications, developers often prefer `querySelector()` and `querySelectorAll()`, but understanding these methods is still important for interviews.
+
+---
+
+## 🔹 Core Explanation
+
+| Method                   | Returns        | Selection Basis |
+| ------------------------ | -------------- | --------------- |
+| getElementById()         | Single Element | ID              |
+| getElementsByClassName() | HTMLCollection | Class Name      |
+| getElementsByTagName()   | HTMLCollection | Tag Name        |
+
+---
+
+### 📌 getElementById()
+
+```js
+const element = document.getElementById("title");
+```
+
+Returns:
+
+```html
+<h1 id="title">Hello</h1>
+```
+
+---
+
+### 📌 getElementsByClassName()
+
+```js
+const cards = document.getElementsByClassName("card");
+```
+
+Returns:
+
+```html
+<div class="card"></div>
+<div class="card"></div>
+<div class="card"></div>
+```
+
+---
+
+### 📌 getElementsByTagName()
+
+```js
+const divs = document.getElementsByTagName("div");
+```
+
+Returns all div elements.
+
+---
+
+## 💻 Example
+
+```html
+<div id="header">Header</div>
+
+<div class="box">1</div>
+<div class="box">2</div>
+
+<p>Hello</p>
+<p>World</p>
+```
+
+```js
+console.log(document.getElementById("header"));
+
+console.log(document.getElementsByClassName("box"));
+
+console.log(document.getElementsByTagName("p"));
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Unique Element
+
+```js
+document.getElementById("submitBtn");
+```
+
+---
+
+### Multiple Cards
+
+```js
+document.getElementsByClassName("product-card");
+```
+
+---
+
+### All Inputs
+
+```js
+document.getElementsByTagName("input");
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+getElementById();
+```
+
+returns:
+
+❌ Array
+
+✅ Single Element
+
+---
+
+### Trap 2
+
+```js
+getElementsByClassName();
+```
+
+returns:
+
+❌ Array
+
+✅ HTMLCollection
+
+---
+
+### Trap 3
+
+```js
+collection.forEach(...)
+```
+
+May fail in older browsers because HTMLCollection is not a real array.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which method is fastest?
+
+Generally:
+
+```js
+getElementById();
+```
+
+because browser optimizes ID lookup.
+
+---
+
+### ❓ Why is ID expected to be unique?
+
+HTML specification expects only one element with a given ID.
+
+---
+
+### ❓ Which methods return live collections?
+
+✅ getElementsByClassName()
+
+✅ getElementsByTagName()
+
+---
+
+### ❓ What is a live collection?
+
+Collection automatically updates when DOM changes.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ getElementById → single element
+
+✅ getElementsByClassName → multiple elements
+
+✅ getElementsByTagName → tag-based selection
+
+✅ ClassName and TagName return live HTMLCollection
+
+✅ Modern apps mostly use querySelector/querySelectorAll
+
+---
+
+# 🟢 Q8. What are Data Types in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Data types define the kind of value a variable can store.
+
+JavaScript data types are broadly categorized into Primitive and Non-Primitive types.
+
+Primitive types include Number, String, Boolean, Undefined, Null, Symbol, and BigInt.
+
+Non-Primitive types include Objects, Arrays, Functions, Dates, and other object-based structures.
+
+Understanding data types is important because JavaScript behaves differently during comparisons, memory allocation, and type coercion.
+
+---
+
+## 🔹 Core Explanation
+
+## 📌 Primitive Data Types
+
+Stored by value.
+
+### Number
+
+```js
+let age = 25;
+```
+
+---
+
+### String
+
+```js
+let name = "Dilip";
+```
+
+---
+
+### Boolean
+
+```js
+let isLoggedIn = true;
+```
+
+---
+
+### Undefined
+
+```js
+let user;
+```
+
+---
+
+### Null
+
+```js
+let data = null;
+```
+
+---
+
+### Symbol
+
+```js
+const id = Symbol("id");
+```
+
+---
+
+### BigInt
+
+```js
+const num = 12345678901234567890n;
+```
+
+---
+
+## 📌 Non-Primitive Data Types
+
+Stored by reference.
+
+### Object
+
+```js
+const user = {
+  name: "Dilip",
+};
+```
+
+---
+
+### Array
+
+```js
+const skills = ["React", "Angular"];
+```
+
+---
+
+### Function
+
+```js
+function greet() {}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Response
+
+```js
+{
+  name: "Dilip",
+  age: 30
+}
+```
+
+Object.
+
+---
+
+### Product List
+
+```js
+[{}, {}, {}];
+```
+
+Array.
+
+---
+
+### Event Handler
+
+```js
+function handleClick() {}
+```
+
+Function.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+Historic JavaScript bug.
+
+---
+
+### Trap 2
+
+```js
+typeof [];
+```
+
+Output:
+
+```js
+"object";
+```
+
+Use:
+
+```js
+Array.isArray();
+```
+
+instead.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ How many primitive types are there?
+
+Modern JavaScript:
+
+7 Primitive Types
+
+- Number
+- String
+- Boolean
+- Undefined
+- Null
+- Symbol
+- BigInt
+
+---
+
+### ❓ Are arrays primitive?
+
+❌ No
+
+Arrays are objects.
+
+---
+
+### ❓ Are functions objects?
+
+✅ Yes
+
+Functions are special objects.
+
+---
+
+### ❓ Why is typeof null object?
+
+Historical implementation bug maintained for backward compatibility.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Data Types define stored value type.
+
+✅ Primitive → stored by value.
+
+✅ Non-Primitive → stored by reference.
+
+✅ Arrays and Functions are objects.
+
+✅ typeof null returns object (legacy behavior).
+
+---
+
+# 🟢 Q9. What are Operators? What are the Types of Operators in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operators are symbols that perform operations on values and variables.
+
+JavaScript supports Arithmetic, Assignment, Comparison, Logical, Bitwise, String, Conditional, and Type operators.
+
+Operators are heavily used in conditions, calculations, validations, filtering data, and business logic.
+
+Understanding operator behavior is important because many interview questions focus on comparisons, type coercion, and operator precedence.
+
+---
+
+## 🔹 Core Explanation
+
+## 📌 Arithmetic Operators
+
+```js
++
+-
+*
+/
+%
+**
+```
+
+Example:
+
+```js
+console.log(10 + 5);
+console.log(10 % 3);
+```
+
+---
+
+## 📌 Assignment Operators
+
+```js
+=
++=
+-=
+*=
+/=
+```
+
+Example:
+
+```js
+let count = 10;
+
+count += 5;
+```
+
+---
+
+## 📌 Comparison Operators
+
+```js
+==
+===
+!=
+!==
+>
+<
+>=
+<=
+```
+
+Example:
+
+```js
+console.log(5 > 3);
+```
+
+---
+
+## 📌 Logical Operators
+
+```js
+&&
+||
+!
+```
+
+Example:
+
+```js
+isLoggedIn && isAdmin;
+```
+
+---
+
+## 📌 String Operator
+
+```js
++
+```
+
+```js
+"Hello" + " World";
+```
+
+---
+
+## 📌 Conditional Operator
+
+```js
+condition ? value1 : value2;
+```
+
+Example:
+
+```js
+const role = isAdmin ? "Admin" : "User";
+```
+
+---
+
+## 📌 Type Operator
+
+```js
+typeof
+instanceof
+```
+
+Example:
+
+```js
+typeof "hello";
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Form Validation
+
+```js
+if(email && password)
+```
+
+---
+
+### API Filtering
+
+```js
+users.filter((user) => user.age > 18);
+```
+
+---
+
+### UI Rendering
+
+```js
+isLoading ? "Loading..." : "Data Loaded";
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+"5" + 5;
+```
+
+Output:
+
+```js
+"55";
+```
+
+---
+
+### Trap 2
+
+```js
+"5" - 5;
+```
+
+Output:
+
+```js
+0;
+```
+
+Because numeric coercion occurs.
+
+---
+
+### Trap 3
+
+```js
+true + true;
+```
+
+Output:
+
+```js
+2;
+```
+
+Boolean becomes number.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Difference between == and ===?
+
+`==`
+
+Performs type coercion.
+
+`===`
+
+No type coercion.
+
+Preferred in production code.
+
+---
+
+### ❓ What is short-circuit evaluation?
+
+Logical operators stop execution once result is known.
+
+Example:
+
+```js
+true || someFunction();
+```
+
+Function never executes.
+
+---
+
+### ❓ Which operator is used most in React?
+
+Commonly:
+
+```js
+&&
+?:
+```
+
+for conditional rendering.
+
+---
+
+### ❓ What is operator precedence?
+
+Determines execution order of operators.
+
+Example:
+
+```js
+2 + 3 * 4;
+```
+
+Output:
+
+```js
+14;
+```
+
+not 20.
+
 ---
