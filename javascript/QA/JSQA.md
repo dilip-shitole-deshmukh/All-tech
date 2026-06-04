@@ -1842,3 +1842,715 @@ Output:
 not 20.
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q10. What are the Types of Conditional Statements in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Conditional statements allow JavaScript to execute different code paths based on conditions.
+
+The main conditional statements are:
+
+- if
+- if...else
+- else if
+- switch
+- ternary operator
+
+In real applications, if-else is used for complex business logic, ternary operators for simple value assignments, and switch statements when multiple cases depend on the same variable.
+
+---
+
+## 🔹 Core Explanation
+
+### 1️⃣ if Statement
+
+Used when a block should execute only if condition is true.
+
+```js
+const age = 20;
+
+if (age >= 18) {
+  console.log("Eligible");
+}
+```
+
+---
+
+### 2️⃣ if...else
+
+```js
+const age = 16;
+
+if (age >= 18) {
+  console.log("Adult");
+} else {
+  console.log("Minor");
+}
+```
+
+---
+
+### 3️⃣ else if
+
+```js
+const marks = 80;
+
+if (marks >= 90) {
+  console.log("A");
+} else if (marks >= 75) {
+  console.log("B");
+} else {
+  console.log("C");
+}
+```
+
+---
+
+### 4️⃣ switch
+
+```js
+const role = "admin";
+
+switch (role) {
+  case "admin":
+    console.log("Full Access");
+    break;
+
+  case "user":
+    console.log("Limited Access");
+    break;
+
+  default:
+    console.log("No Access");
+}
+```
+
+---
+
+### 5️⃣ Ternary Operator
+
+```js
+const result = age >= 18 ? "Adult" : "Minor";
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Conditional Rendering
+
+```jsx
+{
+  isLoading ? <Loader /> : <Dashboard />;
+}
+```
+
+---
+
+### Angular
+
+```html
+<div *ngIf="isLoggedIn">Welcome</div>
+```
+
+---
+
+### Role-Based Access
+
+```js
+if (user.role === "admin") {
+  showAdminPanel();
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+if(a = 5)
+```
+
+❌ Assignment
+
+---
+
+```js
+if(a === 5)
+```
+
+✅ Comparison
+
+---
+
+### Trap 2
+
+Using nested if blocks unnecessarily.
+
+Prefer:
+
+```js
+if(){}
+else if(){}
+else{}
+```
+
+---
+
+### Trap 3
+
+Missing break in switch.
+
+```js
+switch (value) {
+  case 1:
+    console.log("One");
+  case 2:
+    console.log("Two");
+}
+```
+
+Causes fall-through.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ When should switch be preferred?
+
+When comparing the same variable against multiple values.
+
+---
+
+### ❓ Is ternary faster than if-else?
+
+Practically no significant difference.
+
+Choose readability.
+
+---
+
+### ❓ Can switch use strings?
+
+✅ Yes
+
+```js
+switch(role)
+```
+
+is common.
+
+---
+
+### ❓ What is fall-through in switch?
+
+Execution continues into next case if break is omitted.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ if-else for complex logic.
+
+✅ ternary for simple value assignment.
+
+✅ switch for multiple cases.
+
+✅ Avoid deep nesting.
+
+✅ Always remember break in switch.
+
+---
+
+# 🟢 Q11. What is a Loop? What are the Types of Loops in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Loops are used to execute a block of code repeatedly until a condition becomes false.
+
+JavaScript provides several loop types:
+
+- for
+- while
+- do...while
+- for...of
+- for...in
+
+In frontend development, loops are frequently used for rendering lists, processing API data, validating records, and iterating through objects.
+
+---
+
+## 🔹 Core Explanation
+
+### 1️⃣ for Loop
+
+Most common loop.
+
+```js
+for (let i = 0; i < 5; i++) {
+  console.log(i);
+}
+```
+
+Output:
+
+```js
+0;
+1;
+2;
+3;
+4;
+```
+
+---
+
+### 2️⃣ while Loop
+
+```js
+let i = 0;
+
+while (i < 5) {
+  console.log(i);
+  i++;
+}
+```
+
+---
+
+### 3️⃣ do...while Loop
+
+Executes at least once.
+
+```js
+let i = 10;
+
+do {
+  console.log(i);
+} while (i < 5);
+```
+
+Output:
+
+```js
+10;
+```
+
+---
+
+### 4️⃣ for...of
+
+Iterates values.
+
+```js
+const skills = ["JS", "React", "Angular"];
+
+for (const skill of skills) {
+  console.log(skill);
+}
+```
+
+---
+
+### 5️⃣ for...in
+
+Iterates object keys.
+
+```js
+const user = {
+  name: "Dilip",
+  age: 30,
+};
+
+for (const key in user) {
+  console.log(key);
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```jsx
+users.map((user) => <UserCard />);
+```
+
+Behind the scenes this is iteration.
+
+---
+
+### API Processing
+
+```js
+for (const user of users) {
+  sendEmail(user);
+}
+```
+
+---
+
+### Object Traversal
+
+```js
+for (const key in settings) {
+  console.log(settings[key]);
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Infinite Loop
+
+```js
+while (true) {}
+```
+
+---
+
+### Trap 2
+
+Using for...in on arrays.
+
+```js
+for(let item in arr)
+```
+
+Not recommended.
+
+Use:
+
+```js
+for(let item of arr)
+```
+
+---
+
+### Trap 3
+
+Off-by-one errors.
+
+```js
+i <= arr.length;
+```
+
+Usually incorrect.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Difference between for and while?
+
+| for              | while              |
+| ---------------- | ------------------ |
+| Known iterations | Unknown iterations |
+| Compact syntax   | Flexible           |
+
+---
+
+### ❓ Difference between while and do-while?
+
+do-while executes at least once.
+
+while may execute zero times.
+
+---
+
+### ❓ Difference between for...of and for...in?
+
+for...of → Values
+
+for...in → Keys
+
+---
+
+### ❓ Which loop is most used in modern frontend?
+
+Often:
+
+```js
+map()
+forEach()
+for...of
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Loops repeat code execution.
+
+✅ Types:
+
+- for
+- while
+- do-while
+- for...of
+- for...in
+
+✅ for...of for arrays.
+
+✅ for...in for objects.
+
+✅ Avoid infinite loops.
+
+---
+
+# 🟢 Q12. What are Functions in JavaScript? What are the Types of Functions?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Functions are reusable blocks of code designed to perform a specific task.
+
+They help improve code reusability, maintainability, and modularity.
+
+JavaScript supports multiple function types including:
+
+- Named Functions
+- Anonymous Functions
+- Function Expressions
+- Arrow Functions
+- IIFE
+- Callback Functions
+- Higher-Order Functions
+
+Functions are heavily used in React, Angular, event handling, API calls, and business logic implementation.
+
+---
+
+## 🔹 Core Explanation
+
+### Basic Function
+
+```js
+function add(a, b) {
+  return a + b;
+}
+```
+
+---
+
+### Function Invocation
+
+```js
+add(10, 20);
+```
+
+---
+
+### Components of Function
+
+```js
+function add(a, b) {
+  return a + b;
+}
+```
+
+| Part     | Meaning        |
+| -------- | -------------- |
+| add      | Function Name  |
+| a,b      | Parameters     |
+| return   | Returned Value |
+| add(1,2) | Function Call  |
+
+---
+
+## 📌 Types of Functions
+
+### 1️⃣ Named Function
+
+```js
+function greet() {
+  console.log("Hello");
+}
+```
+
+---
+
+### 2️⃣ Anonymous Function
+
+```js
+const greet = function () {
+  console.log("Hello");
+};
+```
+
+---
+
+### 3️⃣ Function Expression
+
+```js
+const add = function (a, b) {
+  return a + b;
+};
+```
+
+---
+
+### 4️⃣ Arrow Function
+
+```js
+const add = (a, b) => a + b;
+```
+
+---
+
+### 5️⃣ IIFE
+
+Immediately Invoked Function Expression
+
+```js
+(function () {
+  console.log("Executed");
+})();
+```
+
+---
+
+### 6️⃣ Callback Function
+
+```js
+setTimeout(function () {
+  console.log("Done");
+}, 1000);
+```
+
+---
+
+### 7️⃣ Higher-Order Function
+
+```js
+function execute(fn) {
+  fn();
+}
+```
+
+Accepts another function.
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Event Handler
+
+```jsx
+const handleClick = () => {
+  setCount(count + 1);
+};
+```
+
+---
+
+### Angular
+
+```ts
+saveUser(){
+   this.userService.save();
+}
+```
+
+---
+
+### API Processing
+
+```js
+users.map((user) => user.name);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Forgetting return.
+
+```js
+const add = (a, b) => {
+  a + b;
+};
+```
+
+Returns undefined.
+
+---
+
+### Trap 2
+
+Confusing parameter and argument.
+
+```js
+function add(a, b) {}
+```
+
+Parameters.
+
+```js
+add(1, 2);
+```
+
+Arguments.
+
+---
+
+### Trap 3
+
+Thinking functions are not objects.
+
+Functions are First-Class Citizens in JavaScript.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What are First-Class Functions?
+
+Functions can:
+
+✅ Be assigned to variables
+
+✅ Passed as arguments
+
+✅ Returned from functions
+
+---
+
+### ❓ Why are functions important in React?
+
+Everything is component and event-driven.
+
+Functions handle:
+
+- State Updates
+- API Calls
+- Event Handling
+
+---
+
+### ❓ Difference between Function Declaration and Function Expression?
+
+Function Declaration is hoisted completely.
+
+Function Expression is not.
+
+---
+
+### ❓ Can functions return functions?
+
+✅ Yes
+
+Used in currying and higher-order functions.
+
+---
