@@ -6274,3 +6274,733 @@ For conditional rendering.
 | ??       | Only null/undefined |
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q28. What is Operator Precedence in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operator precedence determines the order in which operators are evaluated in an expression.
+
+Operators with higher precedence execute before operators with lower precedence.
+
+For example, multiplication has higher precedence than addition, so in `2 + 3 * 4`, multiplication executes first.
+
+Understanding precedence is important because it helps avoid unexpected results in calculations and logical expressions.
+
+---
+
+## 🔹 Core Explanation
+
+### Example 1
+
+```js
+let result = 2 + 3 * 4;
+console.log(result);
+```
+
+Output:
+
+```js
+14;
+```
+
+Because:
+
+```js
+2 + 3 * 4;
+```
+
+---
+
+### Example 2
+
+```js
+let result = (2 + 3) * 4;
+console.log(result);
+```
+
+Output:
+
+```js
+20;
+```
+
+Parentheses have highest priority.
+
+---
+
+## 📌 Common Precedence Order
+
+| Precedence  | Operators         |
+| ----------- | ----------------- | --- | --- |
+| Highest     | ()                |
+| Unary       | !, typeof, ++, -- |
+| Arithmetic  | \*, /, %          |
+| Arithmetic  | +, -              |
+| Comparison  | >, <, >=, <=      |
+| Equality    | ==, ===           |
+| Logical AND | &&                |
+| Logical OR  |                   |     |     |
+| Lowest      | =                 |
+
+---
+
+## 💻 Interview Output Questions
+
+### Question 1
+
+```js
+console.log(10 + 5 * 2);
+```
+
+Output:
+
+```js
+20;
+```
+
+---
+
+### Question 2
+
+```js
+console.log((10 + 5) * 2);
+```
+
+Output:
+
+```js
+30;
+```
+
+---
+
+### Question 3
+
+```js
+console.log(true || (false && false));
+```
+
+Output:
+
+```js
+true;
+```
+
+Because:
+
+```js
+true || (false && false);
+```
+
+---
+
+### Question 4
+
+```js
+console.log(5 > 3 && 10 < 20);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Form Validation
+
+```js
+if(age > 18 && isActive)
+```
+
+---
+
+### Permission Checks
+
+```js
+if(isAdmin || isManager)
+```
+
+---
+
+### React Rendering
+
+```jsx
+{
+  isLoggedIn && hasPermission && <Dashboard />;
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+10 + 5 * 2;
+```
+
+Many candidates answer:
+
+```js
+30;
+```
+
+❌ Wrong
+
+Correct:
+
+```js
+20;
+```
+
+---
+
+### Trap 2
+
+Complex conditions without parentheses.
+
+```js
+if(a && b || c)
+```
+
+Better:
+
+```js
+if((a && b) || c)
+```
+
+---
+
+### Trap 3
+
+Assuming evaluation occurs left-to-right only.
+
+Precedence rules apply first.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ How can you avoid precedence confusion?
+
+Use parentheses.
+
+---
+
+### ❓ What has higher precedence: && or || ?
+
+```js
+&&
+```
+
+---
+
+### ❓ What has highest precedence?
+
+```js
+()
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Operator precedence determines execution order.
+
+✅ Multiplication executes before addition.
+
+✅ && executes before ||.
+
+✅ Parentheses improve readability and correctness.
+
+---
+
+# 🟢 Q29. When to Use if-else, switch, and Ternary in Real Applications?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+All three are conditional constructs, but they serve different purposes.
+
+- Use if-else for complex business logic.
+- Use ternary operators for simple value assignments or UI rendering.
+- Use switch statements when comparing the same variable against multiple values.
+
+Choosing the correct construct improves readability and maintainability.
+
+---
+
+## 🔹 Core Explanation
+
+## 1️⃣ if-else
+
+Best for:
+
+✅ Multiple conditions
+
+✅ Complex logic
+
+✅ Multiple statements
+
+Example:
+
+```js
+if (user.age < 18) {
+  denyAccess();
+} else if (user.role === "ADMIN") {
+  grantFullAccess();
+} else {
+  grantLimitedAccess();
+}
+```
+
+---
+
+## 2️⃣ Ternary Operator
+
+Best for:
+
+✅ Single condition
+
+✅ Value assignment
+
+✅ JSX rendering
+
+Example:
+
+```js
+const status = isActive ? "Active" : "Inactive";
+```
+
+---
+
+### React Example
+
+```jsx
+{
+  isLoading ? <Loader /> : <Dashboard />;
+}
+```
+
+---
+
+## 3️⃣ Switch Statement
+
+Best for:
+
+✅ Same variable
+
+✅ Many possible values
+
+Example:
+
+```js
+switch (role) {
+  case "ADMIN":
+    break;
+
+  case "MANAGER":
+    break;
+
+  case "USER":
+    break;
+
+  default:
+    break;
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### if-else
+
+Authentication logic.
+
+```js
+if (tokenExpired) {
+}
+```
+
+---
+
+### switch
+
+Role management.
+
+```js
+switch (role) {
+}
+```
+
+---
+
+### ternary
+
+React rendering.
+
+```jsx
+{
+  isLoggedIn ? "Welcome" : "Login";
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Using nested ternaries.
+
+```js
+a ? b : c ? d : e;
+```
+
+Hard to read.
+
+---
+
+### Trap 2
+
+Using switch without break.
+
+Creates fall-through.
+
+---
+
+### Trap 3
+
+Using ternary for complex logic.
+
+Prefer if-else.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which is most commonly used in React?
+
+Ternary and &&.
+
+---
+
+### ❓ When should switch be preferred?
+
+Multiple cases for same variable.
+
+---
+
+### ❓ Which is easiest to maintain?
+
+Depends on use case.
+
+Usually:
+
+- if-else → complex logic
+- switch → many fixed values
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ if-else → complex logic.
+
+✅ ternary → simple values/UI rendering.
+
+✅ switch → multiple cases.
+
+✅ Choose readability over clever syntax.
+
+---
+
+# 🟢 Q30. What is the Difference Between `==` and `===`?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`==` is called Loose Equality and performs type coercion before comparison.
+
+`===` is called Strict Equality and compares both value and data type without performing coercion.
+
+In production code and modern frameworks like React and Angular, `===` is strongly preferred because it avoids unexpected behavior and makes comparisons predictable.
+
+---
+
+## 🔹 Core Explanation
+
+## Loose Equality (`==`)
+
+Performs automatic conversion.
+
+```js
+console.log(1 == "1");
+```
+
+Output:
+
+```js
+true;
+```
+
+Because:
+
+```js
+Number("1") === 1;
+```
+
+---
+
+### More Examples
+
+```js
+console.log(true == 1);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+```js
+console.log(false == 0);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+## Strict Equality (`===`)
+
+No conversion.
+
+```js
+console.log(1 === "1");
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Example
+
+```js
+console.log(true === 1);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## 📌 Comparison Table
+
+| Expression         | Result |
+| ------------------ | ------ |
+| 1 == "1"           | true   |
+| 1 === "1"          | false  |
+| true == 1          | true   |
+| true === 1         | false  |
+| null == undefined  | true   |
+| null === undefined | false  |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```js
+if(user.role === "ADMIN")
+```
+
+Preferred.
+
+---
+
+### Angular
+
+```ts
+if(status === "SUCCESS")
+```
+
+Preferred.
+
+---
+
+### Form Validation
+
+```js
+if(age === 18)
+```
+
+Avoids type coercion bugs.
+
+---
+
+## 💻 Most Asked Interview Outputs
+
+### Question 1
+
+```js
+console.log(0 == false);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Question 2
+
+```js
+console.log(0 === false);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Question 3
+
+```js
+console.log("" == false);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Question 4
+
+```js
+console.log("" === false);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Question 5
+
+```js
+console.log(null == undefined);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Question 6
+
+```js
+console.log(null === undefined);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Using `==` in production applications.
+
+---
+
+### Trap 2
+
+Assuming:
+
+```js
+1 == "1";
+```
+
+and
+
+```js
+1 === "1";
+```
+
+behave same.
+
+---
+
+### Trap 3
+
+Forgetting coercion rules.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which operator should be preferred?
+
+✅ `===`
+
+---
+
+### ❓ Why is `===` safer?
+
+No implicit conversion.
+
+---
+
+### ❓ Does `==` perform type coercion?
+
+✅ Yes.
+
+---
+
+### ❓ Why do product companies ask this question?
+
+Because it tests understanding of JavaScript coercion rules.
+
+---
