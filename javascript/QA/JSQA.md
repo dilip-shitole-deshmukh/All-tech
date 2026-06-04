@@ -5472,3 +5472,805 @@ Because it avoids unexpected coercion.
 ```
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q25. What are Operators? What are the Types of Operators in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operators are special symbols that perform operations on values or variables.
+
+JavaScript provides multiple categories of operators including Arithmetic, Assignment, Comparison, Logical, String, Bitwise, Conditional, and Type operators.
+
+Operators are used extensively in conditions, calculations, validations, filtering, state management, and business logic implementation.
+
+Understanding operator behavior is important because many interview questions focus on type coercion, precedence, and comparison operators.
+
+---
+
+## 🔹 Core Explanation
+
+## 1️⃣ Arithmetic Operators
+
+Used for mathematical operations.
+
+```js
++
+-
+*
+/
+%
+**
+```
+
+### Example
+
+```js
+let a = 10;
+let b = 3;
+
+console.log(a + b); // 13
+console.log(a % b); // 1
+console.log(a ** b); // 1000
+```
+
+---
+
+## 2️⃣ Assignment Operators
+
+```js
+=
++=
+-=
+*=
+/=
+%=
+```
+
+### Example
+
+```js
+let count = 10;
+
+count += 5;
+
+console.log(count);
+```
+
+Output:
+
+```js
+15;
+```
+
+---
+
+## 3️⃣ Comparison Operators
+
+```js
+==
+===
+!=
+!==
+>
+<
+>=
+<=
+```
+
+### Example
+
+```js
+console.log(5 > 3);
+console.log(5 === "5");
+```
+
+Output:
+
+```js
+true;
+false;
+```
+
+---
+
+## 4️⃣ Logical Operators
+
+```js
+&&
+||
+!
+```
+
+### Example
+
+```js
+const isLoggedIn = true;
+const isAdmin = false;
+
+console.log(isLoggedIn && isAdmin);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## 5️⃣ String Operator
+
+```js
++
+```
+
+### Example
+
+```js
+console.log("Hello" + " World");
+```
+
+Output:
+
+```js
+Hello World
+```
+
+---
+
+## 6️⃣ Conditional Operator
+
+```js
+condition ? value1 : value2;
+```
+
+### Example
+
+```js
+const role = isAdmin ? "Admin" : "User";
+```
+
+---
+
+## 7️⃣ Type Operators
+
+```js
+typeof
+instanceof
+```
+
+### Example
+
+```js
+typeof "JavaScript";
+```
+
+Output:
+
+```js
+string;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Conditional Rendering
+
+```jsx
+{
+  isLoading ? <Loader /> : <Dashboard />;
+}
+```
+
+---
+
+### Form Validation
+
+```js
+if (email && password) {
+}
+```
+
+---
+
+### Access Control
+
+```js
+if (user.role === "ADMIN") {
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+"5" + 5;
+```
+
+Output:
+
+```js
+"55";
+```
+
+---
+
+### Trap 2
+
+```js
+"5" - 5;
+```
+
+Output:
+
+```js
+0;
+```
+
+---
+
+### Trap 3
+
+```js
+true + true;
+```
+
+Output:
+
+```js
+2;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which operator is most commonly used in React?
+
+```js
+&&
+?:
+```
+
+---
+
+### ❓ Why prefer === over ==?
+
+Avoids type coercion.
+
+---
+
+### ❓ What is operator precedence?
+
+Defines execution order.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Operators perform actions on values.
+
+✅ Main categories:
+
+- Arithmetic
+- Assignment
+- Comparison
+- Logical
+- Conditional
+- Type
+
+✅ `===` preferred in production code.
+
+---
+
+# 🟢 Q26. What is the Difference Between Unary, Binary, and Ternary Operators?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operators can be classified based on the number of operands they require.
+
+- Unary Operators work with one operand.
+- Binary Operators work with two operands.
+- Ternary Operators work with three operands.
+
+This classification helps understand operator behavior and is a common interview theory question.
+
+---
+
+## 🔹 Core Explanation
+
+## 1️⃣ Unary Operator
+
+Operates on one value.
+
+### Example
+
+```js
+let a = 5;
+
+console.log(-a);
+```
+
+Output:
+
+```js
+-5;
+```
+
+---
+
+### Increment Operator
+
+```js
+let count = 5;
+
+count++;
+```
+
+---
+
+Common Unary Operators:
+
+```js
+++
+--
+!
+typeof
+delete
+```
+
+---
+
+## 2️⃣ Binary Operator
+
+Operates on two values.
+
+```js
+let a = 10;
+let b = 20;
+
+console.log(a + b);
+```
+
+Output:
+
+```js
+30;
+```
+
+---
+
+Examples
+
+```js
++
+-
+*
+/
+&&
+||
+==
+===
+```
+
+---
+
+## 3️⃣ Ternary Operator
+
+Operates on three expressions.
+
+```js
+condition ? value1 : value2;
+```
+
+Example:
+
+```js
+const age = 20;
+
+const result = age >= 18 ? "Adult" : "Minor";
+```
+
+Output:
+
+```js
+Adult;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```jsx
+{
+  loading ? <Loader /> : <Dashboard />;
+}
+```
+
+---
+
+### Angular
+
+```ts
+const role = isAdmin ? "Admin" : "User";
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Nested ternary operators.
+
+```js
+condition1 ? value1 : condition2 ? value2 : value3;
+```
+
+Hard to read.
+
+---
+
+### Trap 2
+
+Confusing unary minus.
+
+```js
+let x = "5";
+
+console.log(-x);
+```
+
+Output:
+
+```js
+-5;
+```
+
+Because coercion occurs.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Is typeof unary or binary?
+
+✅ Unary
+
+```js
+typeof value;
+```
+
+---
+
+### ❓ Is + always binary?
+
+❌ No
+
+Can also be unary.
+
+```js
++"5";
+```
+
+Output:
+
+```js
+5;
+```
+
+---
+
+### ❓ Why use ternary instead of if-else?
+
+For simple value assignments.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Unary → One Operand
+
+✅ Binary → Two Operands
+
+✅ Ternary → Three Operands
+
+✅ Ternary widely used in React UI rendering.
+
+---
+
+# 🟢 Q27. What is Short-Circuit Evaluation in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Short-circuit evaluation is a behavior of logical operators where JavaScript stops evaluating expressions as soon as the final result becomes known.
+
+This optimization occurs with:
+
+- Logical AND (`&&`)
+- Logical OR (`||`)
+- Nullish Coalescing (`??`)
+
+Short-circuiting is widely used in React, Angular, and modern JavaScript for conditional rendering, default values, and defensive programming.
+
+---
+
+## 🔹 Core Explanation
+
+## AND Operator (`&&`)
+
+Returns first falsy value.
+
+```js
+false && console.log("Hello");
+```
+
+Output:
+
+```js
+false;
+```
+
+`console.log()` never executes.
+
+---
+
+### Example
+
+```js
+true && "JavaScript";
+```
+
+Output:
+
+```js
+JavaScript;
+```
+
+---
+
+## OR Operator (`||`)
+
+Returns first truthy value.
+
+```js
+true || console.log("Hello");
+```
+
+Output:
+
+```js
+true;
+```
+
+Second expression skipped.
+
+---
+
+### Example
+
+```js
+"" || "Default Name";
+```
+
+Output:
+
+```js
+Default Name
+```
+
+---
+
+## Nullish Coalescing (`??`)
+
+Returns right value only when left side is:
+
+```js
+null;
+undefined;
+```
+
+Example:
+
+```js
+const name = null ?? "Guest";
+```
+
+Output:
+
+```js
+Guest;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Conditional Rendering
+
+```jsx
+{
+  isLoggedIn && <Dashboard />;
+}
+```
+
+---
+
+### Default Values
+
+```js
+const username = userName || "Guest";
+```
+
+---
+
+### API Response Handling
+
+```js
+const city = user?.address?.city ?? "Unknown";
+```
+
+---
+
+### Angular Templates
+
+```html
+<div *ngIf="user">Welcome</div>
+```
+
+Conceptually similar.
+
+---
+
+## 💻 Important Output Questions
+
+### Question 1
+
+```js
+console.log(false && "Hello");
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Question 2
+
+```js
+console.log(true || "Hello");
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Question 3
+
+```js
+console.log("" || "Default");
+```
+
+Output:
+
+```js
+Default;
+```
+
+---
+
+### Question 4
+
+```js
+console.log(null ?? "Guest");
+```
+
+Output:
+
+```js
+Guest;
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Confusing `||` and `??`
+
+```js
+0 || 100;
+```
+
+Output:
+
+```js
+100;
+```
+
+---
+
+```js
+0 ?? 100;
+```
+
+Output:
+
+```js
+0;
+```
+
+---
+
+### Trap 2
+
+Thinking all expressions execute.
+
+Short-circuiting prevents unnecessary execution.
+
+---
+
+### Trap 3
+
+Using `||` when value can legitimately be:
+
+```js
+0;
+false;
+("");
+```
+
+Use `??` instead.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why is short-circuit evaluation useful?
+
+Improves readability and performance.
+
+---
+
+### ❓ Which operators support short-circuiting?
+
+✅ `&&`
+
+✅ `||`
+
+✅ `??`
+
+---
+
+### ❓ Why is it heavily used in React?
+
+For conditional rendering.
+
+---
+
+### ❓ Difference between || and ?? ?
+
+| Operator | Checks              |
+| -------- | ------------------- | --- | --------------- |
+|          |                     |     | Any falsy value |
+| ??       | Only null/undefined |
+
+---
