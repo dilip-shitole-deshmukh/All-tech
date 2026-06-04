@@ -2554,3 +2554,691 @@ Function Expression is not.
 Used in currying and higher-order functions.
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q13. What are Arrow Functions in JavaScript? What is their Use?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Arrow Functions were introduced in ES6 as a shorter syntax for writing functions.
+
+Apart from cleaner syntax, the biggest difference is that arrow functions do not have their own `this`. Instead, they inherit `this` from the surrounding lexical scope.
+
+Arrow functions are heavily used in React, array methods like `map()`, `filter()`, `reduce()`, and asynchronous programming because they reduce boilerplate code and avoid `this` binding issues.
+
+---
+
+## 🔹 Core Explanation
+
+### Traditional Function
+
+```js
+function add(a, b) {
+  return a + b;
+}
+```
+
+---
+
+### Arrow Function
+
+```js
+const add = (a, b) => {
+  return a + b;
+};
+```
+
+---
+
+### Short Form
+
+```js
+const add = (a, b) => a + b;
+```
+
+---
+
+## ⭐ Most Important Interview Difference
+
+### Regular Function
+
+```js
+const person = {
+  name: "Dilip",
+
+  greet: function () {
+    console.log(this.name);
+  },
+};
+
+person.greet();
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+---
+
+### Arrow Function
+
+```js
+const person = {
+  name: "Dilip",
+
+  greet: () => {
+    console.log(this.name);
+  },
+};
+
+person.greet();
+```
+
+Output:
+
+```js
+undefined;
+```
+
+Because arrow functions don't create their own `this`.
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```jsx
+<button onClick={() => setCount(count + 1)}>Increment</button>
+```
+
+---
+
+### Array Methods
+
+```js
+users.map((user) => user.name);
+```
+
+---
+
+### Filtering
+
+```js
+users.filter((user) => user.isActive);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Using Arrow Functions as Object Methods
+
+```js
+const obj = {
+  name: "JS",
+  getName: () => this.name,
+};
+```
+
+❌ Wrong
+
+---
+
+### Trap 2
+
+Using Arrow Functions as Constructors
+
+```js
+const User = (name) => {
+  this.name = name;
+};
+
+new User("Dilip");
+```
+
+❌ Error
+
+Arrow functions cannot be used with `new`.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why are Arrow Functions popular in React?
+
+Because they eliminate manual `this` binding.
+
+---
+
+### ❓ Do Arrow Functions have arguments object?
+
+❌ No
+
+Use Rest Operator instead.
+
+```js
+(...args)
+```
+
+---
+
+### ❓ Can Arrow Functions be Hoisted?
+
+❌ No (when assigned to variable)
+
+```js
+const add = () => {};
+```
+
+Behaves like variable declaration.
+
+---
+
+### ❓ Do Arrow Functions have their own this?
+
+❌ No
+
+They inherit lexical this.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Introduced in ES6.
+
+✅ Shorter syntax.
+
+✅ No own `this`.
+
+✅ Commonly used in React and array methods.
+
+✅ Cannot be constructors.
+
+✅ Cannot be used where dynamic `this` is required.
+
+---
+
+# 🟢 Q14. What are Arrays in JavaScript? How to Get, Add & Remove Elements?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+An Array is a special JavaScript object used to store multiple values in a single variable.
+
+Arrays are ordered, zero-indexed collections and can contain values of different data types.
+
+JavaScript provides many built-in methods for adding, removing, searching, filtering, and transforming array elements.
+
+Arrays are one of the most commonly used data structures in React and Angular applications for handling API responses, rendering lists, and managing state.
+
+---
+
+## 🔹 Core Explanation
+
+### Creating Array
+
+```js
+const users = ["Dilip", "Amit", "Rahul"];
+```
+
+---
+
+### Get Element
+
+```js
+console.log(users[0]);
+```
+
+Output:
+
+```js
+Dilip;
+```
+
+---
+
+## 📌 Add Elements
+
+### push()
+
+Adds at end.
+
+```js
+users.push("John");
+```
+
+Result:
+
+```js
+["Dilip", "Amit", "Rahul", "John"];
+```
+
+---
+
+### unshift()
+
+Adds at beginning.
+
+```js
+users.unshift("Admin");
+```
+
+---
+
+## 📌 Remove Elements
+
+### pop()
+
+Removes last element.
+
+```js
+users.pop();
+```
+
+---
+
+### shift()
+
+Removes first element.
+
+```js
+users.shift();
+```
+
+---
+
+## 📌 Modify Elements
+
+```js
+users[0] = "Developer";
+```
+
+---
+
+## 💻 Important Array Methods
+
+| Method    | Purpose      |
+| --------- | ------------ |
+| push()    | Add End      |
+| pop()     | Remove End   |
+| shift()   | Remove Start |
+| unshift() | Add Start    |
+| map()     | Transform    |
+| filter()  | Filter Data  |
+| find()    | First Match  |
+| reduce()  | Aggregation  |
+| some()    | Any Match    |
+| every()   | All Match    |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Rendering
+
+```jsx
+users.map((user) => <UserCard key={user.id} user={user} />);
+```
+
+---
+
+### API Data
+
+```js
+const users = await fetchUsers();
+```
+
+Usually returns array.
+
+---
+
+### Search
+
+```js
+users.filter((user) => user.active);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+typeof [];
+```
+
+Output:
+
+```js
+object;
+```
+
+---
+
+### Correct Check
+
+```js
+Array.isArray(arr);
+```
+
+---
+
+### Trap 2
+
+Arrays are Objects.
+
+Many developers think they're separate types.
+
+---
+
+### Trap 3
+
+Mutating State Directly in React
+
+```js
+users.push(newUser);
+```
+
+❌ Avoid
+
+Use:
+
+```js
+setUsers([...users, newUser]);
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Can arrays store mixed types?
+
+✅ Yes
+
+```js
+[1, "JS", true, {}];
+```
+
+---
+
+### ❓ Are arrays mutable?
+
+✅ Yes
+
+```js
+arr.push(1);
+```
+
+Modifies original array.
+
+---
+
+### ❓ Difference between map and forEach?
+
+| map            | forEach           |
+| -------------- | ----------------- |
+| Returns Array  | Returns Undefined |
+| Transformation | Iteration         |
+
+---
+
+### ❓ Which methods are most asked in interviews?
+
+✅ map()
+
+✅ filter()
+
+✅ reduce()
+
+✅ find()
+
+✅ splice()
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Arrays store multiple values.
+
+✅ Zero-indexed.
+
+✅ Mutable.
+
+✅ Most important methods:
+
+- push
+- pop
+- map
+- filter
+- reduce
+- find
+
+✅ Very common in React state management.
+
+---
+
+# 🟢 Q15. What are Objects in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Objects are collections of key-value pairs used to represent real-world entities.
+
+They are one of the most important data structures in JavaScript and are heavily used for API responses, configurations, user data, and application state.
+
+Objects can store properties, arrays, nested objects, and even functions called methods.
+
+---
+
+## 🔹 Core Explanation
+
+### Object Example
+
+```js
+const user = {
+  name: "Dilip",
+  age: 30,
+  city: "Pune",
+};
+```
+
+---
+
+### Access Properties
+
+#### Dot Notation
+
+```js
+console.log(user.name);
+```
+
+---
+
+#### Bracket Notation
+
+```js
+console.log(user["name"]);
+```
+
+---
+
+### Add Property
+
+```js
+user.role = "Developer";
+```
+
+---
+
+### Modify Property
+
+```js
+user.age = 31;
+```
+
+---
+
+### Delete Property
+
+```js
+delete user.city;
+```
+
+---
+
+## 📌 Objects Can Store Functions
+
+```js
+const user = {
+  name: "Dilip",
+
+  greet() {
+    console.log(`Hello ${this.name}`);
+  },
+};
+```
+
+---
+
+## 📌 Nested Objects
+
+```js
+const employee = {
+  name: "Dilip",
+
+  address: {
+    city: "Pune",
+    state: "MH",
+  },
+};
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Response
+
+```js
+{
+  id: 1,
+  name: "Dilip",
+  role: "Developer"
+}
+```
+
+---
+
+### React State
+
+```js
+const [user, setUser] = useState({
+  name: "",
+  email: "",
+});
+```
+
+---
+
+### Angular Model
+
+```ts
+user = {
+  id: 1,
+  name: "Dilip",
+};
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Comparing Objects
+
+```js
+{} === {}
+```
+
+Output:
+
+```js
+false;
+```
+
+Because references differ.
+
+---
+
+### Trap 2
+
+Copying Objects
+
+```js
+const obj2 = obj1;
+```
+
+Creates reference.
+
+Not copy.
+
+---
+
+### Trap 3
+
+Mutating State
+
+```js
+user.name = "New";
+```
+
+Avoid in React state.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Difference between Object and Array?
+
+| Object         | Array              |
+| -------------- | ------------------ |
+| Key-Value      | Indexed            |
+| Unordered Keys | Ordered Collection |
+
+---
+
+### ❓ Can Objects Store Functions?
+
+✅ Yes
+
+Functions inside objects are called methods.
+
+---
+
+### ❓ How to Check Property Exists?
+
+```js
+"name" in user;
+```
+
+or
+
+```js
+user.hasOwnProperty("name");
+```
+
+---
+
+### ❓ Why are Objects Important?
+
+Because almost all JavaScript applications exchange data using objects.
+
+---
