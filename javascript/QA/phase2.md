@@ -2151,3 +2151,1720 @@ const total = products
 This is a very common real-world pattern.
 
 ---
+
+Continuing sequentially from the PPT.
+
+📄 Source:
+
+---
+
+# 🟢 Q43. What is the Difference Between `null` and `undefined` in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Both `null` and `undefined` represent absence of value, but they are used in different situations.
+
+`undefined` means a variable has been declared but has not yet been assigned a value. JavaScript automatically assigns `undefined`.
+
+`null` is an intentional assignment made by developers to indicate that a variable currently has no value.
+
+In real applications, `undefined` usually means "value not available yet," while `null` means "value intentionally empty."
+
+---
+
+## 🔹 Core Explanation
+
+### 📌 undefined
+
+Automatically assigned by JavaScript.
+
+```js
+let user;
+
+console.log(user);
+```
+
+Output:
+
+```js
+undefined;
+```
+
+---
+
+### 📌 null
+
+Explicitly assigned by developer.
+
+```js
+let user = null;
+
+console.log(user);
+```
+
+Output:
+
+```js
+null;
+```
+
+---
+
+### Memory Perspective
+
+```js
+let employee;
+```
+
+Meaning:
+
+```text
+Variable Exists
+But No Value Assigned
+```
+
+---
+
+```js
+let employee = null;
+```
+
+Meaning:
+
+```text
+Variable Exists
+Value Intentionally Empty
+```
+
+---
+
+## 💻 Example
+
+```js
+let apiResponse;
+
+console.log(apiResponse);
+// undefined
+
+apiResponse = null;
+
+console.log(apiResponse);
+// null
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Loading State
+
+```js
+let users;
+```
+
+Data not loaded yet.
+
+---
+
+### No Selected User
+
+```js
+let selectedUser = null;
+```
+
+User intentionally not selected.
+
+---
+
+### React Example
+
+```js
+const [user, setUser] = useState(null);
+```
+
+Common pattern.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+null === undefined;
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+### Trap 2
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+This is a famous JavaScript bug.
+
+---
+
+### Trap 3
+
+```js
+null == undefined;
+```
+
+Output:
+
+```js
+true;
+```
+
+Because of type coercion.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which one is assigned automatically?
+
+✅ undefined
+
+---
+
+### ❓ Which one is assigned manually?
+
+✅ null
+
+---
+
+### ❓ Why use null?
+
+To intentionally represent no value.
+
+---
+
+### ❓ What is output?
+
+```js
+console.log(typeof null);
+```
+
+```js
+"object";
+```
+
+Historical JavaScript bug.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ undefined → automatic by JS
+
+✅ null → intentional by developer
+
+✅ null === undefined → false
+
+✅ null == undefined → true
+
+✅ typeof null → object
+
+---
+
+# 🟢 Q44. What is the Use of `typeof` Operator?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The `typeof` operator is used to determine the data type of a variable or expression at runtime.
+
+It is commonly used for validations, defensive programming, API response handling, and debugging.
+
+When working with external APIs, `typeof` helps verify data before processing it.
+
+---
+
+## 🔹 Core Explanation
+
+### Syntax
+
+```js
+typeof value;
+```
+
+---
+
+### Examples
+
+```js
+typeof 10;
+```
+
+Output:
+
+```js
+"number";
+```
+
+---
+
+```js
+typeof "Hello";
+```
+
+Output:
+
+```js
+"string";
+```
+
+---
+
+```js
+typeof true;
+```
+
+Output:
+
+```js
+"boolean";
+```
+
+---
+
+```js
+typeof undefined;
+```
+
+Output:
+
+```js
+"undefined";
+```
+
+---
+
+```js
+typeof function () {};
+```
+
+Output:
+
+```js
+"function";
+```
+
+---
+
+```js
+typeof {};
+```
+
+Output:
+
+```js
+"object";
+```
+
+---
+
+## 💻 Example
+
+```js
+const data = "100";
+
+if (typeof data === "string") {
+  console.log("Valid String");
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### API Validation
+
+```js
+if (typeof response.id === "number") {
+  saveData();
+}
+```
+
+---
+
+### React Props Validation
+
+```js
+if (typeof name !== "string") {
+  return;
+}
+```
+
+---
+
+### Dynamic Forms
+
+```js
+if (typeof value === "boolean") {
+  renderCheckbox();
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+typeof null;
+```
+
+Output:
+
+```js
+"object";
+```
+
+---
+
+### Trap 2
+
+```js
+typeof [];
+```
+
+Output:
+
+```js
+"object";
+```
+
+Array is also an object.
+
+Use:
+
+```js
+Array.isArray(arr);
+```
+
+---
+
+### Trap 3
+
+```js
+typeof NaN;
+```
+
+Output:
+
+```js
+"number";
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ How to check Array?
+
+```js
+Array.isArray(arr);
+```
+
+---
+
+### ❓ How to check Function?
+
+```js
+typeof fn === "function";
+```
+
+---
+
+### ❓ How to check Undefined?
+
+```js
+typeof value === "undefined";
+```
+
+---
+
+### ❓ Can typeof distinguish Array and Object?
+
+❌ No
+
+Use:
+
+```js
+Array.isArray();
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ typeof identifies runtime data types
+
+✅ Useful for API validation
+
+✅ typeof null → object
+
+✅ typeof [] → object
+
+✅ Array.isArray() for arrays
+
+---
+
+# 🟢 Q45. What is Type Coercion in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Type coercion is JavaScript's automatic conversion of one data type into another during operations or comparisons.
+
+JavaScript performs implicit conversions when different data types interact.
+
+While type coercion provides flexibility, it can also lead to unexpected behavior, so modern applications generally prefer strict equality (`===`) to avoid bugs.
+
+---
+
+## 🔹 Core Explanation
+
+### Implicit Conversion
+
+JavaScript automatically converts types.
+
+---
+
+### String + Number
+
+```js
+console.log("10" + 5);
+```
+
+Output:
+
+```js
+"105";
+```
+
+Number becomes string.
+
+---
+
+### Boolean + Number
+
+```js
+console.log(true + 1);
+```
+
+Output:
+
+```js
+2;
+```
+
+Because:
+
+```js
+true = 1
+```
+
+---
+
+### Comparison
+
+```js
+console.log(1 == "1");
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Strict Comparison
+
+```js
+console.log(1 === "1");
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## 💻 Example
+
+```js
+console.log(false == 0);
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+```js
+console.log(false === 0);
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Form Input
+
+```js
+const age = "25";
+```
+
+Input comes as string.
+
+Convert:
+
+```js
+Number(age);
+```
+
+---
+
+### Query Parameters
+
+```js
+const id = "101";
+```
+
+Need conversion before calculations.
+
+---
+
+### API Responses
+
+Many APIs return numbers as strings.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+[] == false;
+```
+
+Output:
+
+```js
+true;
+```
+
+Unexpected coercion.
+
+---
+
+### Trap 2
+
+```js
+"" == 0;
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Trap 3
+
+```js
+null == undefined;
+```
+
+Output:
+
+```js
+true;
+```
+
+---
+
+### Trap 4
+
+```js
+null === undefined;
+```
+
+Output:
+
+```js
+false;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is Implicit Coercion?
+
+Automatic conversion by JavaScript.
+
+---
+
+### ❓ What is Explicit Coercion?
+
+Developer converts manually.
+
+```js
+Number("10");
+String(10);
+Boolean(1);
+```
+
+---
+
+### ❓ Why prefer === ?
+
+Avoids unexpected coercion.
+
+---
+
+### ❓ Which comparison operator is recommended?
+
+✅ Strict Equality (`===`)
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Type coercion = automatic type conversion
+
+✅ Common with == operator
+
+✅ Can cause unexpected bugs
+
+✅ Prefer === in production code
+
+✅ Use explicit conversion when possible
+
+---
+
+# 🟢 Q46. What are Operators? What are the Types of Operators in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operators are special symbols that perform operations on values and variables.
+
+JavaScript provides multiple categories of operators including arithmetic, assignment, comparison, logical, string, bitwise, and ternary operators.
+
+Operators are heavily used in calculations, conditional logic, filtering data, and implementing business rules.
+
+---
+
+## 🔹 Core Explanation
+
+### ➕ Arithmetic Operators
+
+```js
++
+-
+*
+/
+%
+**
+```
+
+Example:
+
+```js
+5 + 2;
+```
+
+Output:
+
+```js
+7;
+```
+
+---
+
+### 📝 Assignment Operators
+
+```js
+=
++=
+-=
+*=
+/=
+```
+
+Example:
+
+```js
+let x = 10;
+
+x += 5;
+```
+
+Output:
+
+```js
+15;
+```
+
+---
+
+### ⚖️ Comparison Operators
+
+```js
+==
+===
+!=
+!==
+>
+<
+>=
+<=
+```
+
+Used in conditions.
+
+---
+
+### 🔗 Logical Operators
+
+```js
+&&
+||
+!
+```
+
+Used in authentication, permissions, validations.
+
+---
+
+### 🧵 String Operators
+
+```js
++
+```
+
+```js
+"Hello" + " World";
+```
+
+Output:
+
+```js
+Hello World
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Conditional Rendering
+
+```jsx
+isLoggedIn && <Dashboard />;
+```
+
+---
+
+### Angular
+
+```ts
+if(user.role === "ADMIN")
+```
+
+---
+
+### API Filtering
+
+```js
+users.filter((user) => user.age > 18);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+5 + "5";
+```
+
+Output:
+
+```js
+"55";
+```
+
+---
+
+### Trap 2
+
+```js
+true + true;
+```
+
+Output:
+
+```js
+2;
+```
+
+---
+
+### Trap 3
+
+Using `==` instead of `===`.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What is Exponentiation Operator?
+
+```js
+2 ** 3;
+```
+
+Output:
+
+```js
+8;
+```
+
+---
+
+### ❓ Which operator is preferred for equality?
+
+✅ `===`
+
+---
+
+### ❓ What is Short-Circuit Evaluation?
+
+Using `&&` and `||` where evaluation stops once result is known.
+
+(Asked frequently in Product Companies)
+
+---
+
+Continuing sequentially from the PPT.
+
+📄 Source:
+
+---
+
+# 🟢 Q47. What is the Difference Between Unary, Binary, and Ternary Operators?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operators can be categorized based on the number of operands they work with.
+
+A Unary Operator works with one operand, such as increment (`++`) or negation (`-`).
+
+A Binary Operator works with two operands, such as addition (`+`) or comparison (`===`).
+
+A Ternary Operator works with three operands and is commonly used as a shorthand for simple if-else conditions.
+
+Understanding this classification helps in reading and writing concise JavaScript code.
+
+---
+
+## 🔹 Core Explanation
+
+### 🔹 Unary Operator (1 Operand)
+
+```js
+let a = 5;
+
+console.log(-a);
+```
+
+Output:
+
+```js
+-5;
+```
+
+---
+
+### Other Unary Examples
+
+```js
+++a;
+--a;
+typeof a;
+!true;
+```
+
+---
+
+### 🔹 Binary Operator (2 Operands)
+
+```js
+let x = 10;
+let y = 5;
+
+console.log(x + y);
+```
+
+Output:
+
+```js
+15;
+```
+
+---
+
+### Binary Examples
+
+```js
++
+-
+*
+/
+>
+<
+===
+&&
+||
+```
+
+---
+
+### 🔹 Ternary Operator (3 Operands)
+
+```js
+condition ? value1 : value2;
+```
+
+Example:
+
+```js
+const age = 20;
+
+const result = age >= 18 ? "Adult" : "Minor";
+```
+
+Output:
+
+```js
+Adult;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Conditional Rendering
+
+```jsx
+{
+  isLoggedIn ? <Dashboard /> : <Login />;
+}
+```
+
+---
+
+### Angular Template
+
+```html
+{{ age >= 18 ? 'Adult' : 'Minor' }}
+```
+
+---
+
+### API Status
+
+```js
+const label = success ? "Completed" : "Failed";
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Nested Ternary
+
+```js
+a ? (b ? c : d) : e;
+```
+
+❌ Hard to read.
+
+---
+
+### Trap 2
+
+Using Ternary for Complex Logic
+
+```js
+condition ? executeManyLines() : executeManyLines();
+```
+
+❌ Use if-else instead.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Why is ternary operator popular?
+
+Cleaner syntax for simple conditions.
+
+---
+
+### ❓ Is ternary faster than if-else?
+
+❌ No significant difference.
+
+Choose readability.
+
+---
+
+### ❓ Is typeof unary?
+
+✅ Yes.
+
+```js
+typeof "Hello";
+```
+
+Unary operator.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Unary → 1 Operand
+
+✅ Binary → 2 Operands
+
+✅ Ternary → 3 Operands
+
+✅ Ternary commonly replaces simple if-else
+
+---
+
+# 🟢 Q48. What is Short-Circuit Evaluation in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Short-circuit evaluation is a behavior of logical operators (`&&` and `||`) where JavaScript stops evaluating expressions as soon as the final result is known.
+
+This improves performance and is heavily used in React, Angular, and modern JavaScript applications for conditional rendering, default values, and optional execution.
+
+---
+
+## 🔹 Core Explanation
+
+### AND Operator (`&&`)
+
+Stops at first falsy value.
+
+```js
+false && someFunction();
+```
+
+Output:
+
+```js
+false;
+```
+
+Function never executes.
+
+---
+
+### OR Operator (`||`)
+
+Stops at first truthy value.
+
+```js
+true || someFunction();
+```
+
+Output:
+
+```js
+true;
+```
+
+Function never executes.
+
+---
+
+## 💻 Example
+
+```js
+const username = "";
+
+const name = username || "Guest";
+```
+
+Output:
+
+```js
+Guest;
+```
+
+---
+
+### Conditional Execution
+
+```js
+isLoggedIn && showDashboard();
+```
+
+Equivalent:
+
+```js
+if (isLoggedIn) {
+  showDashboard();
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React Rendering
+
+```jsx
+{
+  users.length > 0 && <UserList />;
+}
+```
+
+Very common interview question.
+
+---
+
+### Default Values
+
+```js
+const city = userCity || "Pune";
+```
+
+---
+
+### API Response
+
+```js
+response && response.data && response.data.users;
+```
+
+(Older approach before optional chaining)
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+0 || 100;
+```
+
+Output:
+
+```js
+100;
+```
+
+Because 0 is falsy.
+
+---
+
+### Trap 2
+
+```js
+"" || "Default";
+```
+
+Output:
+
+```js
+Default;
+```
+
+---
+
+### Trap 3
+
+Confusing `||` with Nullish Coalescing.
+
+```js
+0 ?? 100;
+```
+
+Output:
+
+```js
+0;
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What values are falsy?
+
+There are only 8 falsy values:
+
+```js
+false;
+0 - 0;
+0n;
+("");
+null;
+undefined;
+NaN;
+```
+
+🔥 Product company favorite.
+
+---
+
+### ❓ Difference between || and ??
+
+```js
+0 || 100;
+```
+
+Output:
+
+```js
+100;
+```
+
+---
+
+```js
+0 ?? 100;
+```
+
+Output:
+
+```js
+0;
+```
+
+---
+
+### ❓ Why is short-circuit useful?
+
+Prevents unnecessary execution.
+
+Improves readability.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ AND stops at first falsy value
+
+✅ OR stops at first truthy value
+
+✅ Common in React rendering
+
+✅ Frequently asked in product companies
+
+---
+
+# 🟢 Q49. What is Operator Precedence?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+Operator precedence determines the order in which operators are evaluated in an expression.
+
+Operators with higher precedence are evaluated before operators with lower precedence.
+
+Understanding precedence is important to avoid unexpected results and bugs in calculations and conditions.
+
+When readability is important, parentheses should be used explicitly.
+
+---
+
+## 🔹 Core Explanation
+
+Example:
+
+```js
+let result = 2 + 3 * 4;
+```
+
+Output:
+
+```js
+14;
+```
+
+Because:
+
+```js
+3 * 4;
+```
+
+executes first.
+
+---
+
+### Using Parentheses
+
+```js
+let result = (2 + 3) * 4;
+```
+
+Output:
+
+```js
+20;
+```
+
+---
+
+### Common Order
+
+| Precedence | Operator   |
+| ---------- | ---------- | --- | --- |
+| Highest    | ()         |
+| High       | \*, /, %   |
+| Medium     | +, -       |
+| Low        | Comparison |
+| Lower      | &&         |
+| Lowest     |            |     |     |
+
+---
+
+## 💻 Example
+
+```js
+let a = 6;
+let b = 3;
+let c = 2;
+
+let result = a + b * c + (a - b);
+```
+
+Output:
+
+```js
+15;
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Price Calculation
+
+```js
+price + tax * quantity;
+```
+
+---
+
+### Permission Logic
+
+```js
+isAdmin || (isManager && isActive);
+```
+
+---
+
+### Complex Filters
+
+```js
+users.filter((user) => user.age > 18 && user.active);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+```js
+2 + 3 * 4;
+```
+
+Not:
+
+```js
+20;
+```
+
+Actual:
+
+```js
+14;
+```
+
+---
+
+### Trap 2
+
+Complex Conditions
+
+```js
+a || (b && c);
+```
+
+May not behave as expected.
+
+Use:
+
+```js
+a || (b && c);
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which has higher precedence?
+
+```js
+*
+```
+
+Higher than:
+
+```js
++
+```
+
+---
+
+### ❓ Best practice?
+
+Use parentheses.
+
+Improves readability.
+
+---
+
+### ❓ Does precedence affect logical operators?
+
+✅ Yes.
+
+```js
+&&
+```
+
+evaluates before
+
+```js
+||
+```
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ Operator precedence controls execution order.
+
+✅ Multiplication executes before addition.
+
+✅ Use parentheses for clarity.
+
+✅ Important for calculations and conditions.
+
+---
+
+# 🟢 Q50. What are the Types of Conditional Statements in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+JavaScript provides three primary ways to handle conditions:
+
+1. if-else statements
+2. Ternary operators
+3. Switch statements
+
+The choice depends on complexity. If-else is suitable for complex logic, ternary for simple value selection, and switch for multiple fixed values.
+
+---
+
+## 🔹 Core Explanation
+
+### 1️⃣ if-else
+
+```js
+const age = 20;
+
+if (age >= 18) {
+  console.log("Adult");
+} else {
+  console.log("Minor");
+}
+```
+
+---
+
+### 2️⃣ Ternary Operator
+
+```js
+const result = age >= 18 ? "Adult" : "Minor";
+```
+
+---
+
+### 3️⃣ Switch Statement
+
+```js
+const role = "ADMIN";
+
+switch (role) {
+  case "ADMIN":
+    console.log("Admin");
+    break;
+
+  case "USER":
+    console.log("User");
+    break;
+
+  default:
+    console.log("Guest");
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React
+
+```jsx
+{
+  isLoading ? <Loader /> : <Dashboard />;
+}
+```
+
+---
+
+### Role-Based Access
+
+```js
+switch(role)
+```
+
+Admin/User/Manager.
+
+---
+
+### Form Validation
+
+```js
+if (email === "") {
+  showError();
+}
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Missing break.
+
+```js
+switch (role) {
+  case "ADMIN":
+    console.log("Admin");
+}
+```
+
+Can cause fall-through.
+
+---
+
+### Trap 2
+
+Using nested ternaries.
+
+```js
+a ? (b ? c : d) : e;
+```
+
+Hard to maintain.
+
+---
+
+### Trap 3
+
+Using switch for complex ranges.
+
+```js
+switch(age > 18)
+```
+
+❌ Not ideal.
+
+Use if-else.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ When should switch be used?
+
+When comparing the same variable against multiple fixed values.
+
+---
+
+### ❓ When should ternary be used?
+
+Simple value assignment.
+
+---
+
+### ❓ Which is best for complex business logic?
+
+✅ if-else
+
+---
+
+### ❓ Can switch compare ranges?
+
+Not naturally.
+
+Use if-else.
+
+---
