@@ -1392,3 +1392,762 @@ Removes everything from index 1 onward.
 Because it doesn't mutate original array.
 
 ---
+
+Continuing sequentially from the PPT. 📄
+
+---
+
+# 🟢 Q39. What is `map()` Method in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The `map()` method is an array transformation method that creates a new array by applying a function to every element of an existing array.
+
+It does not modify the original array and always returns a new array of the same length.
+
+In React, `map()` is one of the most commonly used methods for rendering lists and transforming API response data.
+
+---
+
+## 🔹 Core Explanation
+
+### Syntax
+
+```js
+array.map((element, index) => {
+  return transformedValue;
+});
+```
+
+---
+
+### Basic Example
+
+```js
+const numbers = [1, 2, 3, 4];
+
+const doubled = numbers.map((n) => n * 2);
+
+console.log(doubled);
+```
+
+Output:
+
+```js
+[2, 4, 6, 8];
+```
+
+---
+
+### Original Array
+
+```js
+console.log(numbers);
+```
+
+Output:
+
+```js
+[1, 2, 3, 4];
+```
+
+Not modified.
+
+---
+
+## 📌 Transform Objects
+
+```js
+const users = [{ name: "Dilip" }, { name: "Amit" }];
+
+const names = users.map((user) => user.name);
+```
+
+Output:
+
+```js
+["Dilip", "Amit"];
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### React List Rendering
+
+```jsx
+users.map((user) => <UserCard key={user.id} user={user} />);
+```
+
+🚨 Extremely common interview example.
+
+---
+
+### API Data Transformation
+
+```js
+const products = response.map((p) => ({
+  ...p,
+  discounted: true,
+}));
+```
+
+---
+
+### Dropdown Generation
+
+```js
+countries.map((country) => <option>{country.name}</option>);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Not returning value.
+
+```js
+const result = arr.map((item) => {
+  item * 2;
+});
+```
+
+Output:
+
+```js
+[undefined, undefined];
+```
+
+---
+
+Correct:
+
+```js
+arr.map((item) => item * 2);
+```
+
+---
+
+### Trap 2
+
+Using map when return value isn't needed.
+
+Use:
+
+```js
+forEach();
+```
+
+instead.
+
+---
+
+### Trap 3
+
+Mutating original objects.
+
+```js
+users.map((user) => {
+  user.name = "New";
+});
+```
+
+Avoid.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Does map modify original array?
+
+❌ No.
+
+---
+
+### ❓ What does map return?
+
+✅ New array.
+
+---
+
+### ❓ Does map always return same length?
+
+✅ Yes.
+
+---
+
+### ❓ Why is map popular in React?
+
+Because UI rendering is based on transforming arrays into components.
+
+---
+
+### ❓ Difference between map and forEach?
+
+| map            | forEach           |
+| -------------- | ----------------- |
+| Returns Array  | Returns Undefined |
+| Transformation | Iteration         |
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ map() transforms data.
+
+✅ Returns new array.
+
+✅ Does not mutate original.
+
+✅ Same output length as input.
+
+✅ Heavily used in React rendering.
+
+---
+
+# 🟢 Q40. What is `filter()` Method in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The `filter()` method creates a new array containing only elements that satisfy a given condition.
+
+Unlike `map()`, which transforms every element, `filter()` selectively includes elements.
+
+It is widely used for search functionality, data filtering, role-based access, and API response processing.
+
+---
+
+## 🔹 Core Explanation
+
+### Syntax
+
+```js
+array.filter((element) => condition);
+```
+
+---
+
+### Example
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6];
+
+const even = numbers.filter((n) => n % 2 === 0);
+
+console.log(even);
+```
+
+Output:
+
+```js
+[2, 4, 6];
+```
+
+---
+
+### Original Array
+
+```js
+[1, 2, 3, 4, 5, 6];
+```
+
+Remains unchanged.
+
+---
+
+## 📌 Object Filtering
+
+```js
+const users = [
+  { name: "A", active: true },
+  { name: "B", active: false },
+];
+
+const activeUsers = users.filter((user) => user.active);
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Search Feature
+
+```js
+users.filter((user) => user.name.includes(search));
+```
+
+---
+
+### Active Users
+
+```js
+users.filter((user) => user.active);
+```
+
+---
+
+### Product Filtering
+
+```js
+products.filter((product) => product.price > 1000);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Expecting single object.
+
+```js
+const user =
+users.filter(...);
+```
+
+Returns array.
+
+---
+
+### Trap 2
+
+Forgetting return.
+
+```js
+filter((item) => {
+  item.active;
+});
+```
+
+Returns empty array.
+
+---
+
+### Trap 3
+
+Using filter when only one item needed.
+
+Prefer:
+
+```js
+find();
+```
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Does filter modify original array?
+
+❌ No.
+
+---
+
+### ❓ What does filter return?
+
+✅ New array.
+
+---
+
+### ❓ Can filter return empty array?
+
+✅ Yes.
+
+---
+
+### ❓ Which is better for one record?
+
+✅ find()
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ filter() selects data.
+
+✅ Returns new array.
+
+✅ Can return zero, one, or many elements.
+
+✅ Frequently used in search and filtering.
+
+---
+
+# 🟢 Q41. What is `reduce()` Method in JavaScript?
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+The `reduce()` method processes an array and reduces it to a single value.
+
+That value can be:
+
+- Sum
+- Average
+- Object
+- Array
+- Grouped Data
+- Count
+
+It is one of the most powerful and frequently asked array methods in product-company interviews.
+
+---
+
+## 🔹 Core Explanation
+
+### Syntax
+
+```js
+array.reduce((accumulator, current) => {}, initialValue);
+```
+
+---
+
+### Sum Example
+
+```js
+const numbers = [1, 2, 3, 4];
+
+const sum = numbers.reduce((acc, n) => acc + n, 0);
+
+console.log(sum);
+```
+
+Output:
+
+```js
+10;
+```
+
+---
+
+## 📌 Step-by-Step
+
+| Iteration | Acc | Current |
+| --------- | --- | ------- |
+| 1         | 0   | 1       |
+| 2         | 1   | 2       |
+| 3         | 3   | 3       |
+| 4         | 6   | 4       |
+
+Final:
+
+```js
+10;
+```
+
+---
+
+## 📌 Count Occurrences
+
+```js
+const fruits = ["A", "B", "A", "C", "A"];
+
+const result = fruits.reduce((acc, item) => {
+  acc[item] = (acc[item] || 0) + 1;
+
+  return acc;
+}, {});
+```
+
+Output:
+
+```js
+{
+ A:3,
+ B:1,
+ C:1
+}
+```
+
+---
+
+## 🌍 Real-world Use Cases
+
+### Cart Total
+
+```js
+const total = cart.reduce((sum, item) => sum + item.price, 0);
+```
+
+---
+
+### Group Users
+
+```js
+users.reduce(...)
+```
+
+---
+
+### Analytics
+
+```js
+orders.reduce(...)
+```
+
+Calculate revenue.
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Forgetting initial value.
+
+```js
+reduce(...)
+```
+
+Can create bugs.
+
+---
+
+### Trap 2
+
+Using reduce for everything.
+
+Sometimes:
+
+```js
+map();
+filter();
+```
+
+are simpler.
+
+---
+
+### Trap 3
+
+Not returning accumulator.
+
+```js
+acc.count++;
+```
+
+without return.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ What does reduce return?
+
+Single accumulated value.
+
+---
+
+### ❓ Can reduce return object?
+
+✅ Yes.
+
+---
+
+### ❓ Can reduce return array?
+
+✅ Yes.
+
+---
+
+### ❓ Why do product companies ask reduce?
+
+Because it tests deeper understanding of array transformations.
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ reduce() converts array into one value.
+
+✅ Uses accumulator.
+
+✅ Can return number, object, array, etc.
+
+✅ Common in analytics and aggregation logic.
+
+---
+
+# 🟢 Q42. Difference Between `map()`, `filter()`, and `reduce()`
+
+### 🎤 Real-World Interview Answer (30–40 sec)
+
+`map()`, `filter()`, and `reduce()` are higher-order array methods but serve different purposes.
+
+- `map()` transforms every element.
+- `filter()` selects matching elements.
+- `reduce()` aggregates data into a single value.
+
+These methods are heavily used in React, Angular, and product-company coding interviews.
+
+---
+
+## 🔹 Core Explanation
+
+### map()
+
+Transforms data.
+
+```js
+const result = [1, 2, 3].map((n) => n * 2);
+```
+
+Output:
+
+```js
+[2, 4, 6];
+```
+
+---
+
+### filter()
+
+Selects data.
+
+```js
+const result = [1, 2, 3, 4].filter((n) => n % 2 === 0);
+```
+
+Output:
+
+```js
+[2, 4];
+```
+
+---
+
+### reduce()
+
+Aggregates data.
+
+```js
+const result = [1, 2, 3, 4].reduce((acc, n) => acc + n, 0);
+```
+
+Output:
+
+```js
+10;
+```
+
+---
+
+## 📌 Comparison Table
+
+| Feature     | map()     | filter()      | reduce()  |
+| ----------- | --------- | ------------- | --------- |
+| Purpose     | Transform | Select        | Aggregate |
+| Return      | Array     | Array         | Any Value |
+| Same Length | Yes       | Not Necessary | No        |
+| React Usage | Very High | High          | Medium    |
+
+---
+
+## 🌍 Real-world Use Cases
+
+### map()
+
+```jsx
+users.map((user) => <UserCard />);
+```
+
+---
+
+### filter()
+
+```js
+users.filter((user) => user.active);
+```
+
+---
+
+### reduce()
+
+```js
+cart.reduce((sum, item) => sum + item.price, 0);
+```
+
+---
+
+## ❌ Common Mistakes / Traps
+
+### Trap 1
+
+Using map for filtering.
+
+---
+
+### Trap 2
+
+Using filter for transformation.
+
+---
+
+### Trap 3
+
+Using reduce when map/filter is simpler.
+
+---
+
+## ❓ Interview Q&A
+
+### ❓ Which returns single value?
+
+✅ reduce()
+
+---
+
+### ❓ Which always returns array?
+
+✅ map()
+
+✅ filter()
+
+---
+
+### ❓ Which is most used in React?
+
+✅ map()
+
+---
+
+### ❓ Which is most asked in product companies?
+
+✅ reduce()
+
+---
+
+## 🎯 Final Summary (Interview Ready)
+
+✅ map → Transform.
+
+✅ filter → Select.
+
+✅ reduce → Aggregate.
+
+✅ All return new values.
+
+✅ Core methods every frontend developer must master.
+
+---
+
+# 🚨 Senior-Level Product Company Follow-Up
+
+### ❓ Can you combine map, filter, and reduce?
+
+✅ Yes
+
+Example:
+
+```js
+const total = products
+  .filter((p) => p.active)
+  .map((p) => p.price)
+  .reduce((sum, p) => sum + p, 0);
+```
+
+This is a very common real-world pattern.
+
+---
